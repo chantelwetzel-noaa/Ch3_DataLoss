@@ -1,0 +1,579 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"f",
+				"for	For Loop"
+			],
+			[
+				"selex",
+				"selex"
+			],
+			[
+				"nat",
+				"nat"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "OM_10012014.R",
+			"settings":
+			{
+				"buffer_size": 36213,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "testing.R",
+			"settings":
+			{
+				"buffer_size": 4258,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/F/PhD/Chapter2/code/Summarize_Output",
+			"settings":
+			{
+				"buffer_size": 5931,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/F/PhD/Chapter2/code/Summary_Plots.R",
+			"settings":
+			{
+				"buffer_size": 3624,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Simulation_Plotting.R",
+			"settings":
+			{
+				"buffer_size": 28437,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Data_Scenarios.R",
+			"settings":
+			{
+				"buffer_size": 7053,
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 104.0,
+		"selected_items":
+		[
+			[
+				"enhance",
+				"Set Syntax: Enhanced-R"
+			],
+			[
+				"enhan",
+				"Set Syntax: Enhanced-Rd"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 400.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/F/PhD/Chapter3/code/Simulation_Eval_Working",
+		"/F/PhD/Chapter3/code/Simulation_Eval.R",
+		"/F/Classes/FISH559/Home1/Home1a_Code.R",
+		"/F/PhD/Chapter3/code/functions/Overfished_Selex.R",
+		"/F/PhD/Chapter3/code/functions/Multinom_Ages.R",
+		"/F/PhD/Chapter3/code/LH_parameter_values.R",
+		"/F/PhD/Chapter3/code/Data_Scenarios.R",
+		"/F/PhD/Chapter3/code/Arrays.R",
+		"/F/PhD/Chapter3/code/functions/Do_Survey.R",
+		"/F/PhD/Chapter3/code/functions/SS_File_Writer.R",
+		"/F/PhD/Chapter2/code/Rebuilding_OM.r",
+		"/F/PhD/Chapter2/code/functions/Arrays.R",
+		"/F/PhD/Chapter2/code/functions/ApplyRebuilder.R",
+		"/F/PhD/Chapter2/code/functions/IsAccept.R",
+		"/F/PhD/Chapter2/MSE_EXE/MSE.FOR",
+		"/F/PhD/Chapter2/code/functions/DataScenarios.R",
+		"/F/PhD/Chapter2/code/functions/LifeHistory.R",
+		"/F/PhD/Chapter2/code/functions/SS_File_Writer.R",
+		"/F/PhD/Chapter1/Code/dbsra_final.R",
+		"/F/PhD/Chapter1/Code/OM_5282013.R",
+		"/F/PhD/Chapter3/code/testing.R",
+		"/F/PhD/Chapter1/Code/dbsra.R",
+		"/F/PhD/Chapter3/code/OM_8272014.R",
+		"/F/PhD/Chapter3/code/Functions.R",
+		"/F/PhD/Chapter3/code/functions/Multinom_Lengths.R",
+		"/F/PhD/Chapter3/code/functions/Rep_Summary.R",
+		"/F/PhD/Chapter3/code/functions/Get_Biology.R",
+		"/F/PhD/Chapter3/code/retro_plot",
+		"/F/PhD/Chapter3/code/Retro_Code.r",
+		"/F/PhD/Chapter3/code/Simulation_Plotting.R",
+		"/C/PhD/Chapter2/code/Rebuilding_OM.r",
+		"/F/PhD/Chapter2/code/Summary_Plots.R",
+		"/F/PhD/Chapter2/code/Compare.r",
+		"/F/PhD/Chapter3/code/IndividualSim_Plot_Code.R",
+		"/F/PhD/Chapter2/code/Summarize_Output",
+		"/F/PhD/Chapter3/code/Detection_Testing.R",
+		"/F/PhD/Chapter2/code/functions/writeRebuild.R",
+		"/F/PhD/Chapter2/code/functions/ApplySS3.R",
+		"/F/PhD/Chapter2/code/functions/Rep_Summary.R",
+		"/F/Simulation_Project/Code/Ch1_Summary_Plots_1-10.R",
+		"/F/Classes/R_Beautiful_Graphics/ClassProject/HCR_Plot.R",
+		"/F/PhD/Chapter3/code/OM_7072014.R",
+		"/F/PhD/Chapter1/Code/aav_plot.R",
+		"/F/PhD/Chapter1/Code/exDB_output_new_updated.R",
+		"/F/PhD/Chapter1/Code/Model_Comparison_Plots.R",
+		"/F/PhD/Chapter2/code/functions/Biology.R",
+		"/F/Simulation_Project/Code/Sim_Code_5_1.R",
+		"/F/NOAA/SSSais/code/XSSS_AIS/XSSS_AIS_v3.r",
+		"/F/PhD/Chapter2/code/functions/FunctionList.R",
+		"/F/PhD/Chapter2/code/functions/writeRebuild.r",
+		"/F/PhD/Chapter2/code/functions/readRebuild.r",
+		"/F/PhD/Chapter2/code/functions/ApplyRebuilder.r",
+		"/F/PhD/Chapter3/code/OM_2172014.R",
+		"/C/Users/xwetzelch/Desktop/New folder/REBUILD.FOR",
+		"/C/Users/xwetzelch/AppData/Roaming/Sublime Text 3/Packages/Enhanced-R/Enhanced-R.sublime-settings",
+		"/F/PhD/Chapter2/code/Rebuilding_OM.sublime-workspace",
+		"/F/PhD/Chapter3/code/DoSim_Call.R",
+		"/F/PhD/Chapter3/code/Get_SPR.R",
+		"/F/PhD/Chapter2/code/functions/Multinom_Ages.R",
+		"/C/Users/wetzelch/Desktop/Comparison.R",
+		"/F/PhD/Chapter2/code/functions/ApplySS3",
+		"/F/PhD/Chapter2/code/Biology.R",
+		"/F/PhD/Chapter2/code/functions/Arrays",
+		"/F/PhD/Chapter2/code/functions/DataScenarios",
+		"/C/Users/xwetzelch/AppData/Roaming/Sublime Text 3/Packages/User/Enhanced-R.sublime-settings",
+		"/F/NOAA/Assessments/RougheyeRockfish2013/ModelFiles/call_code.R",
+		"/C/Users/xwetzelch/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/C/Users/xwetzelch/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/F/NOAA/ProgrammaticReview/FSSI/fssi.R",
+		"/F/PhD/Chapter2/MSE/MSE.FOR"
+	],
+	"find":
+	{
+		"height": 38.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"sim.range[1]",
+			"block.yrs",
+			"overfished.counter",
+			"selec",
+			"catch.decline.mult",
+			"min.reduce",
+			"RAN1",
+			"imp.error.rv",
+			"error",
+			"rv.imp.error",
+			"obj.fun.f",
+			"CatMult",
+			"impmin",
+			"imp",
+			"catchmult",
+			"catchhist",
+			"Imp",
+			"SS.survey.cv",
+			"survey.CV",
+			"bio",
+			"Chapter\n",
+			"Chapter2\n",
+			"model\n",
+			")\n",
+			"AgeErro",
+			"selec",
+			"projections",
+			"rmse.sb0",
+			"break",
+			"normal",
+			"normal_e",
+			"LH",
+			"rmse",
+			"to.load",
+			"save",
+			"acl",
+			"re.catch",
+			"SS3",
+			"ssb0",
+			"ssb0.est",
+			"ssb0",
+			"wght.exp",
+			"yrs.declared.all",
+			"yrs.delclared.all",
+			"estimate.m",
+			"do.est",
+			"ass.yr",
+			"ss3.dir",
+			"recruit.est",
+			"rrr.max",
+			"rrr.min",
+			"fishery.ages",
+			":/",
+			"rnorm",
+			":/",
+			"SSB[pre",
+			"virgin.",
+			"LH == ",
+			"reb",
+			"do.append",
+			"proj.out",
+			"rebuild.out",
+			"rebuild.summ",
+			"ydecl.cur",
+			"reboot.needed",
+			"recover",
+			"13",
+			"comp.data",
+			"rec.spe",
+			"12",
+			"\"NA\"",
+			"reboot.needed",
+			"ind",
+			"tmax.cur",
+			"mylist$ctl",
+			"mylist$numrec",
+			"user",
+			"4",
+			"IsAccept",
+			"IsAccpet",
+			"acceptable",
+			"proj",
+			"out",
+			"ocode",
+			"IsAccept",
+			"rebuild.file",
+			"rebuild.file[[2]]]",
+			"obs",
+			"selec",
+			"ss.surv",
+			"rrr",
+			"f.len.samp",
+			"sim.dat",
+			"wtat",
+			"m",
+			"s.sample.size",
+			"s.age.samp",
+			"estimat",
+			"m.est",
+			"ss3",
+			"data.scenario",
+			"sigma",
+			"estimate.m",
+			"SS.survey.cv",
+			"source",
+			"save"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "OM_10012014.R",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 36213,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								36213
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Enhanced-R/support/Enhanced-R.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "testing.R",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4258,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								142,
+								3179
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Enhanced-R/support/Enhanced-R.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1648.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/F/PhD/Chapter2/code/Summarize_Output",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5931,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								457,
+								457
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/R/R.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 33.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/F/PhD/Chapter2/code/Summary_Plots.R",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3624,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3551,
+								3551
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Enhanced-R/support/Enhanced-R.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "Simulation_Plotting.R",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 28437,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								468,
+								468
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Enhanced-R/support/Enhanced-R.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "Data_Scenarios.R",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7053,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								460,
+								460
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Enhanced-R/support/Enhanced-R.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": -0.0,
+						"translation.y": 389.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 28.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"project": "Ch3_DataLoss.sublime-project",
+	"replace":
+	{
+		"height": 52.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 152.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
