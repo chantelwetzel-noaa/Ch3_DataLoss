@@ -21,13 +21,18 @@ Do_Survey <- function(biology, f.values, numbers, index, sel.matrix)
   #Used in  Vulnerable Biomass Calculation
   temp2 <- (t(biology$mid.phi.m)) %*% (biology$mid.wght.at.len[,2] * biology$obs.selec[,2])
   temp1 <- (t(biology$mid.phi.f)) %*% (biology$mid.wght.at.len[,1] * biology$obs.selec[,1])
+  #temp2 <- (t(biology$phi.m)) %*% (biology$wght.at.len[,2] * biology$obs.selec[,2])
+  #temp1 <- (t(biology$phi.f)) %*% (biology$wght.at.len[,1] * biology$obs.selec[,1])
+
   
   for (a in 1:length(index))
   {
     #ind is used to access biological values that are track prior to the survey start (numbers and f)
     ind <- pre.fishery.yrs + index[a]
-    vul.bio.obs        <- (temp1) * numbers[ind,,1] * exp(-survey.time * (m + selec.age[ind,,1] * f.values[ind])) +
-                          (temp2) * numbers[ind,,2] * exp(-survey.time * (m + selec.age[ind,,2] * f.values[ind]))      
+    vul.bio.obs        <- (temp1) * numbers[ind,,1] * exp(-survey.time * (m + sel.matrix[ind,,1] * f.values[ind])) +
+                          (temp2) * numbers[ind,,2] * exp(-survey.time * (m + sel.matrix[ind,,2] * f.values[ind]))   
+    #vul.bio.obs        <- (temp1) * numbers[ind,,1] * exp(-survey.time * (m + biology$selec.age.f * f.values[ind])) +
+    #                      (temp2) * numbers[ind,,2] * exp(-survey.time * (m + biology$selec.age.m * f.values[ind]))    
     temp.vul.total[a]  <- sum(vul.bio.obs)     
     temp.index    [a]  <- Q * temp.vul.total[a] * exp(survey.err[index[a]] - 0.5 * (survey.err[index[a]])^2 )
 
@@ -35,9 +40,12 @@ Do_Survey <- function(biology, f.values, numbers, index, sel.matrix)
     #Catch @ age and length
     for (b in 1:ages)
     {   
-      temp.cal[a,b,,1] <- calc1[,b] * (numbers[ind,b,1] * exp(-survey.time * (m + selec.age[ind,b,1] * f.values[ind])))      
-      temp.cal[a,b,,2] <- calc2[,b] * (numbers[ind,b,2] * exp(-survey.time * (m + selec.age[ind,b,2] * f.values[ind])))
-    }        
+      temp.cal[a,b,,1] <- calc1[,b] * (numbers[ind,b,1] * exp(-survey.time * (m + sel.matrix[ind,b,1] * f.values[ind])))      
+      temp.cal[a,b,,2] <- calc2[,b] * (numbers[ind,b,2] * exp(-survey.time * (m + sel.matrix[ind,b,2] * f.values[ind])))
+      #temp.cal[a,b,,1] <- calc1[,b] * (numbers[ind,b,1] * exp(-survey.time * (m + biology$selec.age.f[b] * f.values[ind])))      
+      #temp.cal[a,b,,2] <- calc2[,b] * (numbers[ind,b,2] * exp(-survey.time * (m + biology$selec.age.m[b] * f.values[ind])))
+    } 
+          
   }
   
   Survey[[1]] <- temp.cal

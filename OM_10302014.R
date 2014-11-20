@@ -7,21 +7,13 @@
 #source("F://PhD//Chapter3//Code//OM_10012014.R") 
 drive <-"G:" #"//home//cwetzel//h_cwetzel"
 LH <- "flatfish"
-SR <- "BH" #"Shep" 
-sigma <- 0.36
-p.value <- 0.45
 start.n <- 1
-end.n <- 10
-data.scenario <- "test" 
+end.n <- 1
+data.scenario <- "ds2" 
 tantalus <- FALSE
-auto <- FALSE
-selec.adj <- 5
-start.survey <- 41
-AgeError <- FALSE 
-if(data.scenario == "normal_auto") { auto = TRUE }
-survey.CV <- 0.50
 
-#DoSim <- function(drive, LH, SR,  depl.value, sigma, p.value, start.n, end.n, data.scenario) {
+
+#DoSim <- function(drive, LH, start.n, end.n, data.scenario) {
 
  NSIM         <<- end.n
  seed.list <- list()
@@ -44,20 +36,8 @@ survey.CV <- 0.50
  if (tantalus == T) {
  file.copy(paste(drive,"/PhD/Chapter3/SS3_opt",sep=""),paste(directory,"/SS3_opt",sep="")) }
  
- #Source in the life-history parameter values
- #source(paste(drive,"/PhD/Chapter3/code/LH_parameter_values.R",sep=""))
-
- #max.age = ages - 1
- #if(AgeError == TRUE) { max.age  <- ages + 4  }  
-
- #Source in the data scenarios
-# source(paste(drive,"/PhD/Chapter3/code/Data_Scenarios.R",sep=""))
-  
  #Source in external functions
  source(paste(drive,"/PhD/Chapter3/code/functions/Functions.R",sep=""))
- 
- #Source in Array Setup
- #source(paste(drive,"/PhD/Chapter3/code/Arrays.R",sep=""))
  
  print(LH) ; print(paste("True Depletion", final.depl,sep=" "))
  print(paste("Survey Length", start.survey, sep=" "))
@@ -74,11 +54,8 @@ survey.CV <- 0.50
 #---------------------------------------------------------------------------------------------------
 for (nsim in start.n:end.n)
  {
- tv.err = 0.05
+ 
  #nsim = 1 ; sigmaR = 0 ; survey.CV = 0; tv.err = 0
-
-#Source in the data scenarios
-#source(paste(drive,"/PhD/Chapter3/code/Data_Scenarios.R",sep=""))
 
  #Save Output
  projections <- paste(directory,"save/om_proj_",nsim,sep="")
@@ -175,8 +152,6 @@ for (nsim in start.n:end.n)
        output$catch.at.age.m <- catch.at.age.m
        return(output)
     } #End FindF function
-    
-    #cmp_F <- cmpfun(Findf)
     
     #Objective Function----------------------------------------------------------------------------------------------------------
     Obj.Fun.F <- function(f) {
@@ -364,7 +339,7 @@ for (nsim in start.n:end.n)
  n.length.obs        <<- length(fishery.length.data[,6]) + length(survey.length.data[,6])
  n.age.obs           <<- length(fishery.age.data[,9])    + length(survey.age.data[,9])   
  
- if (data.scenario == "nocomps") {
+ if (data.scenario == "ds5") {
    n.lengths.obs <<- n.age.obs <<- 0
  }
  
@@ -448,8 +423,8 @@ for (nsim in start.n:end.n)
     selec.age[y,,2] <- selec.age.m
 
     dev.yr2 = setup.yrs
-    if (data.scenario == "greatall" || data.scenario == "test") { dev.yr2 = y - pre.fishery.yrs - 1 }
-    #print(paste(temp.fsp1,"---",inflec.selec[y]))
+    if (data.scenario == "ds0" || data.scenario == "ds1") { dev.yr2 = y - pre.fishery.yrs - 1 }
+
     do.ass = y
     if(LH == "flatfish") { do.ass = y - 2}     
     if ( do.ass %% 4 == 0 ){
@@ -518,12 +493,12 @@ for (nsim in start.n:end.n)
         #last.bias <- new.bias$df[3,1]
         #last.no.bias <- new.bias$df[4,1]
             
-        if(data.scenario == 'greathist'  && decl.overfished == TRUE ) {
+        if(data.scenario == 'ds4'  && decl.overfished == TRUE ) {
             last.bias    <- setup.yrs + 1 - 10
             last.no.bias <- setup.yrs + 1 - 2
         }
 
-        if(data.scenario == 'nocomps'  && decl.overfished == TRUE ) {
+        if(data.scenario == 'ds5'  && decl.overfished == TRUE ) {
             last.bias    <- setup.yrs + 1 - 10
             last.no.bias <- setup.yrs + 1 - 2
         }
@@ -619,7 +594,7 @@ for (nsim in start.n:end.n)
             need.blocks = TRUE
             block.num = 1 ; block.fxn = 2
             decl.yr = y - pre.fishery.yrs + 1 #The end year block is set above
-            if (data.scenario == "greathist") { 
+            if (data.scenario == "ds4") { 
               need.blocks = FALSE
               block.num = 0; block.fxn = 0 
             }      
@@ -699,7 +674,7 @@ for (nsim in start.n:end.n)
     
     #Determine the data collection levels based on status-------------------- 
     #There is no more data regardless of status in the projection period   
-    if (data.scenario == "greathist") {
+    if (data.scenario == "ds4") {
       ind             <- y - pre.fishery.yrs
       f.len.samp[ind] <- 0
       s.len.samp[ind] <- 0
@@ -708,7 +683,7 @@ for (nsim in start.n:end.n)
     }
 
     #Always have data available regardless of status (overfished status does not impact sampling)
-    if (data.scenario == "greatall" || data.scenario == "test") {
+    if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds2") {
       ind             <- y - pre.fishery.yrs
       f.len.samp[ind] <- f.len.samp[ind]
       s.len.samp[ind] <- s.len.samp[ind]
@@ -716,7 +691,7 @@ for (nsim in start.n:end.n)
       s.age.samp[ind] <- s.age.samp[ind]
     }
     #Reduce the data during the period that the stock is overfished
-    if (data.scenario == "normal" || data.scenario == "normal_estM" || data.scenario == "normal_auto") {
+    if (data.scenario == "ds3" ) {
         if (decl.overfished  == TRUE) {
             ind             <- y - pre.fishery.yrs
             f.len.samp[ind] <- floor(0.25 * f.len.samp[ind])
@@ -807,7 +782,7 @@ for (nsim in start.n:end.n)
     n.length.obs        <<- length(fishery.length.data[,6]) + length(survey.length.data[,6])
     n.age.obs           <<- length(fishery.age.data[,9])    + length(survey.age.data[,9])
 
-    if (data.scenario == "nocomps") {
+    if (data.scenario == "ds5") {
       n.lengths.obs <<- n.age.obs <<- 0
     }
 

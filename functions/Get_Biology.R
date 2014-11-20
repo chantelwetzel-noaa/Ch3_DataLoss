@@ -45,7 +45,7 @@ Get_Biology<- function()
  Len[[1]] <- len
  Len[[2]] <- mid.len
  names(Len) <- c("len","mid.len")
- rm(len, mid.len, Linf_f, Linf_m, len.slope)
+ #rm(len, mid.len, Linf_f, Linf_m, len.slope)
 
 #=================================================================================================================
 #Calculate the Transisition Matrix
@@ -117,7 +117,7 @@ Get_Biology<- function()
  Phi[[5]] <- mid.phi.m
  Phi[[6]] <- mid.phi.f
  names(Phi) <- c("mid.sigma","sigma.phi","phi.m","phi.f","mid.phi.m","mid.phi.f")
- rm(sigma.phi, mid.sigma, phi.m, phi.f, mid.phi.m, mid.phi.f, total.m, total.f, a, b, p1, p2)
+ #rm(sigma.phi, mid.sigma, phi.m, phi.f, mid.phi.m, mid.phi.f, total.m, total.f, a, b, p1, p2)
  
 #GetWght==========================================================================================
  Wght <- list()
@@ -145,7 +145,7 @@ Get_Biology<- function()
  Wght[[3]] <- wght
  Wght[[4]] <- mid.wght
  names(Wght) <- c("wght.at.len","mid.wght.at.len","wght","mid.wght")
- rm(wght, mid.wght, wght.at.len, mid.wght.at.len)
+ #rm(wght, mid.wght, wght.at.len, mid.wght.at.len)
 
 #Fecundity================================================================================================
  Fecund <- list()
@@ -162,7 +162,7 @@ Get_Biology<- function()
  Fecund[[2]] <- mature.len
  Fecund[[3]] <- fecund
  names(Fecund) <- c("mature.age","mature.len","fecund")
- rm(mature.len, mature.age, fecund)
+ #rm(mature.len, mature.age, fecund)
 
 #Selectivity Function=====================================================================================
   Selex <- list()

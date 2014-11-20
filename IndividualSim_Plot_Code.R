@@ -2,31 +2,31 @@ sim = 1
 pre.fishery.yrs <- ages - 1 
 setup.yrs   <- 49
 first.ass.yr <- 50
-project.yrs <- 100
+project.yrs <- 50
 project.yrs = 52 
 fishery.yrs <- setup.yrs + project.yrs + 2
 total.yrs   <- pre.fishery.yrs + fishery.yrs + 1
 
-par(mfrow= c(4,4))
-for (sim in 1:100)
+par(mfrow= c(4,2))
+for (sim in 1:2)
 {
 
-plot(1:(fishery.yrs+1),  ssb[1,(pre.fishery.yrs+1):total.yrs,sim], col = 1, type = 'l', lwd =2, main = sim)
-for (i in 1:ass.num)
+plot(1:ss.years,  ssb[1:ss.years,sim], col = 1, type = 'l', lwd =2, main = sim)
+for (i in 1:ass.length)
 {
-  y = 1:ass.yr[i]
-  lines(y, ssb.est[1,y,i,sim], col = 'red', lty = 1, lwd =1)
+  y = ind = 1:(50 + a*4 -4)
+  lines(y, ssb.est[y,i,sim], col = 'red', lty = 1, lwd =1)
 }
 
 
 
-plot(1:(fishery.yrs+1), depl[1,(pre.fishery.yrs+1):total.yrs,sim], col = 1, type = 'l', lwd =2, ylim = c(0,1),
+plot(1:ss.years, depl[1:ss.years,sim], col = 1, type = 'l', lwd =2, ylim = c(0,1),
     ylab = "Depletion", xlab = "Year")
 abline(h = 0.40, col = 'blue',lty = 3)
-for (i in 1:ass.num)
+for (i in 1:ass.length)
 {
-  y = 1:ass.yr[i]
-  lines(y, depl.est[1,y,i,sim], col = 'red', lty = 1, lwd =1)
+  ind = 1:(50 + a*4 -4)
+  lines(y, depl.est[y,i,sim], col = 'red', lty = 1, lwd =1)
 }
 }
 

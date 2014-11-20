@@ -7,16 +7,16 @@
 #         Chantel Wetzel                   #
 ############################################
 
-drive = "F"
+drive = "G"
 LH = "flatfish"
-ds.list = c("greatall", "normal_estM", "greathist")
+ds.list = c("ds1", "ds2", "ds3", "ds4")
 sim.range = c(1,100)
-order = c(2,1,3, 4)
+order = c(3,1,2,4)
 #ds.list = c("greatall")
 #sim.range = c(1,50)
 
 #Dimensions by life-history
-source(paste(drive,":/PhD/Chapter3/code/LH_parameter_values.R",sep=""))
+source(paste(drive,":/PhD/Chapter3/code/functions/LH_parameter_values.R",sep=""))
 pre.fishery.yrs <- ages - 1 
 setup.yrs   <- 49
 first.ass.yr <- 50
@@ -147,7 +147,7 @@ for (spec in 1:length(ds.list))
   save (om.all, file = om.out)
 
   #Sort out the runs that were never overfished and calculate some metrics=====================================================
-  if(data.scenario == "normal_estM" ) {
+  if(data.scenario == "ds3" ) {
     index = apply(f.lens[j, first.ass.yr:fishery.yrs,],2,sum) != 100 * sum(length(first.ass.yr:fishery.yrs))
     index.ov = apply(f.lens[j,first.ass.yr:fishery.yrs,],2,sum) == 100 * sum(length(first.ass.yr:fishery.yrs))
     print(paste("Number not estimated overfished", sum(index.ov)))
@@ -168,13 +168,6 @@ for (spec in 1:length(ds.list))
     yrs.declared.all.split= array(0, dim = c(length(ds.list), sum(save.index)))
   }
 
-  if(data.scenario == "normal_auto"){
-    temp = apply(f.lens[j, first.ass.yr:fishery.yrs,],2,sum) != 100 * sum(length(first.ass.yr:fishery.yrs))
-    temp.ov = apply(f.lens[j,first.ass.yr:fishery.yrs,],2,sum) == 100 * sum(length(first.ass.yr:fishery.yrs))
-    print(paste("Number not estimated overfished", sum(temp.ov)))
-    temp2 = 1:100
-    print(temp2[temp=FALSE])
-  }
   
   #Split the never determined overfished from the correct deterimination runs===================================================
   om.split <- list()

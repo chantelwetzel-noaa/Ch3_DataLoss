@@ -9,7 +9,7 @@
 
 
 #Load in the R objects from the Simulation Eval Code ========================================
-drive = "F"
+drive = "G"
 
 load(paste(drive,":/PhD/Chapter3/rockfish_meds_split", sep = ""))
 med.rock <- meds.split
