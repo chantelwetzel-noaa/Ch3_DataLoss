@@ -195,18 +195,18 @@ writeCtl <- function (ctl,y)
     }
 
     if (need.blocks == T){
-        if(data.scenario == "ds2" || data.scenario == "ds3" ){
+        #if(data.scenario == "ds2" || data.scenario == "ds3" ){
             cat(
             1,      " #seleparm_adjust\n",
             file = ctl, append = T, sep = " ")
-        } 
+        #} 
     }
 
     if(data.scenario == "ds0" || data.scenario == "ds1" ){
-       cat(
-        4,      " #selectivity dev phase\n",
-        1,      " #seleparm_adjust\n",
-        file = ctl, append = T, sep = " ")
+       #cat(
+       # 4,      " #selectivity dev phase\n",
+       # 1,      " #seleparm_adjust\n",
+       # file = ctl, append = T, sep = " ")
     }
  
     cat(

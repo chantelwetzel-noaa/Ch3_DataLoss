@@ -22,7 +22,7 @@
 
 sigma <- 0.36
 p.value <- 0.45
-auto <- FALSE
+auto <- TRUE
 selec.adj <- 5
 start.survey <- 41
 AgeError <- FALSE 
@@ -31,7 +31,7 @@ max.age = ages - 1
 if(AgeError == TRUE) { max.age  <- ages + 4  }  
 
 survey.CV <- 0.50 
-tv.err    <- 0.05 #Time Varying StDev
+tv.err    <- 0    #Time Varying StDev
 
 pre.fishery.yrs <- ages - 1 
 setup.yrs   <- 50
@@ -55,7 +55,7 @@ start.survey.len.samp  <- pre.fishery.yrs + start.survey
 start.survey.age.samp  <- pre.fishery.yrs + start.survey
 
 #Data Available Based on Scenario
-N.f.len = 100 ; N.s.len = 5 ; N.f.age = 50 ; N.s.age = 5 
+N.f.len = 100 ; N.s.len = 10 ; N.f.age = 100 ; N.s.age = 10 
 if (data.scenario == "ds0") { 
     N.f.len = 5000 ; N.s.len = 5000 ; N.f.age = 5000 ; N.s.age = 5000 }
 
@@ -75,9 +75,9 @@ s.age.samp <- c(rep(0,start.survey - 1),rep(N.s.len,length(data.yrs)))
 selec.dev = 0
 dev.yr1   = 0
 
-if (data.scenario == "ds0" || data.scenario == "ds1"){
-    selec.dev = 2
-    dev.yr1 = start.survey
-    #the dev.yr2 variable is dynamically resent in the projection period
-}
+#if (data.scenario == "ds0" || data.scenario == "ds1"){
+#    selec.dev = 2
+#    dev.yr1 = start.survey
+#    #the dev.yr2 variable is dynamically resent in the projection period
+#}
 

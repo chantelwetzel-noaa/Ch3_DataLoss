@@ -3,14 +3,22 @@
 ##           UPDATED 2/20/14                ###
 
 #/usr/bin/R-64-v3.0.0
-#source("//even_more_home//h_cwetzel//PhD//Chapter3//code//OM_10012014.R") 
-#source("F://PhD//Chapter3//Code//OM_10012014.R") 
-drive <-"G:" #"//home//cwetzel//h_cwetzel"
+#source("//even_more_home//h_cwetzel//PhD//Chapter3//code//OM_10302014.R") 
+#source("F://PhD//Chapter3//Code//OM_10302014.R") 
+#source("C:/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/OM_10302014.R")
+
+# ************************  WARNING ANNUAL DEVIATIONS ARE TURNED OF IN THE DATA SCENARIO FILE  ************************
+# ************************  RECRUITMENT AUTO-CORRELATION IS CURRENTLY TURNED ON ***************************************
+# ************************  THE BASE SAMPLE SIZES HAVE BEEN ALTERED 12/24   *******************************************
+
+drive <-"C:" #"//home//cwetzel//h_cwetzel"
 LH <- "flatfish"
-start.n <- 1
-end.n <- 1
-data.scenario <- "ds2" 
+start.n <- 11
+end.n <- 100
+data.scenario <- "ds1" 
 tantalus <- FALSE
+
+github = TRUE
 
 
 #DoSim <- function(drive, LH, start.n, end.n, data.scenario) {
@@ -37,7 +45,10 @@ tantalus <- FALSE
  file.copy(paste(drive,"/PhD/Chapter3/SS3_opt",sep=""),paste(directory,"/SS3_opt",sep="")) }
  
  #Source in external functions
- source(paste(drive,"/PhD/Chapter3/code/functions/Functions.R",sep=""))
+ if (github == TRUE) { 
+  git.wd = "/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/"
+  source(paste(drive, git.wd, "functions/Functions.R", sep = "")) }
+ if (github == FALSE){ source(paste(drive,"/PhD/Chapter3/code/functions/Functions.R",sep="")) }
  
  print(LH) ; print(paste("True Depletion", final.depl,sep=" "))
  print(paste("Survey Length", start.survey, sep=" "))
@@ -468,6 +479,9 @@ for (nsim in start.n:end.n)
             virgin.SB <- as.numeric(strsplit(rep.new[grep(paste("SPB_Virgin",sep=""),rep.new)]," ")[[1]][3])
             while(virgin.SB < (SSB0/4) || virgin.SB > (SSB0*4)) {
               rerun = rerun + 1  
+              starter.file = SS_readstarter(paste(directory, "starter.ss", sep = ""))
+              starter.file$jitter_fraction = 0.10
+              SS_writestarter(starter.file, paste(directory, sep = ""), overwrite = T )
               if (tantalus == T) { system("./SS3_opt  > test.txt 2>&1")  }
               if (tantalus == F) { shell("ss3_opt.exe > test.txt 2>&1")  }
               rep.new   <- readLines(paste(directory, "Report.sso", sep=""))
@@ -520,6 +534,9 @@ for (nsim in start.n:end.n)
         virgin.SB <- as.numeric(strsplit(rep.new[grep(paste("SPB_Virgin",sep=""),rep.new)]," ")[[1]][3])
         while(virgin.SB < (SSB0/4) || virgin.SB > (SSB0*4)) {
           rerun = rerun + 1  
+          starter.file = SS_readstarter(paste(directory, "starter.ss", sep = ""))
+          starter.file$jitter_fraction = 0.10
+          SS_writestarter(starter.file, paste(directory, sep = ""), overwrite = T )
           if (tantalus == T) { system("./SS3_opt  > test.txt 2>&1")  }
           if (tantalus == F) { shell("ss3_opt.exe > test.txt 2>&1")  }
           rep.new   <- readLines(paste(directory, "Report.sso", sep=""))
