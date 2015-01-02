@@ -12,10 +12,10 @@
 # ************************  THE BASE SAMPLE SIZES HAVE BEEN ALTERED 12/24   *******************************************
 
 drive <-"C:" #"//home//cwetzel//h_cwetzel"
-LH <- "flatfish"
-start.n <- 11
-end.n <- 100
-data.scenario <- "ds1" 
+LH <- "rockfish"
+start.n <- 56
+end.n <- 75
+data.scenario <- "ds4" 
 tantalus <- FALSE
 
 github = TRUE
@@ -52,6 +52,7 @@ github = TRUE
  
  print(LH) ; print(paste("True Depletion", final.depl,sep=" "))
  print(paste("Survey Length", start.survey, sep=" "))
+ print(paste("Auto-Correlation", auto, sep =" "))
 
 #Parameter Section =================================================================================== 
 
@@ -65,8 +66,15 @@ github = TRUE
 #---------------------------------------------------------------------------------------------------
 for (nsim in start.n:end.n)
  {
- 
- #nsim = 1 ; sigmaR = 0 ; survey.CV = 0; tv.err = 0
+  #nsim = 1 ; sigmaR = 0 ; survey.CV = 0; tv.err = 0
+  
+  if (github == TRUE) { 
+    git.wd = "/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/"
+    source(paste(drive, git.wd, "functions/Functions.R", sep = "")) 
+  }
+  if (github == FALSE){ 
+    source(paste(drive,"/PhD/Chapter3/code/functions/Functions.R",sep="")) 
+  }
 
  #Save Output
  projections <- paste(directory,"save/om_proj_",nsim,sep="")

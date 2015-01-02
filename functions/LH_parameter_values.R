@@ -60,7 +60,7 @@ if (LH == "flatfish" ) {
  over.thres <- 0.125
  
  #Depletion value in year 50 of the fishery ===========================================================================
- final.depl <- 0.08 
+ final.depl <- 0.06 
 } 
 
 
@@ -116,7 +116,7 @@ if (LH == "rockfish" ) {
  over.thres <- 0.25
  
  #Depletion value in year 50 of the fishery ===========================================================================
- final.depl <- 0.20
+ final.depl <- 0.15
 }
 
 

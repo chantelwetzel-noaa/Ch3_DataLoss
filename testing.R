@@ -1,7 +1,6 @@
-
-#wd = "F:/PhD/Chapter3/rockfish_greatall_sims_1_40/save/" ; par(mfrow =c (3,3))
-#wd = "F:/PhD/Chapter3/rockfish_normal_estM_sims_1_40/save/"
-wd = "F:/PhD/Chapter3/rockfish_greathist_sims_1_40/save/"
+d = "C:/PhD/Chapter3/output/flatfish_g_sims_1_40/save/" ; par(mfrow =c (3,3))
+#wd = "C:/PhD/Chapter3/output/flatfish_normal_estM_sims_1_40/save/"
+#wd = "C:/PhD/Chapter3/output/flatfish_greathist_sims_1_40/save/"
 setwd(wd)
 ass.length = 26#14
 start.year = 71#41
