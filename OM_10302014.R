@@ -12,10 +12,10 @@
 # ************************  THE BASE SAMPLE SIZES HAVE BEEN ALTERED 12/24   *******************************************
 
 drive <-"C:" #"//home//cwetzel//h_cwetzel"
-LH <- "rockfish"
-start.n <- 56
-end.n <- 75
-data.scenario <- "ds4" 
+LH <- "flatfish"
+start.n <- 1
+end.n <- 20
+data.scenario <- "ds0" 
 tantalus <- FALSE
 
 github = TRUE
@@ -63,10 +63,25 @@ github = TRUE
  if (LH == "rockfish") { 
     low.bound <- 500  ; upper.bound <- 15000 ; first.R0 <- 13000 }
 
+# Save the run information ===========================================================================
+
+capture.output(list(Survey_Start = start.survey, 
+                    Overfished_Selectivity_Shift = selec.adj,
+                    Annual_TimeVarying_Selectivity = tv.err,
+                    Estimate_Annual_Deviations = selec.dev, 
+                    Depletion_Year_50 = final.depl, 
+                    Recruitment_AutoCorrelation = auto,
+                    Survey_CV = survey.CV,
+                    SigmaR = sigmaR,
+                    Pstar = p.value, 
+                    Sigma = sigma, 
+                    Age_Error = AgeError),
+                    file = paste(directory,'/save/Run_Details.txt',sep=""))
+
 #---------------------------------------------------------------------------------------------------
 for (nsim in start.n:end.n)
  {
-  #nsim = 1 ; sigmaR = 0 ; survey.CV = 0; tv.err = 0
+  
   
   if (github == TRUE) { 
     git.wd = "/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/"
@@ -76,6 +91,7 @@ for (nsim in start.n:end.n)
     source(paste(drive,"/PhD/Chapter3/code/functions/Functions.R",sep="")) 
   }
 
+ #nsim = 1 ; sigmaR = 0 ; survey.CV = 0; tv.err = 0
  #Save Output
  projections <- paste(directory,"save/om_proj_",nsim,sep="")
  estimates   <- paste(directory,"save/ss_ests_",nsim,sep="")

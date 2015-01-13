@@ -1,14 +1,17 @@
-d = "C:/PhD/Chapter3/output/flatfish_g_sims_1_40/save/" ; par(mfrow =c (3,3))
-#wd = "C:/PhD/Chapter3/output/flatfish_normal_estM_sims_1_40/save/"
-#wd = "C:/PhD/Chapter3/output/flatfish_greathist_sims_1_40/save/"
+wd = "C:/PhD/Chapter3/flatfish_test_sims_1_50/save/" ; par(mfrow =c (4,3), oma =c(1,1,1,1), mar = c(2,4,2,3))
+
+#wd = "C:/PhD/Chapter3/flatfish_ds1_sims_1_100/save/" ; par(mfrow =c (4,3))
+#wd = "C:/PhD/Chapter3/flatfish_ds2_sims_1_100/save/"
+#wd = "C:/PhD/Chapter3/flatfish_ds3_sims_1_100/save/"
+#wd = "C:/PhD/Chapter3/flatfish_ds4_sims_1_100/save/"
 setwd(wd)
-ass.length = 26#14
-start.year = 71#41
-ss.years = 150#102
+ass.length = 14#26#14
+start.year = 41#71#41
+ss.years = 102#150#102
 end.year = start.year + ss.years - 1
 sims = 40
-target = 0.40#0.25 
-thres  = 0.25#0.08
+target = 025#0.40#0.25 
+thres  = 0.125#0.25#0.08
 ssb = matrix(0, ss.years, sims)
 ssb.est = array (0, dim = c(ss.years, ass.length, sims))
 #par(mfrow=c(2,2))
@@ -79,18 +82,18 @@ for (a in 1:ass.length){
 }
 
 #par(mfrow =c (3,3))
-plot(1:ss.years, med.depl[1:ss.years], ylim =c(0,1), type ='l', lwd =2)
+plot(1:ss.years, med.depl[1:ss.years], ylim =c(0,1), type ='l', lwd =2, ylab = "Depletion")
 abline (h =target) ; abline ( h =thres)
 for (a in 1:ass.length){
 	ind = 1:(50 + a*4 -4)
 	lines(ind, med.depl.est[ind,a], lty = 2, col =2)
 }
-plot(1:ss.years, med.ssb[1:ss.years], type ='l', lwd =2, ylim = c(0, 8000))
+plot(1:ss.years, med.ssb[1:ss.years], type ='l', lwd =2, ylim = c(0, 8000), ylab = "SSB")
 for (a in 1:ass.length){
 	ind = 1:(50 + a*4 -4)
 	lines(ind, med.ssb.est[ind,a], lty = 2, col =2)
 }
-plot(1:ss.years, med.rec[1:ss.years], type ='l', lwd =2, ylim = c(0, 8000))
+plot(1:ss.years, med.rec[1:ss.years], type ='l', lwd =2, ylim = c(0, 8000), ylab = "Recruits")
 for (a in 1:ass.length){
 	ind = 1:(50 + a*4 -4)
 	lines(ind, med.rec.est[ind,a], lty = 2, col =2)
@@ -102,6 +105,9 @@ M.mat = matrix(NA, ass.length, sims)
 k.mat = matrix(NA, ass.length, sims)
 lmin.mat = matrix(NA, ass.length, sims)
 lmax.mat = matrix(NA, ass.length, sims)
+f.selex = array(NA, dim = c(2, ass.length, sims))
+s.selex = array(NA, dim = c(2, ass.length, sims))
+f.adj   = matrix(NA, ass.length, sims)
 for (i in 1:sims){
 	#if (i < 26) { temp = 25 + i }
 	#if (i > 25) { temp = 50 + i }
@@ -111,22 +117,34 @@ for (i in 1:sims){
  	k.mat[,i] = Est$k.store
  	lmin.mat[,i] = Est$Lmin.store
  	lmax.mat[,i] = Est$Lmax.store
+ 	f.selex[,,i] = Est$F.selex[c(1,3),]
+ 	s.selex[,,i] = Est$S.selex[c(1,3),]
+ 	f.adj[,i] = Est$F.selex.1.adj
 }
 
-par(mfrow=c(2,2))
-boxplot(t(M.mat), ylim = c(0.13, 0.25)) ; abline (h = 0.15, col =2)
-boxplot(t(k.mat), ylim = c(0.10, 0.20)) ; abline (h = 0.143779 , col =2)
-boxplot(t(lmin.mat), ylim = c(15, 35)) ; abline (h = 24.6219, col =2)
-boxplot(t(lmax.mat), ylim = c(45, 65)) ; abline (h = 55.4099, col =2)
+#par(mfrow=c(2,2))
+boxplot(t(M.mat), ylim = c(0.13, 0.25), ylab = "M") ; abline (h = 0.15, col =2)
+#boxplot(t(k.mat), ylim = c(0.10, 0.20)) ; abline (h = 0.143779 , col =2)
+boxplot(t(lmin.mat), ylim = c(15, 35), ylab = "Lmin") ; abline (h = 24.6219, col =2)
+boxplot(t(lmax.mat), ylim = c(45, 65), ylab = "Lmax") ; abline (h = 55.4099, col =2)
+boxplot(t(f.selex[1,,]), ylim = c(40, 47), ylab = "F Peak Select") ; abline (h = 43, col =2)
+boxplot(t(f.selex[2,,]), ylim = c(4, 5), ylab = "F Slope Select") ; abline (h = 4.25, col =2)
+boxplot(t(f.adj), ylim = c(43, 53), ylab = "F Peak Adj Select"); abline (h = 48, col = 2)
+boxplot(t(s.selex[1,,]), ylim = c(30, 37), ylab = "S Peak Select") ; abline (h = 33, col =2)
+boxplot(t(s.selex[2,,]), ylim = c(4, 5), ylab = "S Slope Select") ; abline (h = 4.25, col =2)
 
 
+#par(mfrow=c(2,2))
+boxplot(t(M.mat), ylim = c(0.04, 0.12), ylab = "M") ; abline (h = 0.08, col =2)
+#boxplot(t(k.mat), ylim = c(0, 0.10), ylab = "Lmin") ; abline (h = 0.05 , col =2)
+boxplot(t(lmin.mat), ylim = c(10, 20), ylab = "Lmin") ; abline (h = 18, col =2)
+boxplot(t(lmax.mat), ylim = c(60, 70), ylab = "Lmax") ; abline (h = 64, col =2)
+boxplot(t(f.selex[1,,]), ylim = c(42, 48), ylab = "F Peak Select") ; abline (h = 45, col =2)
+boxplot(t(f.selex[2,,]), ylim = c(4, 5), ylab = "F Slope Select") ; abline (h = 4.25, col =2)
+boxplot(t(f.adj), ylim = c(45, 55), ylab = "F Peak Adj Select"); abline (h = 50, col = 2)
+boxplot(t(s.selex[1,,]), ylim = c(36, 43), ylab = "S Peak Select") ; abline (h = 39, col =2)
+boxplot(t(s.selex[2,,]), ylim = c(4, 5), ylab = "S Slope Select") ; abline (h = 4.25, col =2)
 
-
-par(mfrow=c(2,2))
-boxplot(t(M.mat), ylim = c(0.04, 0.12)) ; abline (h = 0.08, col =2)
-boxplot(t(k.mat), ylim = c(0, 0.10)) ; abline (h = 0.05 , col =2)
-boxplot(t(lmin.mat), ylim = c(10, 20)) ; abline (h = 18, col =2)
-boxplot(t(lmax.mat), ylim = c(60, 70)) ; abline (h = 64, col =2)
 
 
 

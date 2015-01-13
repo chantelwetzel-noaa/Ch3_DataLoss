@@ -9,32 +9,33 @@
 
 
 #Load in the R objects from the Simulation Eval Code ========================================
-drive = "G"
+drive = "C:"
+run.name = "run1"
 
-load(paste(drive,":/PhD/Chapter3/rockfish_meds_split", sep = ""))
+load(paste(drive,"/PhD/Chapter3/", run.name, "/output/rockfish_meds_split", sep = ""))
 med.rock <- meds.split
-load(paste(drive,":/PhD/Chapter3/rockfish_est_split", sep = ""))
+load(paste(drive,"/PhD/Chapter3/", run.name, "/output/rockfish_est_split", sep = ""))
 est.rock <- est.split
-load(paste(drive,":/PhD/Chapter3/rockfish_om_split", sep = ""))
+load(paste(drive,"/PhD/Chapter3/", run.name, "/output/rockfish_om_split", sep = ""))
 om.rock <- om.split
-load(paste(drive,":/PhD/Chapter3/flatfish_meds_split", sep = ""))
+load(paste(drive,"/PhD/Chapter3/", run.name, "/output/flatfish_meds_split", sep = ""))
 med.flat <- meds.split
-load(paste(drive,":/PhD/Chapter3/flatfish_est_split", sep = ""))
+load(paste(drive,"/PhD/Chapter3/", run.name, "/output/flatfish_est_split", sep = ""))
 est.flat <- est.split
-load(paste(drive,":/PhD/Chapter3/flatfish_om_split", sep = ""))
+load(paste(drive,"/PhD/Chapter3/", run.name, "/output/flatfish_om_split", sep = ""))
 om.flat <- om.split
 
-#load(paste(drive,":/PhD/Chapter3/rockfish_meds_all", sep = ""))
+#load(paste(drive,":/PhD/Chapter3/", run.name, "/output/rockfish_meds_all", sep = ""))
 #med.rock <- meds.all
-#load(paste(drive,":/PhD/Chapter3/rockfish_est_all", sep = ""))
+#load(paste(drive,":/PhD/Chapter3/", run.name, "/output/rockfish_est_all", sep = ""))
 #est.rock <- est.all
-#load(paste(drive,":/PhD/Chapter3/rockfish_om_all", sep = ""))
+#load(paste(drive,":/PhD/Chapter3/", run.name, "/output/rockfish_om_all", sep = ""))
 #om.rock <- om.all
-#load(paste(drive,":/PhD/Chapter3/flatfish_meds_all", sep = ""))
+#load(paste(drive,":/PhD/Chapter3/", run.name, "/output/flatfish_meds_all", sep = ""))
 #med.flat <- meds.all
-#load(paste(drive,":/PhD/Chapter3/flatfish_est_all", sep = ""))
+#load(paste(drive,":/PhD/Chapter3/", run.name, "/output/flatfish_est_all", sep = ""))
 #est.flat <- est.all
-#load(paste(drive,":/PhD/Chapter3/flatfish_om_all", sep = ""))
+#load(paste(drive,":/PhD/Chapter3/", run.name, "/output/flatfish_om_all", sep = ""))
 #om.flat <- om.all
 
 rock.out <- flat.out <- list()
@@ -70,6 +71,9 @@ final.yr.rock = rock.yrs + 50 + pre.yrs.rock - 1
 ass.num = dim(flat.out[[2]]$ssb.est)[3]
 ass.yr = seq(50,150,4)
 
+N.flat = dim(om.flat$ssb)[3]
+N.rock = dim(om.rock$ssb)[3] 
+
 #Create Plots to compare results==================================================================
 windows(10, 10, record = TRUE)
 
@@ -80,6 +84,8 @@ start.plot.rock = 105#112
 color <- rgb(0, 0, 0, 0.30) 
 ass.index.flat = rev(c(2, 1, 4, 6))#rev(c(1,  5, 10, 14))#rev(c(1, 7, 14))
 ass.index.rock = rev(c(1, 14, 26))#rev(c(1, 10, 20, 26))#rev(c(1, 13, 26))
+text.yr.flat = sort((pre.yrs.flat + ass.yr)[ass.index.flat]) - 2
+text.yr.rock = sort((pre.yrs.rock + ass.yr)[ass.index.rock]) - 5
 a = 256
 plot.color = c(rgb(0, 153/a, 0), rgb(255/a, 128/a, 0), "Blue", "violet")
 #plot.color = c('blue', "darkgreen", 'red')
@@ -96,6 +102,8 @@ for(b in 1:ds){
   #Plot flatfish
   plot(start.plot.flat:final.yr.flat,  flat.out[[1]]$med.ssb[b,start.plot.flat:final.yr.flat,2], col = rgb(1,1,1,1), type = 'l', lwd =2,
      ylim = c(0,ymax), ylab = "SB", xlab = "Year", axes = F, xaxs="i")
+  #Calculate the % determined to be overfished
+  per.of = round(flat.out[[1]]$n.overfished[b,sort(ass.index.flat)]/N.flat,2)
   #xx = c(start.plot.flat:final.yr.flat,rev(start.plot.flat:final.yr.flat))
   #yy = c(flat.out[[1]]$med.ssb[b,start.plot.flat:final.yr.flat,1],rev(flat.out[[1]]$med.ssb[b,start.plot.flat:final.yr.flat,3])) 
   #polygon(xx, yy, col=color, lty=1, border = 'grey')
@@ -104,6 +112,8 @@ for(b in 1:ds){
   lines(start.plot.flat:final.yr.flat,  flat.out[[1]]$med.ssb[b,start.plot.flat:final.yr.flat,3], col = 'darkgrey', lty = 4, lwd =1)
   box() ; axis(side = 2)
   print.letter(alpha.label1[b], xy = c(0.05, 0.95))
+  text( labels = per.of, x = text.yr.flat, y = rep(10, length(text.yr.flat)), cex = 1.2 ) 
+
   if(b == 1)  {  mtext("Flatfish", side = 2, outer = T, line = 2.5) }
   if(b == ds) { 
     mtext("Spawning Biomass", side = 2, outer = T, line = 2.5); axis(side = 1 , at =seq(80, 140,10), labels = seq(40, 100, 10))
@@ -136,6 +146,8 @@ for(b in 1:ds){
   if(b == ds) { 
     axis(side = 1, at =seq(120, 220,20), labels = seq(50, 150, 20)) ; mtext("Year", side = 1, outer = T, line = 2.5)
   }
+  #Calculate the % determined to be overfished
+  per.of = round(rock.out[[1]]$n.overfished[b,sort(ass.index.rock)]/N.rock,2)
   #xx = c(start.plot.rock:final.yr.rock,rev(start.plot.rock:final.yr.rock))
   #yy = c(rock.out[[1]]$med.ssb[b,start.plot.rock:final.yr.rock,1],rev(rock.out[[1]]$med.ssb[b,start.plot.rock:final.yr.rock,3])) 
   #polygon(xx, yy, col=color, lty=0)
@@ -143,6 +155,7 @@ for(b in 1:ds){
   lines(start.plot.rock:final.yr.rock,  rock.out[[1]]$med.ssb[b,start.plot.rock:final.yr.rock,1], col = 'darkgrey', lty = 4, lwd =1)
   lines(start.plot.rock:final.yr.rock,  rock.out[[1]]$med.ssb[b,start.plot.rock:final.yr.rock,3], col = 'darkgrey', lty = 4, lwd =1)
   print.letter(alpha.label2[b], xy = c(0.05, 0.95))
+  text(labels = per.of, x = text.yr.rock, y = rep(10, length(text.yr.rock)), cex = 1.2 ) 
 
   for (i in 1:length(ass.index.rock)){
     temp = ass.index.rock[i]*4 - 4 + 50
@@ -173,8 +186,10 @@ final.yr.rock = 196
 start.plot.flat = 85#75#82
 start.plot.rock = 105#112
 color <- rgb(0, 0, 0, 0.30) 
-ass.index.flat = rev(c(1, 2, 3, 6)) #rev(c(1,  5, 10, 14))#rev(c(1, 7, 14))
+ass.index.flat = rev(c(1, 3, 5, 6)) #rev(c(1,  5, 10, 14))#rev(c(1, 7, 14))
 ass.index.rock = rev(c(1, 8, 13, 20))#rev(c(1, 10, 20, 26))#rev(c(1, 13, 26))
+text.yr.flat = sort((pre.yrs.flat + ass.yr)[ass.index.flat]) - 2
+text.yr.rock = sort((pre.yrs.rock + ass.yr)[ass.index.rock]) - 5
 a = 256
 plot.color = c(rgb(0, 153/a, 0), rgb(255/a, 128/a, 0), "Blue", "Brown")
 #plot.color = c('blue', "darkgreen", 'red')
@@ -192,6 +207,8 @@ for(b in 1:ds){
   lines(start.plot.flat:final.yr.flat,  flat.out[[1]]$med.ssb[b,start.plot.flat:final.yr.flat,3], col = 'darkgrey', lty = 4, lwd =1)
   box() ; axis(side = 2)
   print.letter(alpha.label1[b], xy = c(0.05, 0.95))
+  per.of = round(flat.out[[1]]$n.overfished[b,sort(ass.index.flat)]/N.flat,2)
+  text( labels = per.of, x = text.yr.flat, y = rep(10, length(text.yr.flat)), cex = 1.2 )
   if(b == 1)  {  mtext("Flatfish", side = 3, outer = F, line = 1) }
   if(b == ds) { 
     mtext("Spawning Biomass", side = 2, outer = T, line = 2.5); axis(side = 1 , at =seq(80, 140,5), labels = seq(40, 100, 5))
@@ -225,7 +242,8 @@ for(b in 1:ds){
   lines(start.plot.rock:final.yr.rock,  rock.out[[1]]$med.ssb[b,start.plot.rock:final.yr.rock,1], col = 'darkgrey', lty = 4, lwd =1)
   lines(start.plot.rock:final.yr.rock,  rock.out[[1]]$med.ssb[b,start.plot.rock:final.yr.rock,3], col = 'darkgrey', lty = 4, lwd =1)
   print.letter(alpha.label2[b], xy = c(0.05, 0.95))
-
+  per.of = round(rock.out[[1]]$n.overfished[b,sort(ass.index.rock)]/N.rock,2)
+  text( labels = per.of, x = text.yr.rock, y = rep(10, length(text.yr.rock)), cex = 1.2 )
   for (i in 1:length(ass.index.rock)){
     temp = ass.index.rock[i]*4 - 4 + 50
     y = (start.plot.rock):(temp + pre.yrs.rock - 1)
@@ -248,7 +266,7 @@ for(b in 1:ds){
 
 #Depletion================================================================================================================================
 par(mfrow= c(ds,2), mar = c(0.1,0.1,0.1,0.1), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
-ymax = 0.65
+ymax = 0.75
 for(b in 1:ds){
   #Plot flatfish
   plot(start.plot.flat:final.yr.flat,  flat.out[[1]]$med.depl[b,start.plot.flat:final.yr.flat,2], col = rgb(1,1,1,1), type = 'l', lwd =2,
@@ -262,6 +280,8 @@ for(b in 1:ds){
   box() ; axis(side = 2)
   abline(h = 0.25, lty = 3, col = 'red')
   print.letter(alpha.label1[b], xy = c(0.05, 0.95))
+  per.of = round(flat.out[[1]]$n.overfished[b,sort(ass.index.flat)]/N.flat,2)
+  text( labels = per.of, x = text.yr.flat, y = rep(0, length(text.yr.flat)), cex = 1.2 )
   if(b ==1) { mtext(side = 3, "Flatfish", outer = F, line = 1) }
   if(b == ds) { mtext("Depletion", side = 2, outer = T, line = 2.5); axis(side = 1 , at =seq(80, 140, 5), labels = seq(40, 100, 5)) }
 
@@ -298,6 +318,8 @@ for(b in 1:ds){
   lines(start.plot.rock:final.yr.rock,  rock.out[[1]]$med.depl[b,start.plot.rock:final.yr.rock,3], col ='darkgrey', lty = 4, lwd = 1)
   abline(h = 0.40, lty = 3, col = 'red')
   print.letter(alpha.label2[b], xy = c(0.05, 0.95))
+  per.of = round(rock.out[[1]]$n.overfished[b,sort(ass.index.rock)]/N.rock,2)
+  text( labels = per.of, x = text.yr.rock, y = rep(0, length(text.yr.rock)), cex = 1.2 )
 
   for (i in 1:length(ass.index.rock))
   {
@@ -358,15 +380,15 @@ for(b in 1:ds){
 
 par(mfrow= c(ds,2), mar = c(1, 1, 1, 1), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
 for (b in 1:ds){
-  a = hist(flat.out[[1]]$yrs.declared.all[b,]/26.5, ylim = c(0,35), breaks = c(seq(-1.45,2.15,0.10)), main = "", axes = T)
-  lines(rep(0,2), c(0, a$counts[15] ), col =1, lty = 2.5)
+  a = hist(flat.out[[1]]$yrs.declared.all[b,]/26.5, ylim = c(0,35), breaks = c(seq(-1.55,2.15,0.15)), main = "", axes = T)
+  lines(rep(0,2), c(0, a$counts[11] ), col =1, lty = 2.5)
   if (b == 1) { mtext(side =3, "Flatfish", outer = F, line = 0.5)}
   #axis(side = 2) ; axis(side = 1, at = seq(-2, 2, 1))
   if (b == ds) { mtext(side = 2, "Count", line = 2, outer = T) }
   print.letter(alpha.label1[b], xy = c(0.05, 0.90))
 
-  a = hist(rock.out[[1]]$yrs.declared.all[b,]/48, ylim = c(0,35), breaks = c(seq(-1.45,2.15,0.10)), main = "", axes = T)
-  lines(rep(0,2), c(0, a$counts[15] ), col =1, lty = 2)
+  a = hist(rock.out[[1]]$yrs.declared.all[b,]/48, ylim = c(0,35), breaks = c(seq(-1.55,2.15,0.15)), main = "", axes = T)
+  lines(rep(0,2), c(0, a$counts[11] ), col =1, lty = 2)
   print.letter(alpha.label2[b], xy = c(0.05, 0.90))
   #axis(side = 1, at = seq(-2, 3, 1))
   #axis(side = 1, at = seq(-2, 3, 1));
@@ -376,15 +398,15 @@ for (b in 1:ds){
 
 par(mfrow= c(ds,2), mar = c(1, 1, 1, 1), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
 for (b in 1:ds){
-  a = hist(flat.out[[1]]$yrs.declared.all[b,], ylim = c(0,35), breaks = c(seq(-45,95,4)), main = "", axes = T)
-  lines(rep(0,2), c(0, a$counts[15] ), col =1, lty = 2.5)
+  a = hist(flat.out[[1]]$yrs.declared.all[b,], ylim = c(0,35), breaks = c(seq(-54,95,4)), main = "", axes = T)
+  lines(rep(0,2), c(0, a$counts[14] ), col =1, lty = 2.5)
   if (b == 1) { mtext(side =3, "Flatfish", outer = F, line = 0.5)}
   #axis(side = 2) ; axis(side = 1, at = seq(-2, 2, 1))
   if (b == ds) { mtext(side = 2, "Count", line = 2, outer = T) }
   print.letter(alpha.label1[b], xy = c(0.05, 0.90))
 
-  a = hist(rock.out[[1]]$yrs.declared.all[b,], ylim = c(0,35), breaks = c(seq(-45,95,4)), main = "", axes = T)
-  lines(rep(0,2), c(0, a$counts[15] ), col =1, lty = 2)
+  a = hist(rock.out[[1]]$yrs.declared.all[b,], ylim = c(0,35), breaks = c(seq(-54,95,4)), main = "", axes = T)
+  lines(rep(0,2), c(0, a$counts[14] ), col =1, lty = 2)
   print.letter(alpha.label2[b], xy = c(0.05, 0.90))
   #axis(side = 1, at = seq(-2, 3, 1))
   #axis(side = 1, at = seq(-2, 3, 1));
@@ -440,6 +462,94 @@ write.table(round(d, 2) , file = "", quote = F, row.names = F, col.names = F)
 ##                ADDITIONAL PLOTS NOT USED IN THE PAPER FOR MODEL EXPLORATION                                                  #####
 #####################################################################################################################################
 
+#Relative error of spawning biomass and depletion
+
+
+#Flatfish
+ass.index = c(ass.index.flat, 10)
+grey = rgb(0,0,0,0.10)
+par(mfrow =c (ds,length(ass.index)), oma = c(4,4,2,4), mar = c(0,0,0,0))
+for (b in 1:ds){
+  for (a in 1:length(ass.index)){
+    ind = sort(ass.index)
+    temp = 1:(50 + ind[a]* 4 - 4)
+    med.re.ssb = apply(flat.out[[1]]$re.ssb[b, ind[a], temp,], 1, quantile, c(0.975, 0.50, 0.25))
+    plot( temp, med.re.ssb[2,], type = 'l', lwd =2, ylim = c( -0.50, 0.75), axes = F)# xlim = c(1, max(50 + ass.index.flat* 4 - 4)) )
+    xx = c(temp, rev(temp)); yy = c(med.re.ssb[1,], rev(med.re.ssb[3,]))
+    polygon(xx, yy, col = grey, border = NA)
+    lines(temp, med.re.ssb[1,], lty = 2)
+    lines(temp, med.re.ssb[3,], lty = 2)
+    #boxplot(t(flat.out[[1]]$re.ssb[b, ind[a], temp, ]), ylim = c(-1, 1), axes = F, xlim = c(1, max(50 + ass.index.flat* 4 - 4)))
+    box(); abline (h = 0, lty =1); abline(v = 50, lty = 2)
+    if (a == 1) { axis(side = 2); mtext(side = 2, "Relative Error Spawning Biomass", outer = T, line = 2.5) }
+    if (b == ds){ axis(side = 1); mtext(side = 1, "Year", outer = T, line = 2.5) }
+  }  
+}
+
+#Rockfish
+ass.index = c(ass.index.rock, 7, 18)
+par(mfrow =c (ds,length(ass.index)), oma = c(4,4,2,4), mar = c(0,0,0,0))
+for (b in 1:ds){
+  for (a in 1:length(ass.index)){
+    ind = sort(ass.index)
+    temp = 1:(50 + ind[a]* 4 - 4)
+    med.re.ssb = apply(rock.out[[1]]$re.ssb[b, ind[a], temp,], 1, quantile, c(0.975, 0.50, 0.25))
+    plot( temp, med.re.ssb[2,], type = 'l', lwd =2,ylim = c( -0.50, 0.75), axes = F)# xlim = c(1, max(50 + ass.index.rock* 4 - 4)),
+    xx = c(temp, rev(temp)); yy = c(med.re.ssb[1,], rev(med.re.ssb[3,]))
+    polygon(xx, yy, col = grey, border = NA)
+    lines(temp, med.re.ssb[1,], lty = 2)
+    lines(temp, med.re.ssb[3,], lty = 2)
+    #boxplot(t(flat.out[[1]]$re.ssb[b, ind[a], temp, ]), ylim = c(-1, 1), axes = F, xlim = c(1, max(50 + ass.index.flat* 4 - 4)))
+    box(); abline (h = 0, lty =1); abline(v = 50, lty = 2)
+    if (a == 1) { axis(side = 2); mtext(side = 2, "Relative Error Spawning Biomass", outer = T, line = 2.5) }
+    if (b == ds){ axis(side = 1); mtext(side = 1, "Year", outer = T, line = 2.5) }
+  }  
+}
+
+
+#Flatfish
+ass.index = c(ass.index.flat, 10)
+grey = rgb(0,0,0,0.10)
+par(mfrow =c (ds,length(ass.index)), oma = c(4,4,2,4), mar = c(0,0,0,0))
+for (b in 1:ds){
+  for (a in 1:length(ass.index)){
+    ind = sort(ass.index)
+    temp = 1:(50 + ind[a]* 4 - 4)
+    med.re.depl = apply(flat.out[[1]]$re.depl[b, ind[a], temp,], 1, quantile, c(0.975, 0.50, 0.25))
+    plot( temp, med.re.depl[2,], type = 'l', lwd =2, ylim = c( -0.25, 1), axes = F) #, xlim = c(1, max(50 + ass.index* 4 - 4))
+    xx = c(temp, rev(temp)); yy = c(med.re.depl[1,], rev(med.re.depl[3,]))
+    polygon(xx, yy, col = grey, border = NA)
+    lines(temp, med.re.depl[1,], lty = 2)
+    lines(temp, med.re.depl[3,], lty = 2)
+    #boxplot(t(flat.out[[1]]$re.ssb[b, ind[a], temp, ]), ylim = c(-1, 1), axes = F, xlim = c(1, max(50 + ass.index.flat* 4 - 4)))
+    box(); abline (h = 0, lty =1); abline(v = 50, lty = 2)
+    if (a == 1) { axis(side = 2); mtext(side = 2, "Relative Error Depletion", outer = T, line = 2.5) }
+    if (b == ds){ axis(side = 1); mtext(side = 1, "Year", outer = T, line = 2.5) }
+  }  
+}
+
+#Rockfish
+ass.index = c(ass.index.rock, 7, 18)
+par(mfrow =c (ds,length(ass.index)), oma = c(4,4,2,4), mar = c(0,0,0,0))
+for (b in 1:ds){
+  for (a in 1:length(ass.index)){
+    ind = sort(ass.index)
+    temp = 1:(50 + ind[a]* 4 - 4)
+    med.re.depl = apply(rock.out[[1]]$re.depl[b, ind[a], temp,], 1, quantile, c(0.975, 0.50, 0.25))
+    plot( temp, med.re.depl[2,], type = 'l', lwd =2,  ylim = c( -0.25, 1), axes = F) #,xlim = c(1, max(50 + ass.index* 4 - 4)),
+    xx = c(temp, rev(temp)); yy = c(med.re.depl[1,], rev(med.re.depl[3,]))
+    polygon(xx, yy, col = grey, border = NA)
+    lines(temp, med.re.depl[1,], lty = 2)
+    lines(temp, med.re.depl[3,], lty = 2)
+    #boxplot(t(flat.out[[1]]$re.ssb[b, ind[a], temp, ]), ylim = c(-1, 1), axes = F, xlim = c(1, max(50 + ass.index.flat* 4 - 4)))
+    box(); abline (h = 0, lty =1); abline(v = 50, lty = 2)
+    if (a == 1) { axis(side = 2); mtext(side = 2, "Relative Error Depletion", outer = T, line = 2.5) }
+    if (b == ds){ axis(side = 1); mtext(side = 1, "Year", outer = T, line = 2.5) }
+  }  
+}
+
+#--------------------------------------------------------------------------------------------------------------
+
 #Estimates of Natural Mortality
 par(mfrow = c(ds,2), oma = c(4,4,2,4), mar = c(2,2,2,4))
 for(b in 1:ds){
@@ -455,32 +565,81 @@ for(b in 1:ds){
 
 #Selectivity Plots ==========================================================================================
 par(mfrow = c(ds,4), oma = c(4,4,2,4), mar = c(2,2,2,4))
-xfact = 0.10
-for(b in 1:ds){    
+
+for(b in 1:ds){  
+  xfact = 0.10  
   boxplot(t(flat.out[[2]]$s.selex.est[b,1,,]), ylim = c(33 - xfact*33, 33 + xfact*33))
   abline(h = 33,col = 1, lty =2)
   boxplot(t(flat.out[[2]]$s.selex.est[b,3,,]), ylim = c(4.25 - xfact*4.25, 4.25 + xfact*4.25))
   abline(h = 4.25, col = 1, lty =2)
   
+  xfact = 0.05
   boxplot(t(flat.out[[2]]$f.selex.est[b,1,,]), ylim = c(43 - xfact*43, 43 + xfact*43))
   abline(h = 43,col = 1, lty =2)
   boxplot(t(flat.out[[2]]$f.selex.est[b,3,,]), ylim = c(4.25- xfact*4.25, 4.25 + xfact*4.25))
   abline(h = 4.25,col = 1, lty =2)
 }
 
+
 for(b in 1:ds){
+  xfact = 0.10
   boxplot(t(rock.out[[2]]$s.selex.est[b,1,,]), ylim = c(39 - xfact*39, 39 + xfact*39))
   abline(h = 39,col = 1, lty =2)
   boxplot(t(rock.out[[2]]$s.selex.est[b,3,,]), ylim = c(4.25 - xfact*4.25, 4.25 + xfact*4.25))
   abline(h = 4.25, col = 1, lty =2)
   
+  xfact = 0.05
   boxplot(t(rock.out[[2]]$f.selex.est[b,1,,]), ylim = c(45 - xfact*45, 45 + xfact*45))
   abline(h = 45,col = 1, lty =2)
   boxplot(t(rock.out[[2]]$f.selex.est[b,3,,]), ylim = c(4.25- xfact*4.25, 4.25 + xfact*4.25))
   abline(h = 4.25,col = 1, lty =2)
 }
 
+#Relative Error for Selectivity ================================================================================================
+par(mfrow = c(ds,5), oma = c(4,4,2,4), mar = c(0,0,0,0))
 
+for(b in 1:ds){  
+  boxplot(t(flat.out[[1]]$re.s.selex[b,1,,]), ylim =   c(-0.15, 0.15), axes = F)
+  abline(h = 0,col = 1, lty =2); box(); axis(side = 2 )
+  if(b == ds) {  axis(side =1, at = 1:14, labels = seq(50, 102,4))
+     mtext(side = 2, outer = T, "Selecitivity", line = 2.5 ) }
+  boxplot(t(flat.out[[1]]$re.s.selex[b,2,,]), ylim =   c(-0.15, 0.15), axes = F)
+  abline(h = 0, col = 1, lty =2); box()
+  if(b == ds) { axis(side =1, at = 1:14, labels = seq(50, 102,4)) }
+  
+  xfact = 0.05
+  boxplot(t(flat.out[[1]]$re.f.selex[b,1,,]), ylim =   c(-0.15, 0.15), axes = F)
+  abline(h = 0,col = 1, lty =2); box()
+  if(b == ds) { axis(side =1, at = 1:14, labels = seq(50, 102,4)) }
+  boxplot(t(flat.out[[1]]$re.f.selex[b,2,,]), ylim =   c(-0.15, 0.15), axes = F)
+  abline(h = 0,col = 1, lty =2); box()
+  if(b == ds) { axis(side =1, at = 1:14, labels = seq(50, 102,4)) }
+  boxplot(t(flat.out[[1]]$re.f.selex.adj[b,,]), ylim = c(-0.15, 0.15), axes = F)
+  abline(h = 0,col = 1, lty =2); box()
+  if(b == ds) { axis(side =1, at = 1:14, labels = seq(50, 102,4))
+     mtext(side = 1, outer = T, "Assessment Year", line = 2.5) }
+}
+
+
+for(b in 1:ds){
+  boxplot(t(rock.out[[1]]$re.s.selex[b,1,,]), ylim =  c(-0.1, 0.1), axes = F)
+  abline(h = 0,col = 1, lty =2); box(); axis(side = 2 )
+  if(b == ds) { axis(side =1); mtext(side = 2, outer = T, "Selecitivity", line = 2.5 ) }
+  boxplot(t(rock.out[[1]]$re.s.selex[b,2,,]), ylim =  c(-0.1, 0.1), axes = F)
+  abline(h = 0, col = 1, lty =2); box()
+  if(b == ds) { axis(side =1, at = 1:26, labels = seq(50,150,4)) }
+  
+  boxplot(t(rock.out[[1]]$re.f.selex[b,1,,]), ylim =  c(-0.1, 0.1), axes = F)
+  abline(h = 0,col = 1, lty =2); box()
+  if(b == ds) { axis(side =1, at = 1:26, labels = seq(50,150,4))  }
+  boxplot(t(rock.out[[1]]$re.f.selex[b,2,,]), ylim =  c(-0.1, 0.1), axes = F)
+  abline(h = 0,col = 1, lty =2); box()
+  if(b == ds) { axis(side =1, at = 1:26, labels = seq(50,150,4))  }
+  boxplot(t(rock.out[[1]]$re.f.selex.adj[b,,]), ylim =  c(-0.1, 0.1), axes = F)
+  abline(h = 0,col = 1, lty =2); box()
+  if(b == ds) { axis(side =1, at = 1:26, labels = seq(50,150,4)) 
+    mtext(side = 1, outer = T, "Assessment Year", line = 2.5) }
+}
 
 #Catches ========================================================================================================================
 par(mfrow= c(ds,2), mar = c(0,0,0,0), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
@@ -537,11 +696,18 @@ for (b in 1:ds){
 #Relative Error about estimated virgin SB ========================================
 par(mfrow = c(ds,2), oma = c(4,4,2,4), mar = c(2,2,2,4))
 for (b in 1:ds){
-  boxplot(t(flat.out[[1]]$re.ssb0[b,,]), xlab= "RE SB0", ylim = c(-0.5, 0.5))
+  ind = seq(50,102,4)
+  boxplot(t(flat.out[[1]]$re.ssb0[b,,]), xlab= "RE SB0", ylim = c(-0.5, 0.5), axes = F)
+  box(); axis(side = 2)
   abline(h = 0, lty = 2, col = 'red')
+  mtext(side = 2, "RE Assessment Year Relative Biomass", outer = T, line = 2)
+  if (b == ds) { axis(side = 1, at =seq(1,14,1), labels = ind) ; mtext(side = 1, "Assessment Year", outer = T, line = 2) }
 
-  boxplot(t(rock.out[[1]]$re.ssb0[b,,]), xlab= "RE SB0", ylim = c(-0.5, 0.5))
+  ind = seq(50,150,4)
+  boxplot(t(rock.out[[1]]$re.ssb0[b,,]), xlab= "RE SB0", ylim = c(-0.5, 0.5), axes = F)
+  box(); axis(side = 2)
   abline(h = 0, lty = 2, col = 'red')
+  if (b == ds) { axis(side = 1, at= seq(1,26,1), labels = ind) }
 }
 
 

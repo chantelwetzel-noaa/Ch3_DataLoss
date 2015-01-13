@@ -22,7 +22,7 @@
 
 sigma <- 0.36
 p.value <- 0.45
-auto <- TRUE
+auto <- FALSE
 selec.adj <- 5
 start.survey <- 36
 AgeError <- FALSE 

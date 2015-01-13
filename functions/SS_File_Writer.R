@@ -215,7 +215,8 @@ writeCtl <- function (ctl,y)
     1,      " #Max_lambda_phase\n",
     1,      " #sd_offset\n",
     0,      " #Number Lambda Changes\n",
-    "#Place holdere for lambdas\n",
+    "#Place holder for lambdas\n",
+    #5, 1, 1, 0, 1, "#Fishery Ages\n",
     0,      " #Option for Variance Estimates\n",
     999, file=ctl, append=T)
 }    
