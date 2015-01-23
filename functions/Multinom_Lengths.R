@@ -9,8 +9,7 @@
 Multinom_Lengths <- function(catch.type, len.samp){
      
   len.expect <-  catch.type/(sum(catch.type)) 
-  small <- 0.00001 #Set to the value in the data file
-  #small <- 0.0000001
+  small <- 0.0 #Set to the value in the data file
   new.prob.len.m <- len.expect[,2] + small
   new.prob.len.f <- len.expect[,1] + small  
   

@@ -20,7 +20,7 @@ writeCtl <- function (ctl,y)
 
     block.selec <- matrix(c(
     #_LO    HI   INIT   PRIOR  PR_type SD  PHASE
-    25,     60,  fsp1 + selec.adj,  fsp1 + selec.adj,  -1,     1,  2,  "#Peak Block"),
+    25,     60,  fsp1 + selec.adj,  fsp1 + selec.adj,  -1,     1,  3,  "#Peak Block"),
     ncol = 8, byrow = F)  
 
     
@@ -60,8 +60,8 @@ writeCtl <- function (ctl,y)
 
     rec.mat <- matrix(c(
     #_LO    HI     INIT     PRIOR   PR_type     SD      PHASE
-    2,      15,    log(R0), log(R0),      -1,         10,      1,  "# log(R0)",  
-    0.20,   1,     steep,   steep,   1,        0.09,    -2, "# SR_steep ",
+    2,      15,    log(R0), log(R0), -1,        10,      1, "# log(R0)",  
+    0.20,   1,     steep,   steep,   1,       0.09,     -2, "# SR_steep ",
     0,      1.5,   0.60,    0.60,   -1,         99,     -99,"#SR_sigmaR",
     -5,     5,     0,       0,      -1,         99,     -99,"# SR_envlink",
     -5,     5,     0,       0,      -1,         99,     -99,"# SR_R1_offset",
@@ -134,13 +134,13 @@ writeCtl <- function (ctl,y)
     cat(0, " #SR env link\n", 
     0,                      " #SR env target\n",
     1,                      " #Do rec dev (0=none, 1=devvector, 2= simple dev)\n",
-    main.rec,               " #main recr dev begin yr\n",
-    y-pre.fishery.yrs-4,    " #main recr devs end yr\n",
-    3,                      " #main recr dev phas\n",
+    main.rec.start,         " #main recr dev begin yr\n",
+    main.rec.end,           " #main recr devs end yr\n",
+    2,                      " #main recr dev phas\n",
     1,                      " #advanced options (0=default values)ALL SET AT DEFAULT VALUES\n",
         pre.model.devs,     " #_recdev_early_start    (0=none;    neg value   makes   relative    to  recdev_start)\n",                                                   
-        5,                  " #_recdev_early_phase\n",                                                                                
-        6,                  " #_forecast_recruitment  phase   (incl.  late    recr)   (0  value   resets  to  maxphase+1)\n",                                         
+        3,                  " #_recdev_early_phase\n",                                                                                
+        0,                  " #_forecast_recruitment  phase   (incl.  late    recr)   (0  value   resets  to  maxphase+1)\n",                                         
         1,                  " #_lambda    for prior_fore_recr occurring   before  endyr+1\n",                                                         
         start.bias,         " #_last_early_yr_nobias_adj_in_MPD\n",                                                                               
         full.bias,          " #_first_yr_fullbias_adj_in_MPD\n",                                                                              
@@ -217,6 +217,7 @@ writeCtl <- function (ctl,y)
     0,      " #Number Lambda Changes\n",
     "#Place holder for lambdas\n",
     #5, 1, 1, 0, 1, "#Fishery Ages\n",
+    #4, 1, 1, 0, 1, "#Fishery Lengths\n",
     0,      " #Option for Variance Estimates\n",
     999, file=ctl, append=T)
 }    

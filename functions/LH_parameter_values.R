@@ -12,11 +12,6 @@ if (LH == "flatfish" ) {
  ages  <- 41 
  num.ages <- ages-1
  fishing.time <- -1         ; max.F <- 4 
- main.rec   <- 1#20            
- start.bias <- 1            ;  full.bias <- 25
- last.bias <- 48            ;  last.no.bias <- 49
- max.bias.adj <- 0.80
- pre.model.devs <- -30
 
  len.step <- seq(from=10,to=64,by=2)      ; mid.len.step <- seq(from=11,to=65,by=2)  
  bin <- length(len.step)
@@ -71,11 +66,6 @@ if (LH == "rockfish" ) {
  ages  <- 71 
  num.ages <- ages-1
  fishing.time <- -1         ; max.F <- 4 
- main.rec   <- 20  
- start.bias <- 1            ;  full.bias <- 25
- last.bias <- 48            ;  last.no.bias <- 49
- max.bias.adj <- 0.80
- pre.model.devs <- -30
  
  len.step <- seq(from = 10, to = 76, by = 2)      ; mid.len.step <- seq(from = 11, to = 77, by = 2)  
  bin <- length(len.step)

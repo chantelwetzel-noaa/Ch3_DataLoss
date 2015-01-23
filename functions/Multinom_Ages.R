@@ -8,7 +8,7 @@
 Multinom_Ages <- function(catch.type , age.samp , AgeError) {
   
   age.expect <-  catch.type/(sum(catch.type))       
-  small <- 0.00001 #Set to match the value in the dat files
+  small <- 0 #Set to match the value in the dat files
   #small <- 0.0000001
   new.prob.m <- age.expect[2:ages,2] + small
   new.prob.f <- age.expect[2:ages,1] + small  

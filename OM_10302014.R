@@ -12,9 +12,9 @@
 # ************************  THE BASE SAMPLE SIZES HAVE BEEN ALTERED 12/24   *******************************************
 
 drive <-"C:" #"//home//cwetzel//h_cwetzel"
-LH <- "flatfish"
-start.n <- 1
-end.n <- 20
+LH <- "rockfish"
+start.n <- 6
+end.n <- 6
 data.scenario <- "ds0" 
 tantalus <- FALSE
 
@@ -82,7 +82,6 @@ capture.output(list(Survey_Start = start.survey,
 for (nsim in start.n:end.n)
  {
   
-  
   if (github == TRUE) { 
     git.wd = "/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/"
     source(paste(drive, git.wd, "functions/Functions.R", sep = "")) 
@@ -91,7 +90,7 @@ for (nsim in start.n:end.n)
     source(paste(drive,"/PhD/Chapter3/code/functions/Functions.R",sep="")) 
   }
 
- #nsim = 1 ; sigmaR = 0 ; survey.CV = 0; tv.err = 0
+ #nsim = 1 ; sigmaR = 0 ; survey.CV = 0; tv.err = 0; SS.survey.cv = 0.05; selec.adj = 0; CV1 = CV2 <- 0.05  
  #Save Output
  projections <- paste(directory,"save/om_proj_",nsim,sep="")
  estimates   <- paste(directory,"save/ss_ests_",nsim,sep="")
@@ -104,6 +103,17 @@ for (nsim in start.n:end.n)
  comp.seed     <- as.numeric(seed.list[[1]][,"comp.seed"])  
  age.err.seed  <- as.numeric(seed.list[[1]][,"spare1"]) 
  select.seed   <- as.numeric(seed.list[[1]][,"spare2"])
+
+ #Set up the bias adjustment parameters -----------------------------------------------------------------------------------
+ #Bias adjustment parameters
+ main.rec.start <- start.survey
+ main.rec.end   <- setup.yrs - 6            
+ start.bias     <- start.survey - (ages - 1)
+ full.bias      <- start.survey - (ages - 1)/2
+ last.bias      <- setup.yrs - 5        
+ last.no.bias   <- setup.yrs - 4
+ max.bias.adj   <- 0.80
+ pre.model.devs <- -(ages - 1)
   
  #Catch History -----------------------------------------------------------------------------------------------------------
  set.seed(catch.seed[nsim])
@@ -522,15 +532,24 @@ for (nsim in start.n:end.n)
                             startvalues = c(start.bias, full.bias , last.bias, last.no.bias ,max.bias.adj))
             start.bias   <- new.bias$df[1,1]
             full.bias    <- new.bias$df[2,1]
+            last.bias    <- new.bias$df[3,1]
+            last.no.bias <- new.bias$df[4,1]
             max.bias.adj <- new.bias$df[5,1]
+            main.rec.end <- last.bias - 1
+            converge     <- new.bias$newbias$message
+            if (converge == "false convergence (8)"){
+
+            }
+
         } 
                        
         #The declining slope is sometimes estimated poorly so do not use those values
-        last.bias    <- y - pre.fishery.yrs - 10
-        last.no.bias <- y - pre.fishery.yrs - 2
-        #last.bias <- new.bias$df[3,1]
-        #last.no.bias <- new.bias$df[4,1]
-            
+        if (y > (pre.fishery.yrs + setup.yrs + 9)) {
+          last.bias    <- last.bias + 4
+          last.no.bias <- last.no.bias + 4
+          main.rec.end <- last.bias - 1
+        }
+
         if(data.scenario == 'ds4'  && decl.overfished == TRUE ) {
             last.bias    <- setup.yrs + 1 - 10
             last.no.bias <- setup.yrs + 1 - 2
@@ -541,10 +560,10 @@ for (nsim in start.n:end.n)
             last.no.bias <- setup.yrs + 1 - 2
         }
  
-        writeCtl(ctl = "sim.ctl", y = y)
+        #writeCtl(ctl = "sim.ctl", y = y)
         file.copy("sim.ctl", paste(directory,"/ctl/sim.ctl",sep =""))
         file.rename(paste(directory,"/ctl/sim.ctl",sep =""), 
-                        paste(directory,"/ctl/sim",nsim,"_",y-pre.fishery.yrs,".ctl",sep =""))    
+                       paste(directory,"/ctl/sim",nsim,"_",y-pre.fishery.yrs,".ctl",sep =""))    
                         
         file.copy("sim.dat", paste(directory,"/ctl/sim.dat",sep =""))
         file.rename(paste(directory,"/ctl/sim.dat",sep =""), 
