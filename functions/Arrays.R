@@ -43,6 +43,9 @@
   #Dynamics
   Ry           <- matrix(0, total.yrs+1, 1)#;  rownames(Ry) <-years
   SSB          <- matrix(0, total.yrs+1, 1)#;  rownames(SSB)<-years
+  depl         <- matrix(0, total.yrs+1, 1)
+  ofl.true     <- matrix(0, total.yrs+1, 1)
+  acl.true     <- matrix(0, total.yrs+1, 1)
   catch.at.age <- array(NA, dim=c(total.yrs, ages, sexes))
   catch.at.len <- array(NA, dim=c(total.yrs, length(len.step), sexes))
   z.rate       <- array(NA,dim = c(total.yrs, ages, sexes)) ; rownames(z.rate) <- years

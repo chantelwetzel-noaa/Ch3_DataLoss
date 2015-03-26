@@ -9,10 +9,11 @@
 Rep_Summary<- function(rep.new, y, pre.fishery.yrs)
 {
   tot.yrs <- 1:(y-pre.fishery.yrs)
-  ofl.yrs <- (tot.yrs[length(tot.yrs)]):(tot.yrs[length(tot.yrs)] + 3)
+  ofl.yrs <- (tot.yrs[length(tot.yrs)]+1):(tot.yrs[length(tot.yrs)] + 4)
   
   SB = mapply(function(x) SB = as.numeric(strsplit(rep.new[grep(paste("SPB_",x,sep=""),rep.new)]," ")[[1]][3]), x = tot.yrs)
   SB.virgin = as.numeric(strsplit(rep.new[grep("SPB_Virgin",rep.new)]," ")[[1]][3])
+  
   Recruits = mapply(function(x) TotBio = as.numeric(strsplit(rep.new[grep(paste(1, x,"TIME",sep=" "),rep.new)]," ")[[1]][8]),
                                         x = 1:tot.yrs[length(tot.yrs)-1])
   TotBio= mapply(function(x) TotBio = as.numeric(strsplit(rep.new[grep(paste(1, x,"TIME",sep=" "),rep.new)]," ")[[1]][5]),

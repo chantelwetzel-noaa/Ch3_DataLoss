@@ -13,8 +13,8 @@
 
 drive <-"C:" #"//home//cwetzel//h_cwetzel"
 LH <- "rockfish"
-start.n <- 6
-end.n <- 6
+start.n <- 1
+end.n <- 1
 data.scenario <- "ds0" 
 tantalus <- FALSE
 
@@ -63,20 +63,6 @@ github = TRUE
  if (LH == "rockfish") { 
     low.bound <- 500  ; upper.bound <- 15000 ; first.R0 <- 13000 }
 
-# Save the run information ===========================================================================
-
-capture.output(list(Survey_Start = start.survey, 
-                    Overfished_Selectivity_Shift = selec.adj,
-                    Annual_TimeVarying_Selectivity = tv.err,
-                    Estimate_Annual_Deviations = selec.dev, 
-                    Depletion_Year_50 = final.depl, 
-                    Recruitment_AutoCorrelation = auto,
-                    Survey_CV = survey.CV,
-                    SigmaR = sigmaR,
-                    Pstar = p.value, 
-                    Sigma = sigma, 
-                    Age_Error = AgeError),
-                    file = paste(directory,'/save/Run_Details.txt',sep=""))
 
 #---------------------------------------------------------------------------------------------------
 for (nsim in start.n:end.n)
@@ -90,7 +76,26 @@ for (nsim in start.n:end.n)
     source(paste(drive,"/PhD/Chapter3/code/functions/Functions.R",sep="")) 
   }
 
- #nsim = 1 ; sigmaR = 0 ; survey.CV = 0; tv.err = 0; SS.survey.cv = 0.05; selec.adj = 0; CV1 = CV2 <- 0.05  
+ #nsim = 1 ; 
+ #sigmaR = 0 ; 
+ survey.CV = 0; tv.err = 0; SS.survey.cv = 0.50; 
+ selec.adj = 0; CV1 = CV2 <- 0.05  
+ # Save the run information ===========================================================================
+ 
+ capture.output(list(Survey_Start = start.survey, 
+                     Overfished_Selectivity_Shift = selec.adj,
+                     Annual_TimeVarying_Selectivity = tv.err,
+                     Estimate_Annual_Deviations = selec.dev, 
+                     Depletion_Year_50 = final.depl, 
+                     Recruitment_AutoCorrelation = auto,
+                     Survey_CV = survey.CV,
+                     SigmaR = sigmaR,
+                     Pstar = p.value, 
+                     Sigma = sigma, 
+                     Age_Error = AgeError),
+                     file = paste(directory,'/save/Run_Details.txt',sep="")) 
+
+
  #Save Output
  projections <- paste(directory,"save/om_proj_",nsim,sep="")
  estimates   <- paste(directory,"save/ss_ests_",nsim,sep="")
@@ -145,7 +150,7 @@ for (nsim in start.n:end.n)
  }
  
  #This will start the population in equilibrium
- #autocorr[1:ages] <- 0
+ autocorr[1:(ages-1)] <- 0
  
  #Draw Survey Error---------------------------------------------------------------------------------------------------------------  
  set.seed(survey.seed[nsim])
@@ -182,6 +187,9 @@ for (nsim in start.n:end.n)
        #Catch At Length
        mid.temp.f <- numbers[y,,1] * z.f 
        mid.temp.m <- numbers[y,,2] * z.m 
+       #mid.temp.f <- numbers[y,,1] * exp(m+selec.age.f * f ) #numbers[y,,1] * z.f
+       #mid.temp.m <- numbers[y,,2] * exp(m+selec.age.m * f ) #numbers[y,,2] * z.m
+
        catch.at.len.f <- ((biology$mid.phi.f * selec[y,,1]) %*% (mid.temp.f))
        catch.at.len.m <- ((biology$mid.phi.m * selec[y,,2]) %*% (mid.temp.m))
            
@@ -239,8 +247,8 @@ for (nsim in start.n:end.n)
       SSB[y+1] <- sum(numbers[y+1, 2:ages, 1] * biology$fecund[2:ages])
   
       #Expected (and then realized) recruitment
-      Ry[y+1] <- (4 * steep * ( R0 / 2 ) * SSB[y+1]) / (SSB0 * (1 - steep) + SSB[y+1] * (5 * steep - 1))  
-      Ry[y+1] <- Ry[y+1] * exp(-0.5 * (sigmaR^2)) * exp(autocorr[y+1])
+      Ry[y+1] <- (4 * steep * ( R0 / 2 ) * SSB[y+1]) / (SSB0 * (1 - steep) + SSB[y+1] * (5 * steep - 1))
+      if (autocorr[y+1] != 0 ) { Ry[y+1] <- Ry[y+1] * exp(-0.5 * (sigmaR^2)) * exp(autocorr[y+1]) }
       numbers[y+1,1,] <- Ry[y+1]
            
     } #closes yearly loop
@@ -432,6 +440,7 @@ for (nsim in start.n:end.n)
     #Catch At Length
     mid.temp.f <- numbers[y,,1] * z.f
     mid.temp.m <- numbers[y,,2] * z.m
+
     catch.at.len.f <- ((biology$mid.phi.f * selec[y,,1]) %*% (mid.temp.f))
     catch.at.len.m <- ((biology$mid.phi.m * selec[y,,2]) %*% (mid.temp.m))
         
@@ -560,7 +569,7 @@ for (nsim in start.n:end.n)
             last.no.bias <- setup.yrs + 1 - 2
         }
  
-        #writeCtl(ctl = "sim.ctl", y = y)
+        writeCtl(ctl = "sim.ctl", y = y)
         file.copy("sim.ctl", paste(directory,"/ctl/sim.ctl",sep =""))
         file.rename(paste(directory,"/ctl/sim.ctl",sep =""), 
                        paste(directory,"/ctl/sim",nsim,"_",y-pre.fishery.yrs,".ctl",sep =""))    

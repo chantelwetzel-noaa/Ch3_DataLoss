@@ -3,8 +3,8 @@
 #Survey Parameters
  Q <- 1
  survey.time <- 0.5
- survey.CV <- 0.50
- SS.survey.cv <- 0.50
+ survey.cv <- 0.50
+ ss.survey.cv <- 0.50
 
 #Life-History Parameters
 if (LH == "flatfish" ) {
@@ -50,8 +50,10 @@ if (LH == "flatfish" ) {
  fsp6 <- 70               ; ssp6 <- 70
  
  #Forecast File Values=================================================================================================
- spr.target <- 0.30         ; bio.target <- 0.25
- ctl.rule.tgt<- 0.25        ; ctl.rule.thres <- 0.05
+ spr.target <- spr.target.int <-  0.30         
+ bio.target <- 0.25
+ ctl.rule.tgt<- 0.25
+ ctl.rule.thres <- 0.05
  over.thres <- 0.125
  
  #Depletion value in year 50 of the fishery ===========================================================================
@@ -101,8 +103,10 @@ if (LH == "rockfish" ) {
  fsp6 <- 80               ; ssp6 <- 80
  
  #Forecast File Values=================================================================================================
- spr.target <- 0.50         ; bio.target <- 0.40
- ctl.rule.tgt<- 0.40        ; ctl.rule.thres <- 0.10
+ spr.target <- spr.target.int <- 0.50         
+ bio.target <- 0.40
+ ctl.rule.tgt<- 0.40        
+ ctl.rule.thres <- 0.10
  over.thres <- 0.25
  
  #Depletion value in year 50 of the fishery ===========================================================================
