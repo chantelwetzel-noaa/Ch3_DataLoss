@@ -198,60 +198,60 @@ for (nsim in start.n:end.n)
 
     #Start the projection loop
  	for (y in (pre.fishery.yrs + setup.yrs):total.yrs) {
-
-
+ 		#Move the needed files to the estimation area
+    	file.copy("starter.ss", paste(run,"/starter.ss",sep =""))
+    	file.copy("forecast.ss", paste(run,"/forecast.ss",sep =""))
+    	file.copy("data.ss_new", paste(run,"/data.ss_new",sep =""))
+    	OM = FALSE
+    	setwd(run)
+    	start.devs     <- 0
+    	main.rec.start <-  1
+		main.rec.end   <-  setup.yrs - 5            
+		start.bias     <-  1
+		full.bias      <-  30
+		last.bias      <- y - ages - 4      
+		last.no.bias   <- y - ages - 3
+		max.bias.adj   <- 0.90 # full bias adjustment = ry*exp(-0.5*sigmaR^2 + recdev)
+		n.devs = 0
+    	writeCtl(ctl = "est.ctl", y = y)
+    	#Split the data file and modify
+		SS_splitdat(inpath = run, outpath = run,
+    	        inname="data.ss_new", outpattern=paste("boot",nsim,"_",y,sep=""),number=F,verbose=T,fillblank=T,MLE=F)
+    	dat <- NULL
+    	dat <- SS_readdat(paste(run,"/boot",nsim,".ss",sep=""))
+    	dat$Nsurveys <- 1 
+    	dat$fleetnames <- c("Fishery", "Survey")
+    	dat$areas <- c(1,1)
+    	dat$surveytiming <- c(0.5, 0.5) 
+    	dat$N_cpue <- length(survey)
+    	dat$CPUEinfo <- dat$CPUEinfo[1:2,]
+    	dat$CPUE <- dat$CPUE[1:length(survey),]
+    	SS_writedat(datlist=dat,outfile=paste(run,"/boot",nsim,"_",y,".ss",sep=""),overwrite=TRUE,verbose=TRUE)
+	
+    	#Modify the starter file
+    	starter<-SS_readstarter(file=paste(run,"/starter.ss",sep=""))
+    	starter$datfile<-paste("boot",nsim,"_",y,".ss", sep ="")
+    	starter$ctlfile<-"est.ctl"
+    	starter$last_estimation_phase <- 10
+    	SS_writestarter(starter,dir=paste(run,"/",sep=""),file="starter.ss", overwrite=TRUE,verbose=TRUE)
+	
+    	#Run SS
+    	if (tantalus)  { system("./SS3  > test.txt 2>&1")  }
+    	if (!tantalus) { shell("ss3.exe > test.txt 2>&1")  }
+	
+    	#Rename the ctl and data files
+    	file.rename(paste(om,"/om.ctl",sep =""), 
+    	                   paste(om,"/om",nsim,"_",y-pre.fishery.yrs,".ctl",sep =""))      
+    	file.rename(paste(om,"/om.ctl",sep =""), 
+    	                   paste(om,"/om",nsim,"_",y-pre.fishery.yrs,".ctl",sep =""))  
+	
+    	#rename files
+    	#split new dat files
+    	#change the control file to remove the rec devs and remove the depletion survey
+    	#edit the data file to remove the depletion survey and add the added constant
+    	#move to the main folder for estimation
+	
 
  	} #end projection loop
 
-    #Move the needed files to the estimation area
-    file.copy("starter.ss", paste(run,"/starter.ss",sep =""))
-    file.copy("forecast.ss", paste(run,"/forecast.ss",sep =""))
-    file.copy("data.ss_new", paste(run,"/data.ss_new",sep =""))
-    OM = FALSE
-    setwd(run)
-    start.devs     <- 0
-    main.rec.start <-  1
-	main.rec.end   <-  setup.yrs - 5            
-	start.bias     <-  1
-	full.bias      <-  30
-	last.bias      <- y - ages - 4      
-	last.no.bias   <- y - ages - 3
-	max.bias.adj   <- 0.90 # full bias adjustment = ry*exp(-0.5*sigmaR^2 + recdev)
-	n.devs = 0
-    writeCtl(ctl = "est.ctl", y = y)
-    #Split the data file and modify
-	SS_splitdat(inpath = run, outpath = run,
-            inname="data.ss_new", outpattern=paste("boot",nsim,"_",y,sep=""),number=F,verbose=T,fillblank=T,MLE=F)
-    dat <- NULL
-    dat <- SS_readdat(paste(run,"/boot",nsim,".ss",sep=""))
-    dat$Nsurveys <- 1 
-    dat$fleetnames <- c("Fishery", "Survey")
-    dat$areas <- c(1,1)
-    dat$surveytiming <- c(0.5, 0.5) 
-    dat$N_cpue <- length(survey)
-    dat$CPUEinfo <- dat$CPUEinfo[1:2,]
-    dat$CPUE <- dat$CPUE[1:length(survey),]
-    SS_writedat(datlist=dat,outfile=paste(run,"/boot",nsim,"_",y,".ss",sep=""),overwrite=TRUE,verbose=TRUE)
-
-    #Modify the starter file
-    starter<-SS_readstarter(file=paste(run,"/starter.ss",sep=""))
-    starter$datfile<-paste("boot",nsim,"_",y,".ss", sep ="")
-    starter$ctlfile<-"est.ctl"
-    starter$last_estimation_phase <- 10
-    SS_writestarter(starter,dir=paste(run,"/",sep=""),file="starter.ss", overwrite=TRUE,verbose=TRUE)
-
-    #Run SS
-    if (tantalus)  { system("./SS3  > test.txt 2>&1")  }
-    if (!tantalus) { shell("ss3.exe > test.txt 2>&1")  }
-
-    #Rename the ctl and data files
-    file.rename(paste(om,"/om.ctl",sep =""), 
-                       paste(om,"/om",nsim,"_",y-pre.fishery.yrs,".ctl",sep =""))      
-    file.rename(paste(om,"/om.ctl",sep =""), 
-                       paste(om,"/om",nsim,"_",y-pre.fishery.yrs,".ctl",sep =""))  
-
-    #rename files
-    #split new dat files
-    #change the control file to remove the rec devs and remove the depletion survey
-    #edit the data file to remove the depletion survey and add the added constant
-    #move to the main folder for estimation
+    
