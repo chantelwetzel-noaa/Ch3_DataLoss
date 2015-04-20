@@ -133,7 +133,7 @@ writeCtl <- function (ctl,y)
     2,                      " #main recr dev phas\n",
     1,                      " #advanced options (0=default values)ALL SET AT DEFAULT VALUES\n",                                                 
     start.devs,         " #_recdev_early_start    (0=none;    neg value   makes   relative    to  recdev_start)\n",    
-    -3,                 " #_recdev_early_phase\n",                                                                                
+    3,                 " #_recdev_early_phase\n",                                                                                
     0,                  " #_forecast_recruitment  phase   (incl.  late    recr)   (0  value   resets  to  maxphase+1)\n",                                         
     1,                  " #_lambda    for prior_fore_recr occurring   before  endyr+1\n",                                                         
     start.bias,         " #_last_early_yr_nobias_adj_in_MPD\n",                                                                               
@@ -148,15 +148,15 @@ writeCtl <- function (ctl,y)
     " #end of advanced options\n",
     file=ctl,append=T)                                                                
     
-    if(OM) { write.table(write.devs,file=ctl,append=T,row.names=F, col.names=F, quote=F) }
-    
+    if(OM || get.forecast) { write.table(write.devs,file=ctl,append=T,row.names=F, col.names=F, quote=F) }
+
     cat(
     " #Fishing Mortaltity\n",
     0.04,       " #\n",
     -99,        " #\n",
-    3,          " #F Method (1=discrete pope's)\n",
-    2.9,        " #Max F\n",
-    4,          " #N iterations for tuning hybrid F\n",
+    1,          " #F Method (1=discrete pope's)\n",
+    0.9,        " #Max F\n",
+    #4,          " #N iterations for tuning hybrid F\n",
     file=ctl, append=T)
     
     cat(

@@ -41,6 +41,7 @@ source(paste(drive,"/PhD/Chapter3/code/functions/Arrays.R",sep=""))
 }
 
 if (github == TRUE) {
+temp.drive = drive; drive = "C:"
 #Life-History Parameters ============================================================
 source(paste(drive, git.wd, "/functions/LH_parameter_values.R",sep=""))
 
@@ -73,4 +74,6 @@ source(paste(drive, git.wd, "/functions/Overfished_Selex.R",sep=""))
 
 #Storage Arrays========================================================================
 source(paste(drive, git.wd, "/functions/Arrays.R",sep=""))
+
+drive = temp.drive
 }

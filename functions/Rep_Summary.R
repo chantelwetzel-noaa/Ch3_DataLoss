@@ -6,10 +6,16 @@
 #########################################################
 
 
-Rep_Summary<- function(rep.new, y, pre.fishery.yrs)
+Rep_Summary<- function(rep.new, y, pre.fishery.yrs, do.forecast)
 {
   tot.yrs <- 1:(y-pre.fishery.yrs)
-  ofl.yrs <- (tot.yrs[length(tot.yrs)]+1):(tot.yrs[length(tot.yrs)] + 4)
+
+  if (do.forecast > 0){
+    ofl.yrs <- (tot.yrs[length(tot.yrs)]+1):(tot.yrs[length(tot.yrs)] + 4)
+    OFL = mapply(function(x) OFL = as.numeric(strsplit(rep.new[grep(paste("OFLCatch_",x,sep=""),rep.new)], " ")[[1]][3]), x = ofl.yrs)
+    ACL = mapply(function(x) OFL = as.numeric(strsplit(rep.new[grep(paste("ForeCatch_",x,sep=""),rep.new)], " ")[[1]][3]), x = ofl.yrs)
+    ForeCatch = mapply(function(x) ForeCatch = as.numeric(strsplit(rep.new[grep(paste("ForeCatch_",x,sep=""),rep.new)], " ")[[1]][3]), x = ofl.yrs)
+  }
   
   SB = mapply(function(x) SB = as.numeric(strsplit(rep.new[grep(paste("SPB_",x,sep=""),rep.new)]," ")[[1]][3]), x = tot.yrs)
   SB.virgin = as.numeric(strsplit(rep.new[grep("SPB_Virgin",rep.new)]," ")[[1]][3])
@@ -18,9 +24,6 @@ Rep_Summary<- function(rep.new, y, pre.fishery.yrs)
                                         x = 1:tot.yrs[length(tot.yrs)-1])
   TotBio= mapply(function(x) TotBio = as.numeric(strsplit(rep.new[grep(paste(1, x,"TIME",sep=" "),rep.new)]," ")[[1]][5]),
                                         x = 1:tot.yrs[length(tot.yrs)-1])
-  OFL = mapply(function(x) OFL = as.numeric(strsplit(rep.new[grep(paste("OFLCatch_",x,sep=""),rep.new)], " ")[[1]][3]), x = ofl.yrs)
-  ACL = mapply(function(x) OFL = as.numeric(strsplit(rep.new[grep(paste("ForeCatch_",x,sep=""),rep.new)], " ")[[1]][3]), x = ofl.yrs)
-  ForeCatch = mapply(function(x) ForeCatch = as.numeric(strsplit(rep.new[grep(paste("ForeCatch_",x,sep=""),rep.new)], " ")[[1]][3]), x = ofl.yrs)
   FMSY = as.numeric(strsplit(rep.new[grep("Fstd_MSY",rep.new)], " ")[[1]][3])
   FSPR = as.numeric(strsplit(rep.new[grep("Fstd_SPR",rep.new)], " ")[[1]][3])
   #LLsurvey = as.numeric(strsplit(rep.new[grep("TOTAL",rep.new)+2], " ")[[1]][2])
@@ -59,9 +62,11 @@ Rep_Summary<- function(rep.new, y, pre.fishery.yrs)
   RepSummary$SB <- SB
   RepSummary$SB.virgin <- SB.virgin
   RepSummary$TotBio <- TotBio
-  RepSummary$OFL <- OFL
-  RepSummary$ACL <- ACL
-  RepSummary$ForeCatch <- ForeCatch
+  if (do.forecast > 0 ){
+    RepSummary$OFL <- OFL
+    RepSummary$ACL <- ACL
+    RepSummary$ForeCatch <- ForeCatch
+  }
   RepSummary$VulBioEst <- VulBioEst
   RepSummary$Depl <- Depl
   RepSummary$FSPR <- FSPR

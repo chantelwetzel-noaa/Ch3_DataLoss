@@ -35,7 +35,7 @@ tv.err    <- 0    #Time Varying StDev
 
 pre.fishery.yrs <- ages - 1 
 setup.yrs   <- 50
-project.yrs <- 100
+project.yrs <- 76
 if (LH == "flatfish") { project.yrs = 52 }
 fishery.yrs <- setup.yrs + project.yrs + 1
 total.yrs   <- pre.fishery.yrs + fishery.yrs
@@ -57,7 +57,7 @@ start.survey.age.samp  <- pre.fishery.yrs + start.survey
 #Data Available Based on Scenario
 N.f.len = 100 ; N.s.len = 10 ; N.f.age = 100 ; N.s.age = 10 
 if (data.scenario == "ds0") { 
-    N.f.len = 5000 ; N.s.len = 5000 ; N.f.age = 5000 ; N.s.age = 5000 }
+    N.f.len = 500 ; N.s.len = 500 ; N.f.age = 500 ; N.s.age = 500 }
 
 data.yrs   <- start.fishery.len.samp : total.yrs
 f.len.samp <- c(rep(0,start.survey - 1),rep(N.f.len,length(data.yrs)))
