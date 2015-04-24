@@ -63,11 +63,12 @@ writeCtl <- function (ctl,y)
     0,      1,          0,            0,                  -1,         99,    -99,       c(rep(0,4), 0.5, 0, 0), "# CohortGrowDev"), 
     ncol=15, byrow=T)
 
+    sigma.set = ifelse(sigmaR == 0, 0.01, sigmaR)
     rec.mat <- matrix(c(
     #_LO    HI     INIT     PRIOR   PR_type     SD      PHASE
     2,      15,    log(R0), log(R0), -1,        10,      1, "# log(R0)",  
     0.20,   1,     steep,   steep,   1,       0.09,     -2, "# SR_steep ",
-    0,      1.5,   0.60,    0.60,   -1,         99,     -99,"#SR_sigmaR",
+    0,      1.5,   sigma.set,  sigma.set,   -1,         99,     -99,"#SR_sigmaR",
     -5,     5,     0,       0,      -1,         99,     -99,"# SR_envlink",
     -5,     5,     0,       0,      -1,         99,     -99,"# SR_R1_offset",
     0,   0.99,     0,       0,      -1,         99,     -99,"# SR_autocorr"), 
@@ -125,31 +126,46 @@ writeCtl <- function (ctl,y)
 
     write.table(rec.mat,file=ctl, append=T,row.names=FALSE, col.names=FALSE, quote=FALSE)
     
-    cat(0, " #SR env link\n", 
-    0,                      " #SR env target\n",
-    1,                      " #Do rec dev (0=none, 1=devvector, 2= simple dev)\n",
-    main.rec.start,         " #main recr dev begin yr\n",
-    main.rec.end,           " #main recr devs end yr\n",
-    2,                      " #main recr dev phas\n",
-    1,                      " #advanced options (0=default values)ALL SET AT DEFAULT VALUES\n",                                                 
-    start.devs,         " #_recdev_early_start    (0=none;    neg value   makes   relative    to  recdev_start)\n",    
-    3,                 " #_recdev_early_phase\n",                                                                                
-    0,                  " #_forecast_recruitment  phase   (incl.  late    recr)   (0  value   resets  to  maxphase+1)\n",                                         
-    1,                  " #_lambda    for prior_fore_recr occurring   before  endyr+1\n",                                                         
-    start.bias,         " #_last_early_yr_nobias_adj_in_MPD\n",                                                                               
-    full.bias,          " #_first_yr_fullbias_adj_in_MPD\n",                                                                              
-    last.bias,          " #_last_yr_fullbias_adj_in_MPD\n",                                                                               
-    last.no.bias,       " #_first_recent_yr_nobias_adj_in_MPD\n",                                                                             
-    max.bias.adj,       " #_max_bias_adj_in_MPD\n",                                                                               
-    0,                  " #period of cyle in recruitment\n",                                                             
-    -5,                 " #min    rec_dev \n",                                                                        
-    5,                  " #max    rec_dev \n",  
-    n.devs,             " #_read_recdevs\n",
-    " #end of advanced options\n",
-    file=ctl,append=T)                                                                
-    
-    if(OM || get.forecast) { write.table(write.devs,file=ctl,append=T,row.names=F, col.names=F, quote=F) }
+    if (determ == TRUE){
+        cat(0, " #SR env link\n", 
+        0,                      " #SR env target\n",
+        0,                      " #Do rec dev (0=none, 1=devvector, 2= simple dev)\n",
+        1,         " #main recr dev begin yr\n",
+        y-pre.fishery.yrs,           " #main recr devs end yr\n",
+        -2,                      " #main recr dev phas\n",
+        0,                      " #advanced options (0=default values)ALL SET AT DEFAULT VALUES\n",   
+        file=ctl,append=T)  
+    }
 
+    if (determ == FALSE){
+        cat(0, " #SR env link\n", 
+        0,                      " #SR env target\n",
+        1,                      " #Do rec dev (0=none, 1=devvector, 2= simple dev)\n",
+        main.rec.start,         " #main recr dev begin yr\n",
+        main.rec.end,           " #main recr devs end yr\n",
+        2,                      " #main recr dev phas\n",
+        1,                      " #advanced options (0=default values)ALL SET AT DEFAULT VALUES\n",                                                 
+        start.devs,         " #_recdev_early_start    (0=none;    neg value   makes   relative    to  recdev_start)\n",    
+        pre.dev.phase,      " #_recdev_early_phase\n",                                                                                
+        0,                  " #_forecast_recruitment  phase   (incl.  late    recr)   (0  value   resets  to  maxphase+1)\n",                                         
+        1,                  " #_lambda    for prior_fore_recr occurring   before  endyr+1\n",                                                         
+        start.bias,         " #_last_early_yr_nobias_adj_in_MPD\n",                                                                               
+        full.bias,          " #_first_yr_fullbias_adj_in_MPD\n",                                                                              
+        last.bias,          " #_last_yr_fullbias_adj_in_MPD\n",                                                                               
+        last.no.bias,       " #_first_recent_yr_nobias_adj_in_MPD\n",                                                                             
+        max.bias.adj,       " #_max_bias_adj_in_MPD\n",                                                                               
+        0,                  " #period of cyle in recruitment\n",                                                             
+        -5,                 " #min    rec_dev \n",                                                                        
+        5,                  " #max    rec_dev \n",  
+        n.devs,             " #_read_recdevs\n",
+        " #end of advanced options\n",
+        file=ctl,append=T)   
+    }
+    
+    if (!determ){
+        if(OM || get.forecast) { write.table(write.devs,file=ctl,append=T,row.names=F, col.names=F, quote=F) }
+    }                                                            
+    
     cat(
     " #Fishing Mortaltity\n",
     0.04,       " #\n",
@@ -167,12 +183,15 @@ writeCtl <- function (ctl,y)
     "# Q_type options:  <0=mirror, 0/1=float, 2=parameter, 3=parm_w_random_dev, 4=parm_w_randwalk)\n",
     "# A: Do_Power, B: Do_Env_Link, C: Do_extra_sd, D: Q type\n",
     0, 0, 0, 0,  " #Fishery\n",
-    0, 0, 0, 0,  " #Survey\n",
+    0, 0, 0, fix.q,  " #Survey\n",
     file = ctl, append = T)
 
     if (OM) { cat( 0, 0, 0, 2, " #Depl\n",
               -6, 6, 0, 0, -1, 99, -1,  " #Depletion\n",
               file = ctl, append = T) }
+
+    if (fix.q > 0){ cat(-6, 6, 0, 0, -1, 99, -1,
+                file = ctl, append = T) }
 
     cat(" #Size Selectivity Spec\n",
     24, 0, 0, 0, " #Dbl Normal Fishery\n",

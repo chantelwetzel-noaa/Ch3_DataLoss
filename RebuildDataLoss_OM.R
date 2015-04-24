@@ -20,6 +20,7 @@ data.scenario <- "ds0"
 tantalus <- FALSE
 github <- TRUE
 
+
 #Load packages
 require(r4ss)
 require(compiler)
@@ -65,12 +66,13 @@ for (nsim in start.n:end.n)
  	  source(paste(drive,"/PhD/Chapter3/code/functions/Functions.R",sep="")) }
 
  	#nsim = 1 ; 
- 	#sigmaR = 0 ; 
- 	#survey.cv = 0; 
- 	#tv.err = 0; ss.survey.cv = 0.10; 
+ 	sigmaR = 0.6 ; 
+ 	survey.cv = 0.05; 
+ 	ss.survey.cv = 0.05; 
  	#selec.adj = 0; CV1 = CV2 <- 0.05  
- 	equil = FALSE
-
+ 	equil = TRUE
+    pre.dev.phase = ifelse(equil == TRUE, -3, 3)
+    determ = ifelse(sigmaR == 0, TRUE, FALSE)
  	# Save the run information ===========================================================================
  	capture.output(list(Survey_Start = start.survey, 
                      Overfished_Selectivity_Shift = selec.adj,
@@ -145,6 +147,7 @@ for (nsim in start.n:end.n)
 	setwd(om)
 	y = setup.yrs + pre.fishery.yrs
 	OM = TRUE
+    fix.q = ifelse(OM ==TRUE, 2, 0)
 	n.devs = length(autocorr[1:y])
 	write.devs = cbind(c(-1*pre.fishery.yrs:1, 0, 1:(y - pre.fishery.yrs-1)), autocorr[1:y])
 
@@ -160,7 +163,7 @@ for (nsim in start.n:end.n)
 
 
 	# This is the constant added to the proportional composition data
-	add.const  = 0.000000001 
+	add.const  = 0
 	boot.files = 3 # Create a true, perfect, bootstrapped data set
     end.phase  = 1  # Only estimate a R0 value that makes the depletion survey true
 
@@ -187,6 +190,10 @@ for (nsim in start.n:end.n)
     		            paste(om,"/om",nsim,"_",y-pre.fishery.yrs,".ctl",sep =""), overwrite = TRUE)      
     file.copy(paste(om,"/om.dat",sep =""), 
     		            paste(om,"/om",nsim,"_",y-pre.fishery.yrs,".dat",sep =""), overwrite = TRUE) 
+    file.copy(paste(om,"/data.ss_new",sep =""), 
+                        paste(om,"/data",nsim,"_",y-pre.fishery.yrs,".ss_new",sep =""), overwrite = TRUE) 
+    file.copy(paste(om,"/Report.sso",sep =""), 
+                        paste(om,"/Report_depl",nsim,"_",y-pre.fishery.yrs,".sso",sep =""), overwrite = TRUE) 
 
     #Rerun the model with forecast turned on with no estimation
     #This will produce the true ofl and acls for the next four years
@@ -203,7 +210,7 @@ for (nsim in start.n:end.n)
     dat$N_cpue <- length(survey)
     dat$CPUEinfo <- dat$CPUEinfo[1:2,]
     dat$CPUE <- dat$CPUE[1:length(survey),]
-    dat$add_to_comp <- 0.0001
+    dat$add_to_comp <- 0
     SS_writedat(datlist=dat,outfile=paste(om,"/om.dat",sep=""),overwrite=TRUE,verbose=TRUE)
     #Change the final phase for estimation
     starter <- SS_readstarter(file=paste(om,"/starter.ss",sep=""))
@@ -221,6 +228,8 @@ for (nsim in start.n:end.n)
     		            paste(om,"/om_fore_",nsim,"_",y-pre.fishery.yrs,".ctl",sep =""))      
     file.rename(paste(om,"/om.dat",sep =""), 
     		            paste(om,"/om_fore_",nsim,"_",y-pre.fishery.yrs,".dat",sep =""))
+    file.copy(paste(om,"/Report.sso",sep =""), 
+                        paste(om,"/Report_",nsim,"_",y-pre.fishery.yrs,".sso",sep =""))
     
     #Read in the report file and save needed quantities
     rep.new   <- readLines(paste(om, "/Report.sso", sep=""))
@@ -256,6 +265,7 @@ for (nsim in start.n:end.n)
  			# check how the samples sizes are set during this period to ensure reduction
  			setwd(om)
  			OM = TRUE
+            fix.q = ifelse(OM ==TRUE, 2, 0)
 			n.devs = length(autocorr[1:y])
 			write.devs = cbind(c(-1*pre.fishery.yrs:1, 0, 1:(y - pre.fishery.yrs-1)), autocorr[1:y])
 			survey = rep(5000, length(start.survey:(y-pre.fishery.yrs)))
@@ -271,7 +281,7 @@ for (nsim in start.n:end.n)
 			max.bias.adj   <- 0 #when no devs this results in no correction #1 # full bias adjustment = ry*exp(-0.5*sigmaR^2 + recdev)
 				
 			# This is the constant added to the proportional composition data
-			add.const  = 0.000000001 
+			add.const  = 0
 
     		writeDat(dat = "om.dat", y = y, survey , fore.catch = catch)
     		data = NULL
@@ -306,6 +316,15 @@ for (nsim in start.n:end.n)
     		depl[1:(y-pre.fishery.yrs)]  <- rep.out$Depl
     		ofl.true[(y-pre.fishery.yrs+1):(y-pre.fishery.yrs+4)] <- rep.out$OFL
     		acl.true[(y-pre.fishery.yrs+1):(y-pre.fishery.yrs+4)] <- rep.out$ACL
+
+            file.rename(paste(om,"/Report.sso",sep =""), 
+                        paste(om,"/Report",nsim,"_",y-pre.fishery.yrs,".sso",sep ="")) 
+            file.copy(paste(om,"/data.ss_new",sep =""), 
+                        paste(om,"/data",nsim,"_",y-pre.fishery.yrs,".ss_new",sep =""), overwrite = TRUE) 
+            file.copy(paste(om,"/om.dat",sep =""), 
+                        paste(om,"/om",nsim,"_",y-pre.fishery.yrs,".dat",sep =""), overwrite = TRUE)  
+            file.copy(paste(om,"/om.ctl",sep =""), 
+                        paste(om,"/om",nsim,"_",y-pre.fishery.yrs,".ctl",sep =""), overwrite = TRUE) 
  		}
 
  		#################################################################
@@ -318,26 +337,29 @@ for (nsim in start.n:end.n)
     		file.copy("data.ss_new", paste(run,"/data.ss_new",sep =""), overwrite=T)
 
     		OM = FALSE
+            fix.q = ifelse(OM ==TRUE, 2, 0)
     		setwd(run)
-    		if (y != (pre.fishery.yrs + setup.yrs)) {
+    		if (counter != 1) {
     			start.bias   <- start.bias.est 
         		full.bias    <- full.bias.est  
 				last.bias    <- y - pre.fishery.yrs - 5
         		last.no.bias <- last.bias + 1
         		main.rec.end <- last.bias - 1 
         		max.bias.adj <- max.bias.adj.est
+                print(c(main.rec.end, start.bias, full.bias, last.bias, last.no.bias, max.bias.adj))
         	}
 
-    		if ( y == (pre.fishery.yrs + setup.yrs)){
-    			start.devs     <- 0
-    			main.rec.start <- start.survey - ages          
+    		if ( counter == 1){
+    			start.devs     <- start.survey - ages
+    			main.rec.start <- 1          
 				start.bias     <- 1
 				full.bias      <- 30
 				last.bias      <- y - pre.fishery.yrs - 5
         		last.no.bias   <- last.bias + 1
         		main.rec.end   <- last.bias - 1 
 				max.bias.adj   <- 0.90 # full bias adjustment = ry*exp(-0.5*sigmaR^2 + recdev)
-    		}
+    		  
+            }
 
 			n.devs = 0
 			get.forecast = FALSE
@@ -358,7 +380,7 @@ for (nsim in start.n:end.n)
     			dat$N_cpue <- length(survey)
     			dat$CPUEinfo <- dat$CPUEinfo[1:2,]
     			dat$CPUE <- dat$CPUE[1:length(survey),]
-    			dat$add_to_comp <- 0.0001
+    			dat$add_to_comp <- 0.00001
 			}
     		if (counter != 1){
     			dat.new <- dat.old <- dat <- NULL
@@ -370,7 +392,7 @@ for (nsim in start.n:end.n)
     			dat.old$N_cpue <- dat.new$N_cpue
     			ind = (dim(dat.new$CPUE)[1]-3):(dim(dat.new$CPUE)[1])
     			dat.old$CPUE <- rbind(dat.old$CPUE, dat.new$CPUE[ind,])
-    			dat$add_to_comp <- 0.0001
+    			dat$add_to_comp <- 0.00001
     			dat.old$N_lencomp <- dat.new$N_lencomp
     			ind = dat.new$lencomp$FltSvy == 1 ; ind.old.1 = dat.old$lencomp$FltSvy == 1
     			ind1 = (sum(ind)-3):sum(ind)
@@ -429,7 +451,7 @@ for (nsim in start.n:end.n)
         	  if(rerun > 10) { break () }
         	}
 	
-			if (y <= (pre.fishery.yrs + setup.yrs + 9)){
+			if (determ == FALSE & y <= (pre.fishery.yrs + setup.yrs + 9)){
     			#Apply the bias correction
     			rep.bias     <- SS_output(run, covar = TRUE, printstats = FALSE)
         		new.bias     <- SS_fitbiasramp(rep.bias, 
@@ -440,8 +462,8 @@ for (nsim in start.n:end.n)
         		last.bias    <- y - pre.fishery.yrs - 5
         		last.no.bias <- last.bias + 1
         		#last.no.bias <- last.no.bias.est<-new.bias$df[4,1]
-        		max.bias.adj <- max.bias.adj.est<-new.bias$df[5,1]
-        		main.rec.end <- main.rec.end.est<-last.bias - 1
+        		max.bias.adj <- max.bias.adj.est <-new.bias$df[5,1]
+        		main.rec.end <- main.rec.end.est <-last.bias - 1
 		
         		#Rewrite the control file with the new bias adjustment values
         		writeCtl(ctl = "est.ctl", y = y)
