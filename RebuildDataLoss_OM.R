@@ -66,12 +66,12 @@ for (nsim in start.n:end.n)
  	  source(paste(drive,"/PhD/Chapter3/code/functions/Functions.R",sep="")) }
 
  	#nsim = 1 ; 
- 	sigmaR = 0.6 ; 
- 	survey.cv = 0.05; 
- 	ss.survey.cv = 0.05; 
+ 	sigmaR = 0.60 ; 
+ 	survey.cv = 0.25; 
+ 	ss.survey.cv = 0.25; 
  	#selec.adj = 0; CV1 = CV2 <- 0.05  
  	equil = TRUE
-    pre.dev.phase = ifelse(equil == TRUE, -3, 3)
+    pre.dev.phase = ifelse(equil == TRUE, -3, 4)
     determ = ifelse(sigmaR == 0, TRUE, FALSE)
  	# Save the run information ===========================================================================
  	capture.output(list(Survey_Start = start.survey, 
@@ -129,7 +129,8 @@ for (nsim in start.n:end.n)
 	   autocorr[e] <- rho*autocorr[e-1]+sqrt(1-rho*rho)*recdevs[e]  }
 	
 	#This will start the population in equilibrium
-	if (equil) { autocorr[1:(ages-1)] <- 0 }
+	#if (equil) { autocorr[1:(ages-1)] <- 0 }
+    if (equil) { autocorr[1:(ages)] <- 0 }
 	
 	#Draw Survey Error---------------------------------------------------------------------------------------------------------------  
 	set.seed(survey.seed[nsim])
@@ -145,7 +146,7 @@ for (nsim in start.n:end.n)
 
 	# Create the operating model historical population ---------------------------------------------------------------------
 	setwd(om)
-	y = setup.yrs + pre.fishery.yrs
+	y = setup.yrs + pre.fishery.yrs + 1
 	OM = TRUE
     fix.q = ifelse(OM ==TRUE, 2, 0)
 	n.devs = length(autocorr[1:y])
@@ -342,8 +343,8 @@ for (nsim in start.n:end.n)
     		if (counter != 1) {
     			start.bias   <- start.bias.est 
         		full.bias    <- full.bias.est  
-				last.bias    <- y - pre.fishery.yrs - 5
-        		last.no.bias <- last.bias + 1
+				last.bias    <- y - pre.fishery.yrs - 7
+        		last.no.bias <- last.bias + 2
         		main.rec.end <- last.bias - 1 
         		max.bias.adj <- max.bias.adj.est
                 print(c(main.rec.end, start.bias, full.bias, last.bias, last.no.bias, max.bias.adj))
@@ -354,8 +355,8 @@ for (nsim in start.n:end.n)
     			main.rec.start <- 1          
 				start.bias     <- 1
 				full.bias      <- 30
-				last.bias      <- y - pre.fishery.yrs - 5
-        		last.no.bias   <- last.bias + 1
+				last.bias      <- y - pre.fishery.yrs - 7
+        		last.no.bias   <- last.bias + 2
         		main.rec.end   <- last.bias - 1 
 				max.bias.adj   <- 0.90 # full bias adjustment = ry*exp(-0.5*sigmaR^2 + recdev)
     		  
@@ -459,8 +460,8 @@ for (nsim in start.n:end.n)
         		start.bias   <- start.bias.est <- new.bias$df[1,1]
         		full.bias    <- full.bias.est  <- new.bias$df[2,1]
         		#last.bias    <- last.bias.est  <- new.bias$df[3,1]
-        		last.bias    <- y - pre.fishery.yrs - 5
-        		last.no.bias <- last.bias + 1
+        		last.bias    <- y - pre.fishery.yrs - 7
+        		last.no.bias <- last.bias + 2
         		#last.no.bias <- last.no.bias.est<-new.bias$df[4,1]
         		max.bias.adj <- max.bias.adj.est <-new.bias$df[5,1]
         		main.rec.end <- main.rec.end.est <-last.bias - 1
