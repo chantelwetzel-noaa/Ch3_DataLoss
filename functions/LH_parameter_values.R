@@ -35,7 +35,7 @@ if (LH == "flatfish" ) {
  sigmaR <- 0.60         
  a3 <- 2.833                ; a4 <- ages - 11               
  a.linear <- floor(a3)      ; len.slope <- 5.1613
- CV1 <- 0.10                ; CV2 <- 0.10
+ CV1 <- 0.12                ; CV2 <- 0.05
  Amat <-amat <- 5           
  mat.age <- 0 #First Mature Age
  width.95per <- 4.05
@@ -89,7 +89,7 @@ if (LH == "rockfish" ) {
  sigmaR <- 0.60
  a3 <- 2                    ; a4 <- ages - 21  
  a.linear <- floor(a3)      ; len.slope <- 5.32         
- CV1 <- 0.10                ; CV2 <- 0.10
+ CV1 <- 0.12                ; CV2 <- 0.05
  Amat <- amat <- 13
  mat.age <- 0 #First Mature Age
  

@@ -3,25 +3,25 @@ writeCtl <- function (ctl,y)
 {   
     selec.master <- matrix(c(    
     #_LO    HI   INIT   PRIOR  PR_type SD  PHASE   env  use_dev      dev_minyr   dev_maxyr   dev_stddev  Block     Block_Fxn
-    25,     60,  fsp1,  fsp1,   -1,     1,   2,    0,   0,           0,          0,         0.20,      block.num, block.fxn,   "#Peak",
-    -5,     5,   fsp2,  fsp2,   -1,     1,  -3,    0,   0,           0,          0,          0.5,        0,        0,           "#Top (Width)",                            
-    -10,    10,  fsp3,  fsp3,   -1,     1,   3,    0,   0,           0,          0,          0.5,        0,        0,           "#Asc_Width" ,                         
-    -2,     20,  fsp4,  fsp4,   -1,     1,  -3,    0,   0,           0,          0,          0.5,        0,        0,           "#Desc_Width",                         
-    -15,    15,  fsp5,  fsp5,   -1,     1,  -4,    0,   0,           0,          0,          0.5,        0,        0,           "#Init",                           
-    -999,  100,  -999,  -999,   -1,     1,  -4,    0,   0,           0,          0,          0.5,        0,        0,           "#Final",   
+    25,     60,  fsp1,  fsp1,   -1,     1,   4,    0,   0,           0,          0,         0.20,      block.num, block.fxn,   "#Peak",
+    -5,     5,   fsp2,  fsp2,   -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,           "#Top (Width)",                            
+    -10,    10,  fsp3,  fsp3,   -1,     1,   5,    0,   0,           0,          0,          0.5,        0,        0,           "#Asc_Width" ,                         
+    -2,     20,  fsp4,  fsp4,   -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,           "#Desc_Width",                         
+    -15,    15,  fsp5,  fsp5,   -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,           "#Init",                           
+    -999,  100,  -999,  -999,   -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,           "#Final",   
     #Survey                     
-    25,     60,  ssp1,  ssp1,   -1,     1,    2,   0,   0,           0,          0,          0.5,        0,        0,           "#Peak",                           
-    -5,     5,   ssp2,  ssp2,   -1,     1,   -3,   0,   0,           0,          0,          0.5,        0,        0,           "#Top (Width)",                            
-    -10,    10,  ssp3,  ssp3,   -1,     1,    3,   0,   0,           0,          0,          0.5,        0,        0,           "#Asc_Width",                          
-    -2,     20,  ssp4,  ssp4,   -1,     1,   -2,   0,   0,           0,          0,          0.5,        0,        0,           "#Desc_Width",                         
-    -15,    15,  ssp5,  ssp5,   -1,     1,   -3,   0,   0,           0,          0,          0.5,        0,        0,           "#Init",                           
-    -999,  100,  -999,  -999,   -1,     1,   -3,   0,   0,           0,          0,          0.5,        0,        0,           "#Final"),    
+    25,     60,  ssp1,  ssp1,   -1,     1,    4,   0,   0,           0,          0,          0.5,        0,        0,           "#Peak",                           
+    -5,     5,   ssp2,  ssp2,   -1,     1,   -9,   0,   0,           0,          0,          0.5,        0,        0,           "#Top (Width)",                            
+    -10,    10,  ssp3,  ssp3,   -1,     1,    5,   0,   0,           0,          0,          0.5,        0,        0,           "#Asc_Width",                          
+    -2,     20,  ssp4,  ssp4,   -1,     1,   -9,   0,   0,           0,          0,          0.5,        0,        0,           "#Desc_Width",                         
+    -15,    15,  ssp5,  ssp5,   -1,     1,   -9,   0,   0,           0,          0,          0.5,        0,        0,           "#Init",                           
+    -999,  100,  -999,  -999,   -1,     1,   -9,   0,   0,           0,          0,          0.5,        0,        0,           "#Final"),    
     ncol=15, byrow=T) 
 
     ageselec.mat<- matrix(c(
     #_LO    HI        INIT    PRIOR         R_type   SD       PHASE       env-var use_dev dev_minyr   dev_maxyr   dev_stddev  Block   Block_Fxn    
     0,      0,         0,     0,            0,       50,      -3,        c(rep(0,4), 0.5, 0, 0), "#MIN AGE", 
-    0,      ages+10,   ages,  ages,            0,       50,      -3,        c(rep(0,4), 0.5, 0, 0), "#MAX AGE"),
+    0,      ages+10,   ages,  ages,         0,       50,      -3,        c(rep(0,4), 0.5, 0, 0), "#MAX AGE"),
     byrow=T, ncol=15)
 
     block.selec <- matrix(c(
@@ -30,8 +30,8 @@ writeCtl <- function (ctl,y)
     ncol = 8, byrow = F)  
 
     bio.mat <-matrix(c( 
-    #_LO    HI          INIT          PRIOR                 PR_type    SD    PHASE      env-var use_dev dev_minyr   dev_maxyr   dev_stddev  Block   Block_Fxn
-    0.01,   0.4,        m,            m,                     3,      .25,     2,        c(rep(0,4), 0.5, 0,0), "#NatM_p_1_Fem_GP_1",
+    #_LO    HI          INIT          PRIOR              PR_type    SD    PHASE      env-var use_dev dev_minyr   dev_maxyr   dev_stddev  Block   Block_Fxn
+    0.01,   0.2,        m,            round(log(m),4),     3,        .25,     m.phase,        c(rep(0,4), 0.5, 0,0), "#NatM_p_1_Fem_GP_1",
     3,      35,         L1,           L1,                 -1,         10,     3,        c(rep(0,4), 0.5, 0,0), "#L_at_Amin_Fem_GP_1_",
     45,     70,         L2f,          L2f,                -1,         10,     3,        c(rep(0,4), 0.5, 0,0), "#L_at_Amax_Fem_GP_1_",
     0.00,   0.2,        kf,           kf,                 -1,        .25,     -3,       c(rep(0,4), 0.5, 0,0), "#VonBert_K_Fem_GP_1_",
@@ -66,7 +66,7 @@ writeCtl <- function (ctl,y)
     sigma.set = ifelse(sigmaR == 0, 0.01, sigmaR)
     rec.mat <- matrix(c(
     #_LO    HI     INIT     PRIOR   PR_type     SD      PHASE
-    2,      15,    log(R0), log(R0), -1,        10,      1, "# log(R0)",  
+    2,      15,    log(R0), log(R0), -1,        10,      est.R0, "# log(R0)",  
     0.20,   1,     steep,   steep,   1,       0.09,     -2, "# SR_steep ",
     0,      1.5,   sigma.set,  sigma.set,   -1,         99,     -99,"#SR_sigmaR",
     -5,     5,     0,       0,      -1,         99,     -99,"# SR_envlink",
@@ -140,14 +140,14 @@ writeCtl <- function (ctl,y)
     if (determ == FALSE){
         cat(0, " #SR env link\n", 
         0,                      " #SR env target\n",
-        1,                      " #Do rec dev (0=none, 1=devvector, 2= simple dev)\n",
+        2,                      " #Do rec dev (0=none, 1=devvector, 2= simple dev)\n",
         main.rec.start,         " #main recr dev begin yr\n",
         main.rec.end,           " #main recr devs end yr\n",
         3,                      " #main recr dev phas\n",
         1,                      " #advanced options (0=default values)ALL SET AT DEFAULT VALUES\n",                                                 
         start.devs,         " #_recdev_early_start    (0=none;    neg value   makes   relative    to  recdev_start)\n",    
         pre.dev.phase,      " #_recdev_early_phase\n",                                                                                
-        -4,                  " #_forecast_recruitment  phase   (incl.  late    recr)   (0  value   resets  to  maxphase+1)\n",                                         
+        0,                  " #_forecast_recruitment  phase   (incl.  late    recr)   (0  value   resets  to  maxphase+1)\n",                                         
         1000,               " #_lambda    for prior_fore_recr occurring   before  endyr+1\n",                                                         
         start.bias,         " #_last_early_yr_nobias_adj_in_MPD\n",                                                                               
         full.bias,          " #_first_yr_fullbias_adj_in_MPD\n",                                                                              

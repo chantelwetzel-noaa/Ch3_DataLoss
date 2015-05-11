@@ -15,10 +15,13 @@
 drive <-"E:" #"//home//cwetzel//h_cwetzel"
 LH <- "rockfish"
 start.n <- 1
-end.n <- 1
-data.scenario <- "ds0" 
+end.n <- 10
+data.scenario <- "ds1" 
 tantalus <- FALSE
 github <- TRUE
+file.type = "boot" #"boot" "perfect"
+do.MLE = FALSE
+if (file.type == "perfect") { do.MLE = T }
 
 
 #Load packages
@@ -70,7 +73,7 @@ for (nsim in start.n:end.n)
  	survey.cv = 0.25; 
  	ss.survey.cv = 0.25; 
  	#selec.adj = 0; CV1 = CV2 <- 0.05  
- 	equil = TRUE
+ 	equil = FALSE
     pre.dev.phase = ifelse(equil == TRUE, -3, 4)
     determ = ifelse(sigmaR == 0, TRUE, FALSE)
  	# Save the run information ===========================================================================
@@ -105,13 +108,13 @@ for (nsim in start.n:end.n)
 	catch.dev <- c(rnorm(10,0,0.50),rnorm(30,0,0.07),rnorm(10,0,0.15))
 	CatchTot <- rep(0,setup.yrs) ;  CatchTot[1] <- 25
 	  
-	for (y in 2:(setup.yrs-11)) { 
-	   CatchTot[y]<- CatchTot[y-1]*1.4 
-	       if (CatchTot[y-1]*1.4 > 1000 ) { 
-	           CatchTot[y] <- 1000 }  
+	for (a in 2:(setup.yrs-11)) { 
+	   CatchTot[a]<- CatchTot[a-1]*1.4 
+	       if (CatchTot[a-1]*1.4 > 1000 ) { 
+	           CatchTot[a] <- 1000 }  
 	}
-	for (y in (setup.yrs-10):setup.yrs) { 
-	   CatchTot[y]<- CatchTot[y-1]*0.97 
+	for (a in (setup.yrs-10):setup.yrs) { 
+	   CatchTot[a]<- CatchTot[a-1]*0.97 
 	}
 	  
 	CatchTot     <- round(CatchTot,0)    
@@ -122,15 +125,15 @@ for (nsim in start.n:end.n)
 	set.seed(recruit.seed[nsim])
 	rho      <- 0
 	if ( auto ) { rho <- 1 / sqrt(2) }
-	recdevs  <- rnorm(total.yrs, 0, sigmaR)
-	autocorr <- rep(0, total.yrs)
+	recdevs  <- rnorm((total.yrs+1), 0, sigmaR)
+	autocorr <- matrix(0, total.yrs + 5, 1)
 	autocorr[1] <- recdevs[1]  
-	for (e in 2:total.yrs) { 
+	for (e in 2:(total.yrs + 1)) { 
 	   autocorr[e] <- rho*autocorr[e-1]+sqrt(1-rho*rho)*recdevs[e]  }
-	
+	rownames(autocorr) = c(-ages:-1,0,1:(setup.yrs + project.yrs + 4))
 	#This will start the population in equilibrium
-	#if (equil) { autocorr[1:(ages-1)] <- 0 }
-    if (equil) { autocorr[1:(ages)] <- 0 }
+    if (equil) { autocorr[1:(ages+1)] <- 0 }
+    
 	
 	#Draw Survey Error---------------------------------------------------------------------------------------------------------------  
 	set.seed(survey.seed[nsim])
@@ -146,11 +149,13 @@ for (nsim in start.n:end.n)
 
 	# Create the operating model historical population ---------------------------------------------------------------------
 	setwd(om)
-	y = setup.yrs + pre.fishery.yrs + 1
+	y = setup.yrs + pre.fishery.yrs 
 	OM = TRUE
     fix.q = ifelse(OM ==TRUE, 2, 0)
-	n.devs = length(autocorr[1:y])
-	write.devs = cbind(c(-1*pre.fishery.yrs:1, 0, 1:(y - pre.fishery.yrs-1)), autocorr[1:y])
+	#n.devs = length(autocorr[1:y])
+	#write.devs = cbind(c((-1*pre.fishery.yrs+1):1,0, 1:(y - pre.fishery.yrs)), autocorr[1:y])
+    write.devs = cbind(c((-1*ages):-1, 0, 1:(y - pre.fishery.yrs + 4)), autocorr[1:(y + 6)])
+    n.devs = dim(write.devs)[1]
 
 	# Set up the bias adjustment parameters ----------------------------------------------------------------------------------
 	main.rec.start <-  1
@@ -160,13 +165,15 @@ for (nsim in start.n:end.n)
 	last.bias      <- setup.yrs        
 	last.no.bias   <- setup.yrs
 	start.devs     <- start.bias + 1
-	max.bias.adj   <- 0 #when no devs this results in no correction #1 # full bias adjustment = ry*exp(-0.5*sigmaR^2 + recdev)
+	max.bias.adj   <- 1 #0 #when no devs this results in no correction #1 # full bias adjustment = ry*exp(-0.5*sigmaR^2 + recdev)
 
 
 	# This is the constant added to the proportional composition data
 	add.const  = 0
 	boot.files = 3 # Create a true, perfect, bootstrapped data set
     end.phase  = 1  # Only estimate a R0 value that makes the depletion survey true
+    est.R0 = 1
+    m.phase = 1
 
     # Create the depletion survey for the data file
     fleets = "Fishery%Survey%Depl"
@@ -267,22 +274,25 @@ for (nsim in start.n:end.n)
  			setwd(om)
  			OM = TRUE
             fix.q = ifelse(OM ==TRUE, 2, 0)
-			n.devs = length(autocorr[1:y])
-			write.devs = cbind(c(-1*pre.fishery.yrs:1, 0, 1:(y - pre.fishery.yrs-1)), autocorr[1:y])
+			#n.devs = length(autocorr[1:y])
+			#write.devs = cbind(c(-1*pre.fishery.yrs:1, 0, 1:(y - pre.fishery.yrs-1)), autocorr[1:y])
+            write.devs = cbind(c((-1*ages):-1, 0, 1:(y - pre.fishery.yrs + 4)), autocorr[1:(y + 6)])
+            n.devs = dim(write.devs)[1]
 			survey = rep(5000, length(start.survey:(y-pre.fishery.yrs)))
 		
 			# Set up the bias adjustment parameters ----------------------------------------------------------------------------------
 			main.rec.start <-  1
-			main.rec.end   <-  setup.yrs            
+			main.rec.end   <-  y - pre.fishery.yrs #setup.yrs            
 			start.bias     <- -pre.fishery.yrs - 2
 			full.bias      <- -pre.fishery.yrs - 1
 			last.bias      <- setup.yrs        
 			last.no.bias   <- setup.yrs
 			start.devs     <- start.bias + 1
-			max.bias.adj   <- 0 #when no devs this results in no correction #1 # full bias adjustment = ry*exp(-0.5*sigmaR^2 + recdev)
+			max.bias.adj   <- 1 #0 #when no devs this results in no correction #1 # full bias adjustment = ry*exp(-0.5*sigmaR^2 + recdev)
 				
 			# This is the constant added to the proportional composition data
 			add.const  = 0
+            est.R0 = 1
 
     		writeDat(dat = "om.dat", y = y, survey , fore.catch = catch)
     		data = NULL
@@ -344,8 +354,8 @@ for (nsim in start.n:end.n)
     			start.bias   <- start.bias.est 
         		full.bias    <- full.bias.est  
 				last.bias    <- y - pre.fishery.yrs - 7
-        		last.no.bias <- last.bias + 2
-        		main.rec.end <- last.bias - 1 
+        		last.no.bias <- y - pre.fishery.yrs
+        		main.rec.end <- y - pre.fishery.yrs #last.bias - 1 
         		max.bias.adj <- max.bias.adj.est
                 print(c(main.rec.end, start.bias, full.bias, last.bias, last.no.bias, max.bias.adj))
         	}
@@ -356,12 +366,13 @@ for (nsim in start.n:end.n)
 				start.bias     <- 1
 				full.bias      <- 30
 				last.bias      <- y - pre.fishery.yrs - 7
-        		last.no.bias   <- last.bias + 2
-        		main.rec.end   <- last.bias - 1 
+        		last.no.bias   <- y - pre.fishery.yrs
+        		main.rec.end   <- y - pre.fishery.yrs #last.bias - 1 
 				max.bias.adj   <- 0.90 # full bias adjustment = ry*exp(-0.5*sigmaR^2 + recdev)
     		  
             }
 
+            est.R0 = 1
 			n.devs = 0
 			get.forecast = FALSE
 			do.forecast = 1 #This switches on and off the forecast
@@ -369,10 +380,11 @@ for (nsim in start.n:end.n)
     		writeCtl(ctl = "est.ctl", y = y)
     		#Split the data file and modify
 			SS_splitdat(inpath = om, outpath = run,
-    		        inname="data.ss_new", outpattern=paste("boot",nsim,"_",y-pre.fishery.yrs,sep=""),number=F,verbose=T,fillblank=T,MLE=F)
+    		        inname="data.ss_new", outpattern=paste(file.type,nsim,"_",y-pre.fishery.yrs,sep=""),
+                    number=F, verbose=T, fillblank=T, MLE= do.MLE)
 			if (counter == 1){
 				dat <- NULL
-    			dat <- SS_readdat(paste(run,"/boot",nsim,"_", y-pre.fishery.yrs,".ss",sep=""))
+    			dat <- SS_readdat(paste(run,"/", file.type ,nsim,"_", y-pre.fishery.yrs,".ss",sep=""))
     			dat$Nsurveys <- 1 
     			dat$fleetnames <- c("Fishery", "Survey")
     			dat$areas <- c(1,1)
@@ -385,8 +397,8 @@ for (nsim in start.n:end.n)
 			}
     		if (counter != 1){
     			dat.new <- dat.old <- dat <- NULL
-    			dat.new <- SS_readdat(paste(run,"/boot",nsim,"_", y-pre.fishery.yrs,".ss",sep=""))
-    			dat.old <- SS_readdat(paste(run,"/boot",nsim,"_", y-pre.fishery.yrs-4,".ss",sep=""))
+    			dat.new <- SS_readdat(paste(run,"/", file.type, nsim,"_", y-pre.fishery.yrs,".ss",sep=""))
+    			dat.old <- SS_readdat(paste(run,"/", file.type ,nsim,"_", y-pre.fishery.yrs-4,".ss",sep=""))
     			dat.old$endyr <- dat.new$endyr
     			dat.old$N_catch <- dat.new$N_catch
     			dat.old$catch <- cbind(catch[(pre.fishery.yrs+1):y], dat.new$catch[,2:3])
@@ -408,11 +420,11 @@ for (nsim in start.n:end.n)
     			dat.old$agecomp <- rbind(dat.old$agecomp[ind.old.1,], dat.new$agecomp[ind1,], dat.old$agecomp[ind.old.2,], dat.new$agecomp[ind2,])
     			dat = dat.old
     		}
-    		SS_writedat(datlist=dat,outfile=paste(run,"/boot",nsim,"_",y-pre.fishery.yrs,".ss",sep=""),overwrite=TRUE,verbose=TRUE)
+    		SS_writedat(datlist=dat,outfile=paste(run,"/", file.type,nsim,"_",y-pre.fishery.yrs,".ss",sep=""),overwrite=TRUE,verbose=TRUE)
 		
     		#Modify the starter file
     		starter<-SS_readstarter(file=paste(run,"/starter.ss",sep=""))
-    		starter$datfile<-paste("boot",nsim,"_",y-pre.fishery.yrs,".ss", sep ="")
+    		starter$datfile<-paste(file.type,nsim,"_",y-pre.fishery.yrs,".ss", sep ="")
     		starter$ctlfile<-"est.ctl"
     		starter$last_estimation_phase <- 10
     		SS_writestarter(starter,dir=paste(run,"/",sep=""),file="starter.ss", overwrite=TRUE,verbose=TRUE)
@@ -461,10 +473,10 @@ for (nsim in start.n:end.n)
         		full.bias    <- full.bias.est  <- new.bias$df[2,1]
         		#last.bias    <- last.bias.est  <- new.bias$df[3,1]
         		last.bias    <- y - pre.fishery.yrs - 7
-        		last.no.bias <- last.bias + 2
+        		last.no.bias <- y - pre.fishery.yrs
         		#last.no.bias <- last.no.bias.est<-new.bias$df[4,1]
         		max.bias.adj <- max.bias.adj.est <-new.bias$df[5,1]
-        		main.rec.end <- main.rec.end.est <-last.bias - 1
+        		main.rec.end <- main.rec.end.est <-y - pre.fishery.yrs #last.bias - 1
 		
         		#Rewrite the control file with the new bias adjustment values
         		writeCtl(ctl = "est.ctl", y = y)
