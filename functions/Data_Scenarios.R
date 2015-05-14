@@ -24,7 +24,7 @@ sigma <- 0.36
 p.value <- 0.45
 auto <- FALSE
 selec.adj <- 5
-start.survey <- 36
+start.survey <- 106 #36
 AgeError <- FALSE 
 #Adjust the max age value that would be used if ageing error is included
 max.age = ages - 1
@@ -40,19 +40,21 @@ if (LH == "flatfish") { project.yrs = 52 }
 fishery.yrs <- setup.yrs + project.yrs + 1
 total.yrs   <- pre.fishery.yrs + fishery.yrs
 
-years       <- c(seq(-pre.fishery.yrs,-1,1),seq(1,fishery.yrs,1)) 
+years       <- 1:total.yrs #fishery.yrs 
+#years      <- c(seq(-pre.fishery.yrs,-1,1),seq(1,fishery.yrs,1)) 
 ass.num     <- (project.yrs / 4) + 1
 
 estimate.m = TRUE
 if (data.scenario == "ds3") { estimate.m = FALSE }
 
-if (data.scenario == "ds0") { start.survey = 1 }
+#if (data.scenario == "ds0") { start.survey = 1 }
+if (data.scenario == "ds0") { start.survey = 71 }
 
 #Determine when the data begins
-start.fishery.len.samp <- pre.fishery.yrs + start.survey
-start.fishery.age.samp <- pre.fishery.yrs + start.survey
-start.survey.len.samp  <- pre.fishery.yrs + start.survey
-start.survey.age.samp  <- pre.fishery.yrs + start.survey
+start.fishery.len.samp <- start.survey #pre.fishery.yrs + start.survey
+start.fishery.age.samp <- start.survey #pre.fishery.yrs + start.survey
+start.survey.len.samp  <- start.survey #pre.fishery.yrs + start.survey
+start.survey.age.samp  <- start.survey #pre.fishery.yrs + start.survey
 
 #Data Available Based on Scenario
 N.f.len = 100 ; N.s.len = 10 ; N.f.age = 100 ; N.s.age = 10 

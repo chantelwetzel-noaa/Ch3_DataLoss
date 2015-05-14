@@ -128,19 +128,20 @@ writeCtl <- function (ctl,y)
     
     if (determ == TRUE){
         cat(0, " #SR env link\n", 
-        0,                      " #SR env target\n",
-        0,                      " #Do rec dev (0=none, 1=devvector, 2= simple dev)\n",
-        1,         " #main recr dev begin yr\n",
-        y-pre.fishery.yrs,           " #main recr devs end yr\n",
-        -2,                      " #main recr dev phas\n",
-        0,                      " #advanced options (0=default values)ALL SET AT DEFAULT VALUES\n",   
+        0,     " #SR env target\n",
+        0,     " #Do rec dev (0=none, 1=devvector, 2= simple dev)\n",
+        1,     " #main recr dev begin yr\n",
+        #y-pre.fishery.yrs,           " #main recr devs end yr\n",
+        y,     " #main recr devs end yr\n",
+        -2,    " #main recr dev phas\n",
+        0,     " #advanced options (0=default values)ALL SET AT DEFAULT VALUES\n",   
         file=ctl,append=T)  
     }
 
     if (determ == FALSE){
         cat(0, " #SR env link\n", 
         0,                      " #SR env target\n",
-        2,                      " #Do rec dev (0=none, 1=devvector, 2= simple dev)\n",
+        1,                      " #Do rec dev (0=none, 1=devvector, 2= simple dev)\n",
         main.rec.start,         " #main recr dev begin yr\n",
         main.rec.end,           " #main recr devs end yr\n",
         3,                      " #main recr dev phas\n",
@@ -314,7 +315,8 @@ writeForecast <- function (forecast,y)
     0,          " #_Forecast loop control #3 (reserved for future bells&whistles)\n", 
     0,          " #_Forecast loop control #4 (reserved for future bells&whistles)\n", 
     0,          " #_Forecast loop control #5 (reserved for future bells&whistles)\n", 
-    y-pre.fishery.yrs-2, " #FirstYear for caps and allocations (should be after years with fixed inputs)\n", 
+    #y-pre.fishery.yrs-2, " #FirstYear for caps and allocations (should be after years with fixed inputs)\n", 
+    y-2,        " #FirstYear for caps and allocations (should be after years with fixed inputs)\n", 
     0,          " # stddev of log(realized catch/target catch) in forecast (set value>0.0 to cause active impl_error)\n",
     0,          " # Do West Coast gfish rebuilder output (0/1)\n", 
     -1,         " # Rebuilder:  first year catch could have been set to zero (Ydecl)(-1 to set to 1999)\n",
@@ -341,34 +343,41 @@ writeDat<-function(dat, y, survey, fore.catch)
 
     landings <- cbind(
         #Value of Catch                          #Year                              #Fleet          
-        fore.catch[(pre.fishery.yrs+1):(y)],   seq(1,(y-pre.fishery.yrs),1),    rep(1,(y-pre.fishery.yrs)) )
+        #fore.catch[(pre.fishery.yrs+1):y],   seq(1,(y-pre.fishery.yrs),1),    rep(1,(y-pre.fishery.yrs)) )
+        fore.catch[(pre.fishery.yrs+1):y],   seq(ages,y,1),    rep(1,(y-pre.fishery.yrs)) )
 
     ss.survey.data = cbind(
-        start.survey:(y-pre.fishery.yrs), rep(1, length(survey)), rep(2, length(survey)), 
+        #start.survey:(y-pre.fishery.yrs), rep(1, length(survey)), rep(2, length(survey)), 
+        start.survey:y, rep(1, length(survey)), rep(2, length(survey)), 
         survey, rep(ss.survey.cv, length(survey)))
         
-    depl.survey    = cbind(y-pre.fishery.yrs, 1, 3, final.depl, 0.01)
+    depl.survey    = cbind(y, 1, 3, final.depl, 0.01)
+                    #cbind(y-pre.fishery.yrs, 1, 3, final.depl, 0.01)
 
-    data.yrs = (start.fishery.len.samp - pre.fishery.yrs):(y-pre.fishery.yrs)
+    #data.yrs = (start.fishery.len.samp - pre.fishery.yrs):(y-pre.fishery.yrs)
+    data.yrs = start.fishery.len.samp:y
     data.matrix = matrix(0, length(data.yrs), 2*length(len.step))
     data.matrix[,1] = f.len.samp[data.yrs]
     fishery.length.data = cbind(data.yrs, rep(1, length(data.yrs)), rep(1, length(data.yrs)), rep(3, length(data.yrs)), rep(2, length(data.yrs)),
                     f.len.samp[data.yrs], data.matrix)  
 
-    data.yrs = (start.survey.len.samp - pre.fishery.yrs):(y-pre.fishery.yrs)
+    #data.yrs = (start.survey.len.samp - pre.fishery.yrs):(y-pre.fishery.yrs)
+    data.yrs = start.survey.len.samp:y
     data.matrix = matrix(0, length(data.yrs), 2*length(len.step))
     data.matrix[,1] = s.len.samp[data.yrs]
     survey.length.data = cbind(data.yrs, rep(1, length(data.yrs)), rep(2, length(data.yrs)), rep(3, length(data.yrs)), rep(2, length(data.yrs)),
                     s.len.samp[data.yrs], data.matrix)    
 
-    data.yrs = (start.fishery.age.samp- pre.fishery.yrs) :(y-pre.fishery.yrs)
+    #data.yrs = (start.fishery.age.samp- pre.fishery.yrs) :(y-pre.fishery.yrs)
+    data.yrs =  start.fishery.age.samp :y
     data.matrix = matrix(0, length(data.yrs), 2*ages - 2)
     data.matrix[,1] = f.age.samp[data.yrs]
     fishery.age.data = cbind(data.yrs, rep(1, length(data.yrs)), rep(1, length(data.yrs)), rep(3, length(data.yrs)), rep(2, length(data.yrs)),
                     rep(1, length(data.yrs)), rep(-1, length(data.yrs)), rep(-1, length(data.yrs)),
                     f.age.samp[data.yrs], data.matrix)  
 
-    data.yrs = (start.survey.age.samp- pre.fishery.yrs) :(y-pre.fishery.yrs)
+    #data.yrs = (start.survey.age.samp- pre.fishery.yrs) :(y-pre.fishery.yrs)
+    data.yrs =  start.survey.age.samp : y
     data.matrix = matrix(0, length(data.yrs), 2*ages - 2)
     data.matrix[,1] = s.age.samp[data.yrs]
     survey.age.data = cbind(data.yrs, rep(1, length(data.yrs)), rep(2, length(data.yrs)), rep(3, length(data.yrs)), rep(2, length(data.yrs)),
@@ -383,7 +392,8 @@ writeDat<-function(dat, y, survey, fore.catch)
     "#Stock Synthesis\n",
     "#\n",
     1,                  " #Start Year\n",
-    y-pre.fishery.yrs,  " #End Year\n",
+    #y-pre.fishery.yrs,  " #End Year\n",
+    y,                  " #End Year\n",
     1,                  " #Number Seasons per Year\n",
     12,                 " #Months per Season/season\n",
     1,                  " #Spawning Season\n",

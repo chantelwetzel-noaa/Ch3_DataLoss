@@ -8,7 +8,7 @@
 
 Rep_Summary<- function(rep.new, y, pre.fishery.yrs, do.forecast)
 {
-  tot.yrs <- 1:(y-pre.fishery.yrs)
+  tot.yrs <- 1:y #1:(y-pre.fishery.yrs)
 
   if (do.forecast > 0){
     ofl.yrs <- (tot.yrs[length(tot.yrs)]+1):(tot.yrs[length(tot.yrs)] + 4)
@@ -52,7 +52,8 @@ Rep_Summary<- function(rep.new, y, pre.fishery.yrs, do.forecast)
   F.Selex.1.adj = as.numeric(strsplit(rep.new[grep("SizeSel_1P_1_Fishery_BLK1",rep.new)], " ")[[1]][3])
   }
   
-  x = start.survey:(y-pre.fishery.yrs - 1)
+  #x = start.survey:(y-pre.fishery.yrs - 1)
+  x = start.survey:(y - 1)
   VulBioEst <- mapply(function(x)
                VulBioEst = as.numeric(strsplit(rep.new[grep(paste(2,"Survey",x,sep=" "),rep.new)], " ")[[1]][6]), x = x)
   
