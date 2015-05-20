@@ -1,18 +1,18 @@
-wd = "C:/PhD/Chapter3/rockfish_ds0_sims_1_10/save/" ; par(mfrow =c (4,3), oma =c(1,1,1,1), mar = c(2,4,2,3))
+wd = "E:/PhD/Chapter3/rockfish_ds1_sims_1_20_dev2/save/" ; par(mfrow =c (4,3), oma =c(1,1,1,1), mar = c(2,4,2,3))
 
 #wd = "C:/PhD/Chapter3/flatfish_ds1_sims_1_100/save/" ; par(mfrow =c (4,3))
 #wd = "C:/PhD/Chapter3/flatfish_ds2_sims_1_100/save/"
 #wd = "C:/PhD/Chapter3/flatfish_ds3_sims_1_100/save/"
 #wd = "C:/PhD/Chapter3/flatfish_ds4_sims_1_100/save/"
 setwd(wd)
-ass.length = 26#14
-start.year = 71#41
-ss.years = 150#102
-end.year = start.year + ss.years - 1
+ass.length = 20 #14
+start.year = 1#41
+ss.years = 197#150#102
+end.year = ss.years + 1
 sims = 10
 target = 0.40#0.25 
 thres  = 0.25#0.08
-ssb = matrix(0, ss.years, sims)
+ssb = matrix(0, end.year, sims)
 ssb.est = array (0, dim = c(ss.years, ass.length, sims))
 #par(mfrow=c(2,2))
 for (i in 1:sims){
@@ -31,7 +31,7 @@ for (i in 1:sims){
 }
 
 #par(mfrow=c(2,2))
-depl = matrix(0, ss.years, sims)
+depl = matrix(0, end.year, sims)
 depl.est = array (0, dim = c(ss.years, ass.length, sims))
 for (i in 1:sims){
 	#if (i < 26) { temp = 25 + i }
@@ -40,8 +40,8 @@ for (i in 1:sims){
 	dat = paste("om_proj_",i,sep ="")
 	load(est); load (dat)
 
-	depl[,i] = Proj$depl[start.year:end.year]
-	depl.est[,,i] = Est$Bratio[1:ss.years,]
+	depl[,i] = Proj$Depl[start.year:end.year]
+	depl.est[,,i] = Est$Bratio[1:ss.years,] #Est$Bratio[1:ss.years,]
 	#plot(1:102, Proj$depl[start.year:end.year], type = 'l', col = 1, lwd =2, main = i, ylim = c(0, 1.2))
 	#abline(h = 0.08); abline(v = 50) ; abline(h =0.25)
 	#for(j in 1:ass.length){
@@ -50,7 +50,7 @@ for (i in 1:sims){
 	#}
 }
 
-recruit = matrix(0, ss.years, sims)
+recruit = matrix(0, end.year, sims)
 recruit.est = array (0, dim = c(ss.years, ass.length, sims))
 for (i in 1:sims){
 	#if (i < 26) { temp = 25 + i }
@@ -60,7 +60,7 @@ for (i in 1:sims){
 	load(est); load (dat)
 
 	recruit[,i] = 2*Proj$Ry[start.year:end.year]
-	recruit.est[,,i] = Est$Recruits[1:ss.years,]
+	recruit.est[,,i] = Est$Recruits[1:ss.years,] #Est$Recruits[1:ss.years,]
 	#plot(1:102, Proj$depl[start.year:end.year], type = 'l', col = 1, lwd =2, main = i, ylim = c(0, 1.2))
 	#abline(h = 0.08); abline(v = 50) ; abline(h =0.25)
 	#for(j in 1:ass.length){
@@ -78,24 +78,44 @@ med.rec.est = matrix(0, ss.years, ass.length)
 for (a in 1:ass.length){
 	med.depl.est[,a] = apply(depl.est[,a,], 1, median)
 	med.ssb.est[,a] = apply(ssb.est[,a,], 1, median)
-	med.rec.est[,a] = apply(recruit.est[,a,], 1, median)
+	med.rec.est[,a] = apply(2*recruit.est[,a,], 1, median)
 }
 
-#par(mfrow =c (3,3))
+re.depl = matrix(0, sims, ass.length)
+re.ssb  = matrix(0, sims, ass.length)
+re.sb0 = matrix(0, sims, ass.length)
+for (a in 1:ass.length){
+	ind = 120 + 4*a - 4
+	re.depl[,a] = (depl.est[ind,a,] - depl[ind,])/depl[ind,]
+	re.ssb [,a] = (ssb.est[ind,a,] - ssb[ind,]) / ssb[ind,]
+	re.sb0[,a] = (ssb.est[1,a,] - ssb[1,]) / ssb[1,]
+}
+par(mfrow=c(3,1))
+boxplot(re.depl, ylim = c(-0.25, 0.25)); abline(h = 0)
+boxplot(re.ssb, ylim = c(-0.25, 0.25)); abline(h = 0)
+boxplot(re.sb0, ylim = c(-0.25, 0.25)); abline(h = 0)
+
+
+
+
+par(mfrow =c (3,1))
 plot(1:ss.years, med.depl[1:ss.years], ylim =c(0,1), type ='l', lwd =2, ylab = "Depletion")
 abline (h =target) ; abline ( h =thres)
 for (a in 1:ass.length){
-	ind = 1:(50 + a*4 -4)
+	ind = 1:(120 + a*4 -4)
+	if (a == ass.length) { ind = 1:(120+a*4-5) }
 	lines(ind, med.depl.est[ind,a], lty = 2, col =2)
 }
-plot(1:ss.years, med.ssb[1:ss.years], type ='l', lwd =2, ylim = c(0, 8000), ylab = "SSB")
+plot(1:ss.years, med.ssb[1:ss.years], type ='l', lwd =2, ylim = c(0, 12000), ylab = "SSB")
 for (a in 1:ass.length){
-	ind = 1:(50 + a*4 -4)
+	ind = 1:(120 + a*4 -4)
+	if (a == ass.length) { ind = 1:(120+a*4-5) }
 	lines(ind, med.ssb.est[ind,a], lty = 2, col =2)
 }
 plot(1:ss.years, med.rec[1:ss.years], type ='l', lwd =2, ylim = c(0, 8000), ylab = "Recruits")
 for (a in 1:ass.length){
-	ind = 1:(50 + a*4 -4)
+	ind = 1:(120 + a*4 -4)
+	if (a == ass.length) { ind = 1:(50+a*4-5) }
 	lines(ind, med.rec.est[ind,a], lty = 2, col =2)
 }
 
@@ -119,7 +139,7 @@ for (i in 1:sims){
  	lmax.mat[,i] = Est$Lmax.store
  	f.selex[,,i] = Est$F.selex[c(1,3),]
  	s.selex[,,i] = Est$S.selex[c(1,3),]
- 	f.adj[,i] = Est$F.selex.1.adj
+ 	#f.adj[,i] = Est$F.selex.1.adj
 }
 
 #par(mfrow=c(2,2))
@@ -148,5 +168,5 @@ boxplot(t(s.selex[2,,]), ylim = c(4, 5), ylab = "S Slope Select") ; abline (h = 
 
 
 
-re.m = (M.mat - 0.15)/ 0.15
-boxplot(t(re.m), ylim = c(-0.25, 0.50)); abline (h = 0)
+re.m = (M.mat - 0.08)/ 0.08
+boxplot(t(re.m), ylim = c(-0.1, 0.10)); abline (h = 0)
