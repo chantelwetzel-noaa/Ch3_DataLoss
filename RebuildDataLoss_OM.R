@@ -13,10 +13,10 @@
 #source("C:/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/RebuildDataLoss_OM.R")
 
 drive <-"E:" #"//home//cwetzel//h_cwetzel"
-LH <- "rockfish"
+LH <- "flatfish"
 start.n <- 1
-end.n <- 10
-data.scenario <- "ds1" 
+end.n <- 1
+data.scenario <- "ds4" 
 tantalus <- FALSE
 github <- TRUE
 file.type = "boot" #"boot" "perfect"
@@ -200,8 +200,6 @@ for (nsim in start.n:end.n)
     		            #paste(om,"/om",nsim,"_",y-pre.fishery.yrs,".ctl",sep =""), overwrite = TRUE)      
     file.copy(paste(om,"/om.dat",sep =""), paste(om,"/om",nsim,"_",y,".dat",sep =""), overwrite = TRUE)
     		            #paste(om,"/om",nsim,"_",y-pre.fishery.yrs,".dat",sep =""), overwrite = TRUE) 
-    file.copy(paste(om,"/data.ss_new",sep =""), paste(om,"/data",nsim,"_",y,".ss_new",sep =""), overwrite = TRUE) 
-                        #paste(om,"/data",nsim,"_",y-pre.fishery.yrs,".ss_new",sep =""), overwrite = TRUE) 
     file.copy(paste(om,"/Report.sso",sep =""), paste(om,"/Report_depl",nsim,"_",y,".sso",sep =""), overwrite = TRUE)  
                         #paste(om,"/Report_depl",nsim,"_",y-pre.fishery.yrs,".sso",sep =""), overwrite = TRUE) 
 
@@ -240,6 +238,8 @@ for (nsim in start.n:end.n)
     		            #paste(om,"/om_fore_",nsim,"_",y-pre.fishery.yrs,".dat",sep =""))
     file.copy(paste(om,"/Report.sso",sep =""), paste(om,"/Report_",nsim,"_",y,".sso",sep =""))
                         #paste(om,"/Report_",nsim,"_",y-pre.fishery.yrs,".sso",sep =""))
+    file.copy(paste(om,"/data.ss_new",sep =""), paste(om,"/data",nsim,"_",y,".ss_new",sep =""), overwrite = TRUE) 
+                        #paste(om,"/data",nsim,"_",y-pre.fishery.yrs,".ss_new",sep =""), overwrite = TRUE) 
     
     #Read in the report file and save needed quantities
     rep.new   <- readLines(paste(om, "/Report.sso", sep=""))
@@ -267,6 +267,25 @@ for (nsim in start.n:end.n)
     #Start the projection loop
     ###################################################################################################################
  	for (y in (pre.fishery.yrs + setup.yrs):total.yrs) {
+
+
+        #Change the data levels based upon the status and data scenario
+        if (decl.overfished  == TRUE) {
+            if (data.scenario == "ds3" || data.scenario == "ds4") {
+                ind             <- y #y - pre.fishery.yrs
+                f.len.samp[ind] <- floor(0.25 * f.len.samp[ind])
+                s.len.samp[ind] <- s.len.samp[ind]
+                f.age.samp[ind] <- floor(0.25 * f.age.samp[ind])
+                s.age.samp[ind] <- s.age.samp[ind]
+            }
+            if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds2") {
+                ind             <- y # - pre.fishery.yrs
+                f.len.samp[ind] <- f.len.samp[ind]
+                s.len.samp[ind] <- s.len.samp[ind]
+                f.age.samp[ind] <- f.age.samp[ind]
+                s.age.samp[ind] <- s.age.samp[ind]
+            }
+        }
  		
  		do.ass = y
     	if(LH == "flatfish") { do.ass = y - 2} 
@@ -548,42 +567,22 @@ for (nsim in start.n:end.n)
                           	 "Lmin.store", "Lmax.store", "k.store")
 	        save(Est, file=estimates)
 
-	        #Determine is the stock if assessed overfished for the first time
-	        #if (decl.overfished == FALSE & Bratio[(y - pre.fishery.yrs),counter] < over.thres) {
+            #Set the ACLs for the next four years 
+            catch[(y+1):(y+4)] <- ForeCat[(y+1):(y+4)] 
+    
+            #Rename the ctl and data files
+            file.rename(paste(run,"/Report.sso",sep =""), paste(run,"/Report",nsim,"_",y,".sso",sep ="")) 
+                        #paste(run,"/Report",nsim,"_",y-pre.fishery.yrs,".sso",sep =""))  
+            file.rename(paste(run,"/est.ctl",sep =""), paste(run,"/est",nsim,"_",y,".ctl",sep =""))
+                        #paste(run,"/est",nsim,"_",y-pre.fishery.yrs,".ctl",sep ="")) 
+
+            #Determine is the stock if assessed overfished for the first time
+            #if (decl.overfished == FALSE & Bratio[(y - pre.fishery.yrs),counter] < over.thres) {
             if (decl.overfished == FALSE & Bratio[y,counter] < over.thres) {
-	        	decl.overfished = TRUE } 
-
-	        #if(decl.overfished == TRUE & Bratio[(y - pre.fishery.yrs),counter] >= bio.target){
+                decl.overfished = TRUE } 
+               #if(decl.overfished == TRUE & Bratio[(y - pre.fishery.yrs),counter] >= bio.target){
             if(decl.overfished == TRUE & Bratio[y,counter] >= bio.target){
-	        	decl.overfished = FALSE }
-
-	        #Change the data levels based upon the status and data scenario
-	        if (decl.overfished  == TRUE) {
-	        	if (data.scenario == "ds3" ) {
-	        		ind             <- y #y - pre.fishery.yrs
-            		f.len.samp[ind] <- floor(0.25 * f.len.samp[ind])
-            		s.len.samp[ind] <- s.len.samp[ind]
-            		f.age.samp[ind] <- floor(0.25 * f.age.samp[ind])
-            		s.age.samp[ind] <- s.age.samp[ind]
-	        	}
-
-            	if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds2") {
-      				ind             <- y # - pre.fishery.yrs
-      				f.len.samp[ind] <- f.len.samp[ind]
-      				s.len.samp[ind] <- s.len.samp[ind]
-      				f.age.samp[ind] <- f.age.samp[ind]
-      				s.age.samp[ind] <- s.age.samp[ind]
-    			}
-        	}
-        
-        	#Set the ACLs for the next four years 
-        	catch[(y+1):(y+4)] <- ForeCat[(y+1):(y+4)] 
-	
-    		#Rename the ctl and data files
-    		file.rename(paste(run,"/Report.sso",sep =""), paste(run,"/Report",nsim,"_",y,".sso",sep ="")) 
-    		            #paste(run,"/Report",nsim,"_",y-pre.fishery.yrs,".sso",sep =""))  
-    		file.rename(paste(run,"/est.ctl",sep =""), paste(run,"/est",nsim,"_",y,".ctl",sep =""))
-    		            #paste(run,"/est",nsim,"_",y-pre.fishery.yrs,".ctl",sep =""))      
+                decl.overfished = FALSE } 
 		} #end assessment loop
 
     	Proj[[1]] <- SSB

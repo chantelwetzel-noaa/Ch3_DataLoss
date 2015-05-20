@@ -24,7 +24,8 @@ sigma <- 0.36
 p.value <- 0.45
 auto <- FALSE
 selec.adj <- 5
-start.survey <- 106 #36
+start.survey <- ages + 35 #106 #36
+
 AgeError <- FALSE 
 #Adjust the max age value that would be used if ageing error is included
 max.age = ages - 1
