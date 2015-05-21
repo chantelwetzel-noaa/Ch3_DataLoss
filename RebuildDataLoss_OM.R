@@ -12,11 +12,11 @@
 #source("F://PhD//Chapter3//Code//RebuildDataLoss_OM.R") 
 #source("C:/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/RebuildDataLoss_OM.R")
 
-drive <-"E:" #"//home//cwetzel//h_cwetzel"
+drive <-"C:" #"//home//cwetzel//h_cwetzel"
 LH <- "flatfish"
-start.n <- 1
-end.n <- 1
-data.scenario <- "ds4" 
+start.n <- 44
+end.n <- 50
+data.scenario <- "ds1" 
 tantalus <- FALSE
 github <- TRUE
 file.type = "boot" #"boot" "perfect"
@@ -478,11 +478,12 @@ for (nsim in start.n:end.n)
     		}
 	
     		#Make sure the model converged
+            rerun = 0
     		rep.new   <- readLines(paste(run, "/Report.sso", sep=""))
         	virgin.SB <- as.numeric(strsplit(rep.new[grep(paste("SPB_Virgin",sep=""),rep.new)]," ")[[1]][3])
         	while(virgin.SB < (SB0/4) || virgin.SB > (SB0*4)) {
         	  rerun = rerun + 1  
-        	  starter.file = SS_readstarter(paste(directory, "starter.ss", sep = ""))
+        	  starter.file = SS_readstarter(paste(run, "/starter.ss", sep = ""))
         	  starter.file$jitter_fraction = 0.10
         	  SS_writestarter(starter.file, paste(directory, sep = ""), overwrite = T )
         	  if (y <= (pre.fishery.yrs + setup.yrs + 9)){
@@ -493,7 +494,7 @@ for (nsim in start.n:end.n)
         	  	if (tantalus == T) { system("./SS3 -nohess > test.txt 2>&1")  }
         	  	if (tantalus == F) { shell("ss3.exe -nohess > test.txt 2>&1")  }
         	  }
-        	  rep.new   <- readLines(paste(directory, "Report.sso", sep=""))
+        	  rep.new   <- readLines(paste(run, "/Report.sso", sep=""))
         	  virgin.SB <- as.numeric(strsplit(rep.new[grep(paste("SPB_Virgin",sep=""),rep.new)]," ")[[1]][3])
         	  if (virgin.SB > (SB0/4) && virgin.SB < (SB0*4)) {
         	    break()
