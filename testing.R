@@ -1,15 +1,16 @@
-wd = "E:/PhD/Chapter3/rockfish_ds1_sims_1_20_dev2/save/" ; par(mfrow =c (4,3), oma =c(1,1,1,1), mar = c(2,4,2,3))
+wd = "C:/PhD/Chapter3/rockfish_ds4_sims_1_20_cv25/save/" ; par(mfrow =c (4,3), oma =c(1,1,1,1), mar = c(2,4,2,3))
 
 #wd = "C:/PhD/Chapter3/flatfish_ds1_sims_1_100/save/" ; par(mfrow =c (4,3))
 #wd = "C:/PhD/Chapter3/flatfish_ds2_sims_1_100/save/"
 #wd = "C:/PhD/Chapter3/flatfish_ds3_sims_1_100/save/"
 #wd = "C:/PhD/Chapter3/flatfish_ds4_sims_1_100/save/"
 setwd(wd)
-ass.length = 20 #14
-start.year = 1#41
-ss.years = 197#150#102
+ass.length = 20#20 #14
+start.year = 1
+ss.years = 197#143#197
+first.ass = 120#90#120
 end.year = ss.years + 1
-sims = 10
+sims = 18
 target = 0.40#0.25 
 thres  = 0.25#0.08
 ssb = matrix(0, end.year, sims)
@@ -85,7 +86,7 @@ re.depl = matrix(0, sims, ass.length)
 re.ssb  = matrix(0, sims, ass.length)
 re.sb0 = matrix(0, sims, ass.length)
 for (a in 1:ass.length){
-	ind = 120 + 4*a - 4
+	ind = first.ass + 4*a - 4
 	re.depl[,a] = (depl.est[ind,a,] - depl[ind,])/depl[ind,]
 	re.ssb [,a] = (ssb.est[ind,a,] - ssb[ind,]) / ssb[ind,]
 	re.sb0[,a] = (ssb.est[1,a,] - ssb[1,]) / ssb[1,]
@@ -102,19 +103,19 @@ par(mfrow =c (3,1))
 plot(1:ss.years, med.depl[1:ss.years], ylim =c(0,1), type ='l', lwd =2, ylab = "Depletion")
 abline (h =target) ; abline ( h =thres)
 for (a in 1:ass.length){
-	ind = 1:(120 + a*4 -4)
-	if (a == ass.length) { ind = 1:(120+a*4-5) }
+	ind = 1:(first.ass + a*4 -4)
+	if (a == ass.length) { ind = 1:(first.ass+a*4-5) }
 	lines(ind, med.depl.est[ind,a], lty = 2, col =2)
 }
 plot(1:ss.years, med.ssb[1:ss.years], type ='l', lwd =2, ylim = c(0, 12000), ylab = "SSB")
 for (a in 1:ass.length){
-	ind = 1:(120 + a*4 -4)
-	if (a == ass.length) { ind = 1:(120+a*4-5) }
+	ind = 1:(first.ass + a*4 -4)
+	if (a == ass.length) { ind = 1:(first.ass+a*4-5) }
 	lines(ind, med.ssb.est[ind,a], lty = 2, col =2)
 }
 plot(1:ss.years, med.rec[1:ss.years], type ='l', lwd =2, ylim = c(0, 8000), ylab = "Recruits")
 for (a in 1:ass.length){
-	ind = 1:(120 + a*4 -4)
+	ind = 1:(first.ass + a*4 -4)
 	if (a == ass.length) { ind = 1:(50+a*4-5) }
 	lines(ind, med.rec.est[ind,a], lty = 2, col =2)
 }

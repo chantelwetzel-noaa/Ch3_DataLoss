@@ -14,8 +14,8 @@
 
 drive <-"C:" #"//home//cwetzel//h_cwetzel"
 LH <- "flatfish"
-start.n <- 44
-end.n <- 50
+start.n <- 1
+end.n <- 10
 data.scenario <- "ds1" 
 tantalus <- FALSE
 github <- TRUE
@@ -70,8 +70,8 @@ for (nsim in start.n:end.n)
 
  	#nsim = 1 ; 
  	sigmaR = 0.60 ; 
- 	survey.cv = 0.25; 
- 	ss.survey.cv = 0.25; 
+ 	survey.cv = 0.50; 
+ 	ss.survey.cv = 0.50; 
  	#selec.adj = 0; CV1 = CV2 <- 0.05  
  	equil = FALSE
     pre.dev.phase = ifelse(equil == TRUE, -3, 4)

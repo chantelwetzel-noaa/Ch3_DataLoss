@@ -36,7 +36,7 @@ tv.err    <- 0    #Time Varying StDev
 
 pre.fishery.yrs <- ages - 1 
 setup.yrs   <- 50
-project.yrs <- 76
+project.yrs <- 100 #76
 if (LH == "flatfish") { project.yrs = 52 }
 fishery.yrs <- setup.yrs + project.yrs + 1
 total.yrs   <- pre.fishery.yrs + fishery.yrs
