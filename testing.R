@@ -1,16 +1,16 @@
-wd = "C:/PhD/Chapter3/rockfish_ds4_sims_1_20_cv25/save/" ; par(mfrow =c (4,3), oma =c(1,1,1,1), mar = c(2,4,2,3))
+wd = "C:/PhD/Chapter3/rockfish_ds4_sims_1_10/save/" ; par(mfrow =c (4,3), oma =c(1,1,1,1), mar = c(2,4,2,3))
 
 #wd = "C:/PhD/Chapter3/flatfish_ds1_sims_1_100/save/" ; par(mfrow =c (4,3))
 #wd = "C:/PhD/Chapter3/flatfish_ds2_sims_1_100/save/"
 #wd = "C:/PhD/Chapter3/flatfish_ds3_sims_1_100/save/"
 #wd = "C:/PhD/Chapter3/flatfish_ds4_sims_1_100/save/"
 setwd(wd)
-ass.length = 20#20 #14
+ass.length = 26#26 #14
 start.year = 1
-ss.years = 197#143#197
+ss.years = 221#142
 first.ass = 120#90#120
 end.year = ss.years + 1
-sims = 18
+sims = 10
 target = 0.40#0.25 
 thres  = 0.25#0.08
 ssb = matrix(0, end.year, sims)

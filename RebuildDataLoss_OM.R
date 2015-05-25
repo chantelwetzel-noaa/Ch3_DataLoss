@@ -13,10 +13,10 @@
 #source("C:/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/RebuildDataLoss_OM.R")
 
 drive <-"C:" #"//home//cwetzel//h_cwetzel"
-LH <- "flatfish"
+LH <- "rockfish"
 start.n <- 1
 end.n <- 10
-data.scenario <- "ds1" 
+data.scenario <- "ds4" 
 tantalus <- FALSE
 github <- TRUE
 file.type = "boot" #"boot" "perfect"
