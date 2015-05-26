@@ -470,7 +470,7 @@ writeDat<-function(dat, y, survey, fore.catch)
         "#Age Error Matrix\n",
         rep(-1, ages),      " #True Ages\n",
         #rep(-1,max.age + 1),  " #True Ages\n",
-        rep(0.01,ages),     " #Age Error StDev\n",
+        rep(0.1,ages),     " #Age Error StDev\n",
         #(1:ages-0.5)*0.05,    " #Age Error StDev\n",
         #(1:(max.age+1)-0.5)*0.05, " #Age Error StDev\n",
         "#\n",

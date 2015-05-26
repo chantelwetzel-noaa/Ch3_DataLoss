@@ -12,10 +12,10 @@
 #source("F://PhD//Chapter3//Code//RebuildDataLoss_OM.R") 
 #source("C:/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/RebuildDataLoss_OM.R")
 
-drive <-"C:" #"//home//cwetzel//h_cwetzel"
+drive <-"E:" #"//home//cwetzel//h_cwetzel"
 LH <- "rockfish"
-start.n <- 1
-end.n <- 10
+start.n <- 2
+end.n <- 2
 data.scenario <- "ds4" 
 tantalus <- FALSE
 github <- TRUE
@@ -152,6 +152,8 @@ for (nsim in start.n:end.n)
 	y = setup.yrs + pre.fishery.yrs 
 	OM = TRUE
     fix.q = ifelse(OM ==TRUE, 2, 0)
+    fsp1.om[1:y] <- fsp1.start
+    fsp1 <- fsp1.start
 	#n.devs = length(autocorr[1:y])
 	#write.devs = cbind(c((-1*pre.fishery.yrs+1):1,0, 1:(y - pre.fishery.yrs)), autocorr[1:y])
     #write.devs = cbind(c((-1*ages):-1, 0, 1:(y - pre.fishery.yrs + 4)), autocorr[1:(y + 6)])
@@ -261,7 +263,8 @@ for (nsim in start.n:end.n)
     acl.true[(y+1):(y+4)] <- rep.out$ACL
 
     decl.overfished = FALSE
-    counter = 0
+    counter = overfished.counter = 0
+    block.num = block.fxn = bind.block = 0
 
     ###################################################################################################################
     #Start the projection loop
@@ -307,7 +310,18 @@ for (nsim in start.n:end.n)
             n.devs = dim(write.devs)[1]
 			#survey = rep(5000, length(start.survey:(y-pre.fishery.yrs)))
             survey = rep(5000, length(start.survey:y))
-		
+
+            #Selectivity shift while overfished
+            if (decl.overfished == TRUE  & overfished.counter == 1) { 
+                fsp1 = fsp1.start + selec.adj  
+                block.yrs = c(decl.yr, end.yr) 
+                block.pattern = 1 }
+            if (decl.overfished == FALSE & overfished.counter == 1) { 
+                fsp1 = fsp1.start }
+
+            #inflec.selec[y] <- fsp1 * exp(-0.50 * tv.err * tv.err + select.err[y])
+		    fsp1.om[y] <- fsp1
+
 			# Set up the bias adjustment parameters ----------------------------------------------------------------------------------
 			main.rec.start <-  1
 			main.rec.end   <-  y #y - pre.fishery.yrs #setup.yrs            
@@ -547,6 +561,7 @@ for (nsim in start.n:end.n)
         	SB[1:ind,counter]     <- rep.out$SB
             #ind                   <- (ages +1):y #y - pre.fishery.yrs
         	Bratio[1:ind,counter] <- rep.out$Depl
+            fsp1.est[,counter]    <- ifelse(need.blocks == F, 0, rep.out$F.selex.1.adj)
 
         	Est[[1]] <- TotBio
         	Est[[2]] <- OFL
@@ -563,6 +578,7 @@ for (nsim in start.n:end.n)
         	Est[[13]]<- Lmin.store
         	Est[[14]]<- Lmax.store
         	Est[[15]]<- k.store
+            Est[[16]]<- fsp1.est
 
        		names(Est) <- c("TotBio","OFL","ForeCat","Fmult","FSPR","M.store","R0.out","SB","Bratio","F.selex","S.selex","Recruits",
                           	 "Lmin.store", "Lmax.store", "k.store")
@@ -578,12 +594,24 @@ for (nsim in start.n:end.n)
                         #paste(run,"/est",nsim,"_",y-pre.fishery.yrs,".ctl",sep ="")) 
 
             #Determine is the stock if assessed overfished for the first time
-            #if (decl.overfished == FALSE & Bratio[(y - pre.fishery.yrs),counter] < over.thres) {
             if (decl.overfished == FALSE & Bratio[y,counter] < over.thres) {
-                decl.overfished = TRUE } 
-               #if(decl.overfished == TRUE & Bratio[(y - pre.fishery.yrs),counter] >= bio.target){
-            if(decl.overfished == TRUE & Bratio[y,counter] >= bio.target){
-                decl.overfished = FALSE } 
+                decl.overfished = TRUE 
+                overfished.counter = 1 + overfished.counter 
+                need.blocks = TRUE
+                block.num = 1; block.fxn = 2
+                decl.yr = y + 1
+            } 
+
+            if(decl.overfished == TRUE){
+                end.yr = y + 4
+                if(Bratio[y,counter] >= bio.target){
+                    decl.overfished = FALSE 
+                    end.yr = y + 5
+                    print("RECOVERED!!!!!!!!!!!!!!!!!")
+                    print(end.yr)
+                }
+            } 
+
 		} #end assessment loop
 
     	Proj[[1]] <- SSB
@@ -598,9 +626,10 @@ for (nsim in start.n:end.n)
     	Proj[[10]]<- f.age.samp
     	Proj[[11]]<- s.age.samp
     	Proj[[12]]<- inflec.selec
+        Proj[[13]]<- fsp1.om
 
     	names(Proj) <- c ("SSB", "Depl","R0","Ry", "catch","ofl.true", "acl.true", "f.len.samp","s.len.sam","f.age.samp",
-    					"s.age.samp", "new.peak")
+    					"s.age.samp", "new.peak", "peak")
     	save(Proj, file = projections)
  	} #end projection loop
 } #end sim loop

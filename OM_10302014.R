@@ -215,7 +215,7 @@ for (nsim in start.n:end.n)
     for(y in 1:(pre.fishery.yrs+setup.yrs - 1)) {  
 
       #Time-Varying Selectivity---------------------------------------------------------------------------------------------------------
-      inflec.selec[y] <- fsp1 * exp(-0.50 * tv.err * tv.err) * exp(select.err[y])
+      inflec.selec[y] <- fsp1 * exp(-0.50 * tv.err * tv.err + select.err[y])
       selec.out       <- TimeVarying_Selex(mid.phi.m = biology$mid.phi.m, mid.phi.f = biology$mid.phi.f, sel.para = inflec.selec[y])
       selec.age.m     <- selec.out$selec.age.m
       selec.age.f     <- selec.out$selec.age.f

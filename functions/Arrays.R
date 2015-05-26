@@ -7,7 +7,8 @@
   vul.total.obs        <- matrix(0, total.yrs, 1) #fishery.yrs, 1)
   index.expect         <- matrix(0, total.yrs, 1) #fishery.yrs, 1)
   survey.catch.age.len <- array(NA,c(total.yrs, ages, length(len.step), sexes)) #fishery.yrs, ages, length(len.step), sexes))
-  
+  fsp1.om <- numeric(total.yrs)
+
   #Storage matrices for data samples
   f.lengths            <- matrix(0, total.yrs, (2*length(len.step))) #fishery.yrs, (2*length(len.step)))
   s.lengths            <- matrix(0, total.yrs, (2*length(len.step))) #fishery.yrs, (2*length(len.step)))
@@ -37,7 +38,7 @@
   Lmax.store  <- array(NA, dim=c(1, ass.num))
   k.store     <- array(NA, dim=c(1, ass.num))
   F.selex     <- array(NA, dim=c(6, ass.num))
-  F.selex.1.adj<- array(NA, dim=c(1, ass.num))
+  fsp1.est    <- array(NA, dim=c(1, ass.num))
   S.selex     <- array(NA, dim=c(6, ass.num))
   
   #Dynamics

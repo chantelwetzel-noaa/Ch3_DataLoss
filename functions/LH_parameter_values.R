@@ -42,7 +42,7 @@ if (LH == "flatfish" ) {
  
  Fmsy <- 0.1964341
  
- fsp1 <- 43               ; ssp1 <- 33
+ fsp1.start <- 43         ; ssp1 <- 33
  fsp2 <- 3                ; ssp2 <- 3 
  fsp3 <- 4.25             ; ssp3 <- 4.25  
  fsp4 <- 6                ; ssp4 <- 6
@@ -95,7 +95,7 @@ if (LH == "rockfish" ) {
  
  Fmsy <- 0.05080846  
  
- fsp1 <- 45               ; ssp1 <- 39
+ fsp1.start <- 45         ; ssp1 <- 39
  fsp2 <- 3                ; ssp2 <- 3 
  fsp3 <- 4.25             ; ssp3 <- 4.25  
  fsp4 <- 6                ; ssp4 <- 6

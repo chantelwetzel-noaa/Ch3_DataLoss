@@ -49,7 +49,8 @@ Rep_Summary<- function(rep.new, y, pre.fishery.yrs, do.forecast)
   S.Selex.6 = as.numeric(strsplit(rep.new[grep("SizeSel_2P_6_Survey",rep.new)], " ")[[1]][3])
 
   if (need.blocks == TRUE){
-  F.Selex.1.adj = as.numeric(strsplit(rep.new[grep("SizeSel_1P_1_Fishery_BLK1",rep.new)], " ")[[1]][3])
+    F.Selex.1.adj = ifelse(overfished.counter == 0, 0,
+              as.numeric(strsplit(rep.new[grep("SizeSel_1P_1_Fishery_BLK1",rep.new)], " ")[[1]][3]) )
   }
   
   #x = start.survey:(y-pre.fishery.yrs - 1)
