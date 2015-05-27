@@ -14,8 +14,8 @@
 
 drive <-"E:" #"//home//cwetzel//h_cwetzel"
 LH <- "rockfish"
-start.n <- 2
-end.n <- 2
+start.n <- 1
+end.n <- 10
 data.scenario <- "ds4" 
 tantalus <- FALSE
 github <- TRUE
@@ -76,6 +76,7 @@ for (nsim in start.n:end.n)
  	equil = FALSE
     pre.dev.phase = ifelse(equil == TRUE, -3, 4)
     determ = ifelse(sigmaR == 0, TRUE, FALSE)
+    stop.rec.est <- ifelse(LH == "rockfish", 7, 3 )
  	# Save the run information ===========================================================================
  	capture.output(list(Survey_Start = start.survey, 
                      Overfished_Selectivity_Shift = selec.adj,
@@ -400,7 +401,7 @@ for (nsim in start.n:end.n)
     		if (counter != 1) {
     			start.bias   <- start.bias.est 
         		full.bias    <- full.bias.est  
-				last.bias    <- y - 7 #y - pre.fishery.yrs - 7
+				last.bias    <- y - stop.rec.est #y - pre.fishery.yrs - 7
         		last.no.bias <- y #y - pre.fishery.yrs
         		main.rec.end <- y #y - pre.fishery.yrs #last.bias - 1 
         		max.bias.adj <- max.bias.adj.est
@@ -412,7 +413,7 @@ for (nsim in start.n:end.n)
     			main.rec.start <- ages #1          
 				start.bias     <- 0 #1
 				full.bias      <- ages-1 #30
-				last.bias      <- y - 7 #y - pre.fishery.yrs - 7
+				last.bias      <- y - stop.rec.est #y - pre.fishery.yrs - 7
         		last.no.bias   <- y #y - pre.fishery.yrs
         		main.rec.end   <- y #y - pre.fishery.yrs #last.bias - 1 
 				max.bias.adj   <- 0.90 # full bias adjustment = ry*exp(-0.5*sigmaR^2 + recdev)		  
@@ -517,24 +518,35 @@ for (nsim in start.n:end.n)
         	}
 	
 			if (determ == FALSE & y <= (pre.fishery.yrs + setup.yrs + 9)){
-    			#Apply the bias correction
-    			rep.bias     <- SS_output(run, covar = TRUE, printstats = FALSE)
-        		new.bias     <- SS_fitbiasramp(rep.bias, 
-        		                    startvalues = c(start.bias, full.bias , last.bias, last.no.bias ,max.bias.adj))
-        		start.bias   <- start.bias.est <- new.bias$df[1,1]
-        		full.bias    <- full.bias.est  <- new.bias$df[2,1]
-        		#last.bias    <- last.bias.est  <- new.bias$df[3,1]
-        		last.bias    <- y - 7 #y - pre.fishery.yrs - 7
-        		last.no.bias <- y #y - pre.fishery.yrs
-        		#last.no.bias <- last.no.bias.est<-new.bias$df[4,1]
-        		max.bias.adj <- max.bias.adj.est <-new.bias$df[5,1]
-        		main.rec.end <- main.rec.end.est <- y #y - pre.fishery.yrs #last.bias - 1
-		
-        		#Rewrite the control file with the new bias adjustment values
-        		writeCtl(ctl = "est.ctl", y = y)
-        		#Rerun the model with the new bias values
-        		if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
-        		if (!tantalus) { shell("ss3.exe -nohess > test.txt 2>&1")  }
+                if(rerun == 11){
+                    start.bias <- start.bias.est
+                    full.bias <- full.bias.est
+                    last.bias <- y - stop.rec.est
+                    last.no.bias <- y
+                    max.bias.adj <- max.bias.adj.est
+                    main.rec.end <- main.rec.end.est
+                }
+
+                if(rerun != 11){
+                    #Apply the bias correction
+                    rep.bias     <- SS_output(run, covar = TRUE, printstats = FALSE)
+                    new.bias     <- SS_fitbiasramp(rep.bias, 
+                                        startvalues = c(start.bias, full.bias , last.bias, last.no.bias ,max.bias.adj))
+                    start.bias   <- start.bias.est <- new.bias$df[1,1]
+                    full.bias    <- full.bias.est  <- new.bias$df[2,1]
+                    #last.bias    <- last.bias.est  <- new.bias$df[3,1]
+                    last.bias    <- y - stop.rec.est #y - pre.fishery.yrs - 7
+                    last.no.bias <- y #y - pre.fishery.yrs
+                    #last.no.bias <- last.no.bias.est<-new.bias$df[4,1]
+                    max.bias.adj <- max.bias.adj.est <-new.bias$df[5,1]
+                    main.rec.end <- main.rec.end.est <- y #y - pre.fishery.yrs #last.bias - 1
+                }
+
+                #Rewrite the control file with the new bias adjustment values
+                writeCtl(ctl = "est.ctl", y = y)
+                #Rerun the model with the new bias values
+                if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
+                if (!tantalus) { shell("ss3.exe -nohess > test.txt 2>&1")  }                    
         	}
 		
 			#Read the report file and save values

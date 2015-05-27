@@ -3,7 +3,7 @@ writeCtl <- function (ctl,y)
 {   
     selec.master <- matrix(c(    
     #_LO    HI   INIT   PRIOR  PR_type SD  PHASE   env  use_dev      dev_minyr   dev_maxyr   dev_stddev  Block     Block_Fxn
-    25,     60,  fsp1,  fsp1,   -1,     1,   4,    0,   0,           0,          0,         0.20,      block.num, block.fxn,   "#Peak",
+    25,     60,  fsp1.start,  fsp1.start,   -1,     1,   4,    0,   0,           0,          0,         0.20,      block.num, block.fxn,   "#Peak",
     -5,     5,   fsp2,  fsp2,   -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,           "#Top (Width)",                            
     -10,    10,  fsp3,  fsp3,   -1,     1,   5,    0,   0,           0,          0,          0.5,        0,        0,           "#Asc_Width" ,                         
     -2,     20,  fsp4,  fsp4,   -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,           "#Desc_Width",                         
@@ -26,7 +26,7 @@ writeCtl <- function (ctl,y)
 
     block.selec <- matrix(c(
     #_LO    HI   INIT   PRIOR  PR_type SD  PHASE
-    25,     60,  fsp1 + selec.adj,  fsp1 + selec.adj,  -1,     1,  3,  "#Peak Block"),
+    25,     60,  fsp1.start + selec.adj,  fsp1.start + selec.adj,  -1,     1,  3,  "#Peak Block"),
     ncol = 8, byrow = F)  
 
     bio.mat <-matrix(c( 
@@ -233,12 +233,12 @@ writeCtl <- function (ctl,y)
         #} 
     }
 
-    if(data.scenario == "ds0" || data.scenario == "ds1" ){
-       #cat(
-       # 4,      " #selectivity dev phase\n",
-       # 1,      " #seleparm_adjust\n",
-       # file = ctl, append = T, sep = " ")
-    }
+    #if(data.scenario == "ds0" || data.scenario == "ds1" ){
+    #   cat(
+    #    4,      " #selectivity dev phase\n",
+    #    1,      " #seleparm_adjust\n",
+    #    file = ctl, append = T, sep = " ")
+    #}
  
     cat(
     0,      " #No Tag Parameters\n",
@@ -470,7 +470,7 @@ writeDat<-function(dat, y, survey, fore.catch)
         "#Age Error Matrix\n",
         rep(-1, ages),      " #True Ages\n",
         #rep(-1,max.age + 1),  " #True Ages\n",
-        rep(0.1,ages),     " #Age Error StDev\n",
+        rep(0.01,ages),     " #Age Error StDev\n",
         #(1:ages-0.5)*0.05,    " #Age Error StDev\n",
         #(1:(max.age+1)-0.5)*0.05, " #Age Error StDev\n",
         "#\n",
