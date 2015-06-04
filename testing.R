@@ -1,18 +1,32 @@
-wd = "C:/PhD/Chapter3/rockfish_ds4_sims_1_10/save/" ; par(mfrow =c (4,3), oma =c(1,1,1,1), mar = c(2,4,2,3))
+LH= "flatfish"
+
+wd = paste("C:/PhD/Chapter3/",LH,"_ds4_sims_1_100/save/",sep="") 
+par(mfrow =c (4,3), oma =c(1,1,1,1), mar = c(2,4,2,3))
 
 #wd = "C:/PhD/Chapter3/flatfish_ds1_sims_1_100/save/" ; par(mfrow =c (4,3))
 #wd = "C:/PhD/Chapter3/flatfish_ds2_sims_1_100/save/"
 #wd = "C:/PhD/Chapter3/flatfish_ds3_sims_1_100/save/"
 #wd = "C:/PhD/Chapter3/flatfish_ds4_sims_1_100/save/"
 setwd(wd)
-ass.length = 26#26 #14
+sims = 100
 start.year = 1
-ss.years = 221#142
-first.ass = 120#90#120
+if (LH == "rockfish") {
+	ss.years = 221#142
+	first.ass = 120#90#120
+	ass.length = 26#26 #14
+	target = 0.40#0.25 
+	thres  = 0.25#0.08
+}
+if (LH == "flatfish") {
+	ss.years = 142
+	first.ass = 90#120
+	ass.length = 14
+	target = 0.25 
+	thres  = 0.08
+}
 end.year = ss.years + 1
-sims = 10
-target = 0.40#0.25 
-thres  = 0.25#0.08
+
+
 ssb = matrix(0, end.year, sims)
 ssb.est = array (0, dim = c(ss.years, ass.length, sims))
 #par(mfrow=c(2,2))
@@ -49,6 +63,15 @@ for (i in 1:sims){
 	#	ind = 1:(50 + j*4 -4)
 	#	lines(ind, Est$Bratio[ind, j], lty = 2, col =2)
 	#}
+}
+
+ind = 41
+if (LH == "rockfish"){ind = 71 }
+catch = matrix(0,end.year-ind + 1, sims)
+for (i in 1:sims){
+	dat = paste("om_proj_",i,sep ="")
+	load (dat)
+	catch[,i] = Proj$catch[ind:end.year]
 }
 
 recruit = matrix(0, end.year, sims)
@@ -92,9 +115,9 @@ for (a in 1:ass.length){
 	re.sb0[,a] = (ssb.est[1,a,] - ssb[1,]) / ssb[1,]
 }
 par(mfrow=c(3,1))
-boxplot(re.depl, ylim = c(-0.25, 0.25)); abline(h = 0)
-boxplot(re.ssb, ylim = c(-0.25, 0.25)); abline(h = 0)
-boxplot(re.sb0, ylim = c(-0.25, 0.25)); abline(h = 0)
+boxplot(re.depl, ylim = c(-0.5, 0.5)); abline(h = 0)
+boxplot(re.ssb, ylim = c(-0.5, 0.5)); abline(h = 0)
+boxplot(re.sb0, ylim = c(-0.5, 0.5)); abline(h = 0)
 
 
 
@@ -140,10 +163,10 @@ for (i in 1:sims){
  	lmax.mat[,i] = Est$Lmax.store
  	f.selex[,,i] = Est$F.selex[c(1,3),]
  	s.selex[,,i] = Est$S.selex[c(1,3),]
- 	#f.adj[,i] = Est$F.selex.1.adj
+ 	f.adj[,i] = Est[[16]]
 }
 
-#par(mfrow=c(2,2))
+par(mfrow=c(2,2))
 boxplot(t(M.mat), ylim = c(0.13, 0.25), ylab = "M") ; abline (h = 0.15, col =2)
 #boxplot(t(k.mat), ylim = c(0.10, 0.20)) ; abline (h = 0.143779 , col =2)
 boxplot(t(lmin.mat), ylim = c(15, 35), ylab = "Lmin") ; abline (h = 24.6219, col =2)
@@ -155,7 +178,7 @@ boxplot(t(s.selex[1,,]), ylim = c(30, 37), ylab = "S Peak Select") ; abline (h =
 boxplot(t(s.selex[2,,]), ylim = c(4, 5), ylab = "S Slope Select") ; abline (h = 4.25, col =2)
 
 
-#par(mfrow=c(2,2))
+par(mfrow=c(2,2))
 boxplot(t(M.mat), ylim = c(0.04, 0.12), ylab = "M") ; abline (h = 0.08, col =2)
 #boxplot(t(k.mat), ylim = c(0, 0.10), ylab = "Lmin") ; abline (h = 0.05 , col =2)
 boxplot(t(lmin.mat), ylim = c(10, 20), ylab = "Lmin") ; abline (h = 18, col =2)
@@ -169,5 +192,5 @@ boxplot(t(s.selex[2,,]), ylim = c(4, 5), ylab = "S Slope Select") ; abline (h = 
 
 
 
-re.m = (M.mat - 0.08)/ 0.08
+re.m = (M.mat - 0.15)/ 0.15
 boxplot(t(re.m), ylim = c(-0.1, 0.10)); abline (h = 0)

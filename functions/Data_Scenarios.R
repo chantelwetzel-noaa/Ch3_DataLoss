@@ -10,13 +10,12 @@
 #   ds2 = Data levels do not change during rebuilding, blocks are estimated, but no annual
 #   selectivity deviations are estimated
 #
-#   ds3 = Data levels are reduced during the rebuilding period, blocks are estimated, but 
+#   ds4 = Data levels are reduced during the rebuilding period, blocks are estimated, but 
 #   no annual selectivity deviations are estimated
 #
-#   ds4 = There are no additional data beyond year 50.  Blocks and annual deviations for 
+#   ds5 = There are no additional data beyond year 50.  Blocks and annual deviations for 
 #   selectivity are not estimated
 #
-#   ds5 = This is no composition scenario where the only data are the survey indices
 #
 ###############################################################################################
 
@@ -31,8 +30,10 @@ AgeError <- FALSE
 max.age = ages - 1
 if(AgeError == TRUE) { max.age  <- ages + 4  }  
 
-survey.CV <- 0.50 
-tv.err    <- 0    #Time Varying StDev
+sigmaR <- 0.60  
+ss.survey.cv <- 0.50 
+survey.cv <- 0.50 
+select.sd <- 0.10  #Selectivity Time Varying StDev
 
 pre.fishery.yrs <- ages - 1 
 setup.yrs   <- 50
@@ -41,14 +42,11 @@ if (LH == "flatfish") { project.yrs = 52 }
 fishery.yrs <- setup.yrs + project.yrs + 1
 total.yrs   <- pre.fishery.yrs + fishery.yrs
 
-years       <- 1:total.yrs #fishery.yrs 
-#years      <- c(seq(-pre.fishery.yrs,-1,1),seq(1,fishery.yrs,1)) 
+years       <- 1:total.yrs 
 ass.num     <- (project.yrs / 4) + 1
 
 estimate.m = TRUE
-if (data.scenario == "ds3") { estimate.m = FALSE }
 
-#if (data.scenario == "ds0") { start.survey = 1 }
 if (data.scenario == "ds0") { start.survey = 71 }
 
 #Determine when the data begins

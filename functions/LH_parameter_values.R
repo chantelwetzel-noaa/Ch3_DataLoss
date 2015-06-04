@@ -57,7 +57,7 @@ if (LH == "flatfish" ) {
  over.thres <- 0.125
  
  #Depletion value in year 50 of the fishery ===========================================================================
- final.depl <- 0.06 
+ final.depl <- 0.08 
 } 
 
 
