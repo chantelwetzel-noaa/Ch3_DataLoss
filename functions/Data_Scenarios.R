@@ -33,7 +33,8 @@ if(AgeError == TRUE) { max.age  <- ages + 4  }
 sigmaR <- 0.60  
 ss.survey.cv <- 0.50 
 survey.cv <- 0.50 
-select.sd <- 0.10  #Selectivity Time Varying StDev
+select.sd <- 0.02  #Selectivity Time Varying StDev
+m.sd <- 0
 
 pre.fishery.yrs <- ages - 1 
 setup.yrs   <- 50

@@ -42,6 +42,7 @@
   fsp1.est    <- array(NA, dim=c(1, ass.num))
   S.selex     <- array(NA, dim=c(6, ass.num))
   recovered.est <- numeric(total.yrs)
+  fspr.est.vec<- numeric(total.yrs)
   
   #Dynamics
   Ry           <- matrix(0, total.yrs+1, 1)#;  rownames(Ry) <-years
@@ -56,6 +57,7 @@
   catch.wght.values <- rep(0,(total.yrs-1))
   selec        <- array(0, dim=c(total.yrs, length(len.step), sexes))
   selec.age    <- array(0, dim=c(total.yrs, ages, sexes)) 
+  fspr.vec     <- numeric(total.yrs)
   
  #Selectivity Adjustment Parameter
   fsp1.realized <- numeric(total.yrs)
