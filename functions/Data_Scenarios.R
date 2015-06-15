@@ -7,15 +7,16 @@
 #   ds1 = Base data scenario where sample sizes do not change during rebuilding and the model
 #   is allowed to estimate blocks and annual selectivity deviations
 #
-#   ds2 = Data levels do not change during rebuilding, blocks are estimated, but no annual
-#   selectivity deviations are estimated
+#   ds2 = Data levels do not change during rebuilding, deviation in selectivity and
+#   natural mortality.
 #
-#   ds4 = Data levels are reduced during the rebuilding period, blocks are estimated, but 
-#   no annual selectivity deviations are estimated
+#   ds3 = Fishery data levels are reduced during rebuilding period, deviation in selectivity
+#	and natural mortality
 #
+#   ds4 = Data levels are reduced during the rebuilding period, no time varying parameters
+#   
 #   ds5 = There are no additional data beyond year 50.  Blocks and annual deviations for 
 #   selectivity are not estimated
-#
 #
 ###############################################################################################
 
@@ -30,11 +31,15 @@ AgeError <- FALSE
 max.age = ages - 1
 if(AgeError == TRUE) { max.age  <- ages + 4  }  
 
-sigmaR <- 0.60  
+sigmaR 	     <- 0.60  
 ss.survey.cv <- 0.50 
-survey.cv <- 0.50 
-select.sd <- 0.02  #Selectivity Time Varying StDev
-m.sd <- 0
+survey.cv 	 <- 0.50 
+select.sd 	 <- 0  #Selectivity Time Varying StDev
+m.sd 		 <- 0
+
+if (data.scenario == "ds2" || data.scenario == "ds3"){
+	select.sd <- 0.05
+	m.sd      <- 0.02  }
 
 pre.fishery.yrs <- ages - 1 
 setup.yrs   <- 50
@@ -48,7 +53,7 @@ ass.num     <- (project.yrs / 4) + 1
 
 estimate.m = TRUE
 
-if (data.scenario == "ds0") { start.survey = 71 }
+if (data.scenario == "ds0") { start.survey = ages }
 
 #Determine when the data begins
 start.fishery.len.samp <- start.survey #pre.fishery.yrs + start.survey
@@ -72,16 +77,3 @@ f.age.samp <- c(rep(0,start.survey - 1),rep(N.f.age,length(data.yrs)))
 
 data.yrs   <- start.survey.age.samp : total.yrs
 s.age.samp <- c(rep(0,start.survey - 1),rep(N.s.len,length(data.yrs)))
-
-#Estimate Annual Deviations for fishery selectivity
-selec.dev = 0
-dev.yr1   = 0
-
-#if (data.scenario == "ds0" || data.scenario == "ds1"){
-#    selec.dev = 2
-#    dev.yr1 = start.survey
-#    #the dev.yr2 variable is dynamically resent in the projection period
-#}
-
-
-

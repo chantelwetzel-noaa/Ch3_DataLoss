@@ -3,8 +3,8 @@
 #Survey Parameters
  Q <- 1
  survey.time <- 0.5
- survey.cv <- 0.50
- ss.survey.cv <- 0.50
+ #survey.cv <- 0.50
+ #ss.survey.cv <- 0.50
 
 #Life-History Parameters
 if (LH == "flatfish" ) {
@@ -32,7 +32,7 @@ if (LH == "flatfish" ) {
  kf <- km <- 0.143779 
  #kf <- 0.143779 
  #km <- 0.299548                   
- sigmaR <- 0.60         
+ #sigmaR <- 0.60         
  a3 <- 2.833                ; a4 <- ages - 11               
  a.linear <- floor(a3)      ; len.slope <- 5.1613
  CV1 <- 0.12                ; CV2 <- 0.05
@@ -86,7 +86,7 @@ if (LH == "rockfish" ) {
  #km <- 0.05                 ; sigmaR <- 0.60  
  km <- kf <- 0.05
  ohm6 <- 0
- sigmaR <- 0.60
+ #sigmaR <- 0.60
  a3 <- 2                    ; a4 <- ages - 21  
  a.linear <- floor(a3)      ; len.slope <- 5.32         
  CV1 <- 0.12                ; CV2 <- 0.05

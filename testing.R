@@ -1,6 +1,5 @@
-LH= "flatfish"
-
-wd = paste("C:/PhD/Chapter3/",LH,"_ds4_sims_1_100/save/",sep="") 
+LH= "rockfish"
+wd = paste("C:/PhD/Chapter3/",LH,"_ds3_sims_1_100/save/",sep="") 
 par(mfrow =c (4,3), oma =c(1,1,1,1), mar = c(2,4,2,3))
 
 #wd = "C:/PhD/Chapter3/flatfish_ds1_sims_1_100/save/" ; par(mfrow =c (4,3))
@@ -8,7 +7,7 @@ par(mfrow =c (4,3), oma =c(1,1,1,1), mar = c(2,4,2,3))
 #wd = "C:/PhD/Chapter3/flatfish_ds3_sims_1_100/save/"
 #wd = "C:/PhD/Chapter3/flatfish_ds4_sims_1_100/save/"
 setwd(wd)
-sims = 100
+sims = 50
 start.year = 1
 if (LH == "rockfish") {
 	ss.years = 221#142
@@ -72,10 +71,14 @@ for (i in 1:sims){
 	dat = paste("om_proj_",i,sep ="")
 	load (dat)
 	catch[,i] = Proj$catch[ind:end.year]
+ 	
 }
+
+
 
 recruit = matrix(0, end.year, sims)
 recruit.est = array (0, dim = c(ss.years, ass.length, sims))
+om.time.over <- time.over <- re.time.over <- numeric(sims)
 for (i in 1:sims){
 	#if (i < 26) { temp = 25 + i }
 	#if (i > 25) { temp = 50 + i }
@@ -85,12 +88,12 @@ for (i in 1:sims){
 
 	recruit[,i] = 2*Proj$Ry[start.year:end.year]
 	recruit.est[,,i] = Est$Recruits[1:ss.years,] #Est$Recruits[1:ss.years,]
-	#plot(1:102, Proj$depl[start.year:end.year], type = 'l', col = 1, lwd =2, main = i, ylim = c(0, 1.2))
-	#abline(h = 0.08); abline(v = 50) ; abline(h =0.25)
-	#for(j in 1:ass.length){
-	#	ind = 1:(50 + j*4 -4)
-	#	lines(ind, Est$Bratio[ind, j], lty = 2, col =2)
-	#}
+
+	if (sum(Est$recovered.est) != 0){
+ 		ind = Est$recovered.est>0
+ 		time.over[i] = max(Est$recovered.est[ind]) - min(Est$recovered.est[ind]) + 1
+ 	}
+ 	om.time.over[i] = max(Proj$recovered.om) - ifelse(LH == "rockfish", 120, 90)
 }
 
 med.depl = apply(depl, 1, median)
@@ -114,10 +117,13 @@ for (a in 1:ass.length){
 	re.ssb [,a] = (ssb.est[ind,a,] - ssb[ind,]) / ssb[ind,]
 	re.sb0[,a] = (ssb.est[1,a,] - ssb[1,]) / ssb[1,]
 }
-par(mfrow=c(3,1))
+
+re.time.over = (time.over - om.time.over)/ om.time.over
+par(mfrow=c(2,2))
 boxplot(re.depl, ylim = c(-0.5, 0.5)); abline(h = 0)
 boxplot(re.ssb, ylim = c(-0.5, 0.5)); abline(h = 0)
 boxplot(re.sb0, ylim = c(-0.5, 0.5)); abline(h = 0)
+boxplot(re.time.over, ylim =  c(-1, 1)); abline(h = 0)
 
 
 

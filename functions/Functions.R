@@ -13,7 +13,7 @@ source(paste(drive,"/PhD/Chapter3/code/functions/LH_parameter_values.R",sep=""))
 source(paste(drive,"/PhD/Chapter3/code/functions/Data_Scenarios.R",sep=""))
 
 #Seed Function=======================================================================
-source(paste(drive,"/PhD/Chapter3/code/functions/Get_Seed.R",sep=""))
+#source(paste(drive,"/PhD/Chapter3/code/functions/Get_Seed.R",sep=""))
 
 #Lengths Function====================================================================
 source(paste(drive,"/PhD/Chapter3/code/functions/Multinom_Lengths.R",sep=""))

@@ -14,9 +14,9 @@
 
 drive <-"C:" #"//home//cwetzel//h_cwetzel"
 LH <- "flatfish"
-start.n <- 1
-end.n <- 1
-data.scenario <- "ds0" 
+start.n <- 12
+end.n <- 100
+data.scenario <- "ds2" 
 tantalus <- FALSE
 github <- TRUE
 file.type = "boot" #"boot" "perfect"
@@ -235,7 +235,7 @@ for (nsim in start.n:end.n)
     #do.true.fspr  = TRUE
     forecast.report = readLines(paste(om, "/Forecast-report.sso", sep = ""))
     fspr.om  = as.numeric(strsplit(forecast.report[grep(paste("Fmult",sep=""),forecast.report)]," ")[[4]][2])
-    fspr.input = 0.75*fspr.om
+    fspr.input = 0.75*fspr.om #ifelse(LH == "rockfish", 0.02, 0.10) #0.75*fspr.om
     writeForecast(forecast = "forecast.ss", y = y)
     if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
     if (!tantalus) { shell("ss3.exe -nohess > test.txt 2>&1")  }
@@ -313,7 +313,7 @@ for (nsim in start.n:end.n)
 
             #Selectivity shift while overfished
             if (decl.overfished){
-                fsp1.vec[y:(y+3)] = fsp1.shift.vec[y:(y+3)] }
+                fsp1.vec[(y-3):(y)] = fsp1.shift.vec[(y-3):(y)] }
            # if (sum(recovered.om) == 0){
            #     do.true.fspr = TRUE  }
            # if (sum(recovered.om) != 0){
@@ -362,7 +362,7 @@ for (nsim in start.n:end.n)
     		get.forecast = TRUE
  			writeCtl.om(ctl = "om.ctl", y = y)
             #do.true.fspr  = TRUE
-    		fspr.input = 0.75*fspr.om
+    		fspr.input =0.75*fspr.om # ifelse(LH == "rockfish", 0.02, 0.10)#0.75*fspr.om
             do.forecast = 1
     		writeForecast(forecast = "forecast.ss", y = y)
     		if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
@@ -372,15 +372,13 @@ for (nsim in start.n:end.n)
     		rep.out   <- Rep_Summary(rep.new, y, pre.fishery.yrs, do.forecast)
             check.depl<- rep.out$Depl[y]
             if (check.depl > bio.target){
-                fspr.input = fspr.om
+                fspr.input = fspr.om # ifelse(LH == "rockfish", 0.05, 0.20)#fspr.om
                 writeForecast(forecast = "forecast.ss", y = y)
                 if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
                 if (!tantalus) { shell("ss3.exe -nohess > test.txt 2>&1")  }
                 rep.new   <- readLines(paste(om, "/Report.sso", sep=""))
                 rep.out   <- Rep_Summary(rep.new, y, pre.fishery.yrs, do.forecast)
             }
-    		#fore.out  <- readLines(paste(om, "/Forecast-report.sso", sep=""))
-    		#fmult     <- as.numeric(strsplit(fore.out[grep(paste("Fmult",sep=""),fore.out)]," ")[[4]][2])
 		
             SSB [1:y]   <- rep.out$SB
             Ry  [1:(y-1)]  <- rep.out$Recruits
@@ -483,11 +481,13 @@ for (nsim in start.n:end.n)
     			dat.old$agecomp <- rbind(dat.old$agecomp[ind.old.1,], dat.new$agecomp[ind1,], dat.old$agecomp[ind.old.2,], dat.new$agecomp[ind2,])
     			dat = dat.old
 
-                if(decl.overfished == FALSE) { fspr.input = fspr.est }
+                if(decl.overfished == FALSE) { 
+                    fspr.input = fspr.est }#ifelse(LH == "rockfish", 0.05, 0.20) }#fspr.est }
     		}
 
             SS_writedat(datlist=dat,outfile=paste(run,"/", file.type,nsim,"_",y,".ss",sep=""),overwrite=TRUE,verbose=TRUE)
-            if(decl.overfished == TRUE) { fspr.input = 0.75*fspr.est }
+            if(decl.overfished == TRUE) { 
+                fspr.input = 0.75*fspr.est }#ifelse(LH == "rockfish", 0.02, 0.10) }#0.75*fspr.est }
             get.forecast = FALSE #do.true.fspr  = FALSE
             do.forecast = 1 #This switches on and off the forecast
             writeForecast(forecast = "forecast.ss", y = y)
@@ -532,7 +532,7 @@ for (nsim in start.n:end.n)
         	  if (virgin.SB > (SB0/4) && virgin.SB < (SB0*4)) {
         	    break()
         	  }
-        	  if(rerun > 5) { break () }
+        	  if(rerun > 4) { break () }
         	}
 	
 			if (determ == FALSE & y <= (pre.fishery.yrs + setup.yrs + 9)){
@@ -567,7 +567,7 @@ for (nsim in start.n:end.n)
                 check.depl <- rep.out$Depl[y] 
                 if (decl.overfished == FALSE && check.depl < over.thres){
                     #do.est.fspr = TRUE
-                    fspr.input = 0.75*fspr.est
+                    fspr.input = 0.75*fspr.est  #ifelse(LH == "rockfish", 0.02, 0.10)#0.75*fspr.est
                     writeForecast(forecast = "forecast.ss", y = y)
                 }  
                 #Rerun the model with the new bias values
@@ -582,7 +582,7 @@ for (nsim in start.n:end.n)
             check.depl<- rep.out$Depl[y]
             if (decl.overfished == FALSE && counter != 1 && check.depl < over.thres){
                 #do.est.fspr = TRUE
-                fspr.input = 0.75*fspr.est
+                fspr.input = 0.75*fspr.est #ifelse(LH == "rockfish", 0.02, 0.10)#0.75*fspr.est
                 writeForecast(forecast = "forecast.ss", y = y)
                 if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
                 if (!tantalus) { shell("ss3.exe -nohess > test.txt 2>&1")  } 
@@ -592,7 +592,7 @@ for (nsim in start.n:end.n)
             if (decl.overfished == TRUE && check.depl > bio.target){
                 #Change harvest rate to fspr
                 #do.est.fspr = FALSE
-                fspr.input = fspr.est
+                fspr.input = fspr.est #ifelse(LH == "rockfish", 0.05, 0.20)#fspr.est
                 writeForecast(forecast = "forecast.ss", y = y)
                 if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
                 if (!tantalus) { shell("ss3.exe -nohess > test.txt 2>&1")  } 
@@ -671,6 +671,7 @@ for (nsim in start.n:end.n)
                     decl.overfished = FALSE 
                     end.yr = y
                     recovered.est[y] <- end.yr
+                    block.yrs = c(decl.yr, end.yr)
                 }
             }           
 
