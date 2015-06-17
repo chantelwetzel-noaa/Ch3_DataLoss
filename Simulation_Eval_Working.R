@@ -8,12 +8,12 @@
 ############################################
 
 drive = "C:"
-run.name = "orig_runs"#"run1"
+run.name = "june15"#"orig_runs"#"run1"
 LH = "flatfish"
-#ds.list = c("ds1", "ds3", "ds4") #c("ds1", "ds2", "ds3", "ds4")
-ds.list = c("greatall", "normal_estM", "greathist")
+ds.list = c("ds1", "ds2","ds3", "ds4") #c("ds1", "ds2", "ds3", "ds4")
+#ds.list = c("greatall", "normal_estM", "greathist")
 sim.range = c(1,100)
-order = c(2,1,3) #c(3,1,2,4)
+order = c(1,4,2,3) #c(2,1,3) #c(3,1,2,4)
 #ds.list = c("greatall")
 #sim.range = c(1,50)
 
@@ -131,7 +131,9 @@ for (spec in 1:length(ds.list))
 {
   j = order[spec]
   data.scenario = ds.list[j]
-  dir = paste(drive,"/PhD/Chapter3/", run.name, "/",LH,"_",data.scenario,"_sims_",sim.range[1],"_",sim.range[2],
+  #dir = paste(drive,"/PhD/Chapter3/", run.name, "/",LH,"_",data.scenario,"_sims_",sim.range[1],"_",sim.range[2],
+  #      "/save/", sep = "")
+  dir = paste(drive,"/PhD/Chapter3/",LH,"_",data.scenario,"_sims_",sim.range[1],"_",sim.range[2],
         "/save/", sep = "")
   
   for (i in sim.range[1]:sim.range[2]) {
