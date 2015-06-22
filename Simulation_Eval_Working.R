@@ -141,9 +141,9 @@ for (spec in 1:length(ds.list))
       load(dat)
       ssb[j,,i]   = Proj$SSB
       ry[j,,i]    = Proj$Ry*2
-      depl[j,,i]  = Proj$depl
-      catch[j,,i] = Proj$fore.catch[1:total.yrs]
-      ofl[j,,i]   = Proj$true.ofl
+      depl[j,,i]  = Proj$Depl
+      catch[j,,i] = Proj$catch[1:total.yrs]
+      ofl[j,,i]   = Proj$ofl.true
       acl[j,,i]   = ofl[j,,i]*exp(qnorm(0.45, 0, 0.36))
       f.lens[j,,i]= Proj$f.len.samp
       s.lens[j,,i]= Proj$s.len.sam

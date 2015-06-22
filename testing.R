@@ -7,7 +7,7 @@ par(mfrow =c (4,3), oma =c(1,1,1,1), mar = c(2,4,2,3))
 #wd = "C:/PhD/Chapter3/flatfish_ds3_sims_1_100/save/"
 #wd = "C:/PhD/Chapter3/flatfish_ds4_sims_1_100/save/"
 setwd(wd)
-sims = 50
+sims = 100
 start.year = 1
 if (LH == "rockfish") {
 	ss.years = 221#142

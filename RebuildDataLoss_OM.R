@@ -271,9 +271,9 @@ for (nsim in start.n:end.n)
         #Change the data levels based upon the status and data scenario
         if (decl.overfished  == TRUE) {
             if (data.scenario == "ds3" || data.scenario == "ds4") {
-                f.len.samp[y] <- floor(0.25 * f.len.samp[y])
+                f.len.samp[y] <- floor(0.20 * f.len.samp[y])
                 s.len.samp[y] <- s.len.samp[y]
-                f.age.samp[y] <- floor(0.25 * f.age.samp[y])
+                f.age.samp[y] <- floor(0.20 * f.age.samp[y])
                 s.age.samp[y] <- s.age.samp[y]
             }
             if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds2") {

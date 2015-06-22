@@ -39,7 +39,7 @@ m.sd 		 <- 0
 
 if (data.scenario == "ds2" || data.scenario == "ds3"){
 	select.sd <- 0.05
-	m.sd      <- 0.02  }
+	m.sd      <- 0.05  }
 
 pre.fishery.yrs <- ages - 1 
 setup.yrs   <- 50
@@ -62,18 +62,24 @@ start.survey.len.samp  <- start.survey #pre.fishery.yrs + start.survey
 start.survey.age.samp  <- start.survey #pre.fishery.yrs + start.survey
 
 #Data Available Based on Scenario
-N.f.len = 100 ; N.s.len = 10 ; N.f.age = 100 ; N.s.age = 10 
+N.f.len = 75 ; N.s.len = 10 ; N.f.age = 50 ; N.s.age = 10 
 if (data.scenario == "ds0") { 
     N.f.len = 500 ; N.s.len = 500 ; N.f.age = 500 ; N.s.age = 500 }
 
 data.yrs   <- start.fishery.len.samp : total.yrs
 f.len.samp <- c(rep(0,start.survey - 1),rep(N.f.len,length(data.yrs)))
 
+#data.yrs   <- seq(start.survey.len.samp, total.yrs, 3) 
 data.yrs   <- start.survey.len.samp : total.yrs
 s.len.samp <- c(rep(0,start.survey - 1),rep(N.s.len,length(data.yrs)))
+#s.len.samp <- numeric(total.yrs)
+#s.len.samp[data.yrs] <- N.s.len
 
 data.yrs   <- start.fishery.age.samp : total.yrs
 f.age.samp <- c(rep(0,start.survey - 1),rep(N.f.age,length(data.yrs)))
 
+#data.yrs   <- seq(start.survey.age.samp, total.yrs, 3)
 data.yrs   <- start.survey.age.samp : total.yrs
-s.age.samp <- c(rep(0,start.survey - 1),rep(N.s.len,length(data.yrs)))
+s.age.samp <- c(rep(0,start.survey - 1),rep(N.s.age,length(data.yrs)))
+#s.age.samp <- numeric(total.yrs)
+#s.age.samp[data.yrs] <- N.s.age
