@@ -8,34 +8,36 @@
 ############################################
 
 drive = "C:"
-run.name = "june15"#"orig_runs"#"run1"
+run.name = "june29"#"orig_runs"#"run1"
 LH = "flatfish"
 ds.list = c("ds1", "ds2","ds3", "ds4") #c("ds1", "ds2", "ds3", "ds4")
 #ds.list = c("greatall", "normal_estM", "greathist")
 sim.range = c(1,100)
 order = c(1,4,2,3) #c(2,1,3) #c(3,1,2,4)
+data.scenario = "all"
 #ds.list = c("greatall")
 #sim.range = c(1,50)
 
 #Dimensions by life-history
 git.wd = "C:/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/"
 source(paste(git.wd, "/functions/LH_parameter_values.R", sep=""))
+source(paste(git.wd, "/functions/Data_Scenarios.R", sep=""))
 #source(paste(drive,":/PhD/Chapter3/code/functions/LH_parameter_values.R",sep=""))
 if (file.exists( file = paste(drive,"/PhD/Chapter3/", run.name, "/output", sep = "") ) == FALSE ){
   dir.create(paste(drive,"/PhD/Chapter3/", run.name, "/output", sep = ""))
 }
 
-pre.fishery.yrs <- ages - 1 
-setup.yrs   <- 49
-first.ass.yr <- 50
-project.yrs <- 100
-if (LH == "flatfish") { project.yrs = 52 }
-fishery.yrs <- setup.yrs + project.yrs + 2
-total.yrs   <- pre.fishery.yrs + fishery.yrs
-ass.num     <- (project.yrs / 4) + 1
-ass.yr = seq(first.ass.yr, fishery.yrs, 4)
-model.start <- pre.fishery.yrs + first.ass.yr
-model.ass   <- seq(model.start,total.yrs, 4)
+#pre.fishery.yrs <- ages - 1 
+#setup.yrs   <- 49
+first.ass.yr <- total.yrs - project.yrs - 1
+#project.yrs <- 100
+#if (LH == "flatfish") { project.yrs = 52 }
+#fishery.yrs <- setup.yrs + project.yrs + 2
+#total.yrs   <- pre.fishery.yrs + fishery.yrs
+#ass.num     <- (project.yrs / 4) + 1
+ass.yr = seq(first.ass.yr, total.yrs, 4)
+#model.start <- pre.fishery.yrs + first.ass.yr
+#model.ass   <- seq(model.start,total.yrs, 4)
 
 
 med.ssb         = array(0, dim = c(length(ds.list), total.yrs + 1, 3))
@@ -98,28 +100,31 @@ yrs.declared.all          <- array(0, dim = c(length(ds.list), sim.range[2]))
 aav                       <- array(0, dim = c(length(ds.list), sim.range[2]))
 
 #operating model values storage arrays ============================================================
-ssb   = array(0, dim = c(length(ds.list), total.yrs+1, sim.range[2]))
-ry    = array(0, dim = c(length(ds.list), total.yrs+1, sim.range[2]))
-depl  = array(0, dim = c(length(ds.list), total.yrs+1, sim.range[2]))
-catch = array(0, dim = c(length(ds.list), total.yrs,   sim.range[2]))
-ofl   = array(0, dim = c(length(ds.list), total.yrs,   sim.range[2]))
-acl   = array(0, dim = c(length(ds.list), total.yrs,   sim.range[2]))
-f.lens= array(0, dim = c(length(ds.list), total.yrs - pre.fishery.yrs, sim.range[2]))
-s.lens= array(0, dim = c(length(ds.list), total.yrs - pre.fishery.yrs,   sim.range[2]))
-f.ages= array(0, dim = c(length(ds.list), total.yrs - pre.fishery.yrs,   sim.range[2]))
-s.ages= array(0, dim = c(length(ds.list), total.yrs - pre.fishery.yrs,   sim.range[2]))
-new.peak = array(0, dim=c(length(ds.list), ass.num, sim.range[2]))
+ssb   = array(0, dim = c(length(ds.list), total.yrs, sim.range[2]))
+ry    = array(0, dim = c(length(ds.list), total.yrs, sim.range[2]))
+depl  = array(0, dim = c(length(ds.list), total.yrs, sim.range[2]))
+catch = array(0, dim = c(length(ds.list), total.yrs, sim.range[2]))
+ofl   = array(0, dim = c(length(ds.list), total.yrs, sim.range[2]))
+acl   = array(0, dim = c(length(ds.list), total.yrs, sim.range[2]))
+f.lens= array(0, dim = c(length(ds.list), total.yrs, sim.range[2]))
+s.lens= array(0, dim = c(length(ds.list), total.yrs, sim.range[2]))
+f.ages= array(0, dim = c(length(ds.list), total.yrs, sim.range[2]))
+s.ages= array(0, dim = c(length(ds.list), total.yrs, sim.range[2]))
+peak  = array(0, dim=  c(length(ds.list), total.yrs, sim.range[2]))
 
 #estimation values storage arrays  ================================================================
-ssb.est     =  array(0, dim = c(length(ds.list), fishery.yrs, ass.num, sim.range[2]))
-ry.est      =  array(0, dim = c(length(ds.list), fishery.yrs, ass.num, sim.range[2]))
-depl.est    =  array(0, dim = c(length(ds.list), fishery.yrs, ass.num, sim.range[2]))
-m.est       =  array(0, dim = c(length(ds.list), ass.num, sim.range[2]))
-s.selex.est =  array(0, dim = c(length(ds.list), 6,           ass.num, sim.range[2]))
-f.selex.est =  array(0, dim = c(length(ds.list), 6,           ass.num, sim.range[2]))
-f.selex.adj.est =  array(0, dim = c(length(ds.list), 1,       ass.num, sim.range[2]))
-catch.est   =  array(0, dim = c(length(ds.list), (total.yrs+4),   sim.range[2]))
-ofl.est     =  array(0, dim = c(length(ds.list), (total.yrs+4),   sim.range[2]))
+ssb.est     =  array(0, dim = c(length(ds.list), total.yrs, ass.num, sim.range[2]))
+ry.est      =  array(0, dim = c(length(ds.list), total.yrs, ass.num, sim.range[2]))
+depl.est    =  array(0, dim = c(length(ds.list), total.yrs, ass.num, sim.range[2]))
+m.est       =  array(0, dim = c(length(ds.list),            ass.num, sim.range[2]))
+k.est       =  array(0, dim = c(length(ds.list),            ass.num, sim.range[2]))
+cv.young.est=  array(0, dim = c(length(ds.list),            ass.num, sim.range[2]))
+cv.old.est  =  array(0, dim = c(length(ds.list),            ass.num, sim.range[2]))
+s.selex.est =  array(0, dim = c(length(ds.list), 6,         ass.num, sim.range[2]))
+f.selex.est =  array(0, dim = c(length(ds.list), 6,         ass.num, sim.range[2]))
+f.selex.adj.est =  array(0, dim = c(length(ds.list), 1,     ass.num, sim.range[2]))
+catch.est   =  array(0, dim = c(length(ds.list), total.yrs,   sim.range[2]))
+ofl.est     =  array(0, dim = c(length(ds.list), total.yrs,   sim.range[2]))
 ssb0.est    =  array(0, dim = c(length(ds.list), ass.num, sim.range[2]))
 
 n.overfished = matrix(0, length(ds.list), ass.num)
@@ -139,17 +144,17 @@ for (spec in 1:length(ds.list))
   for (i in sim.range[1]:sim.range[2]) {
       dat = paste(dir, "om_proj_",i,sep ="")
       load(dat)
-      ssb[j,,i]   = Proj$SSB
-      ry[j,,i]    = Proj$Ry*2
-      depl[j,,i]  = Proj$Depl
+      ssb[j,,i]   = Proj$SSB[1:total.yrs]
+      ry[j,,i]    = Proj$Ry[1:total.yrs]*2
+      depl[j,,i]  = Proj$Depl[1:total.yrs]
       catch[j,,i] = Proj$catch[1:total.yrs]
-      ofl[j,,i]   = Proj$ofl.true
-      acl[j,,i]   = ofl[j,,i]*exp(qnorm(0.45, 0, 0.36))
+      ofl[j,,i]   = Proj$ofl.true[1:total.yrs]
+      #acl[j,,i]   = ofl[j,,i]*exp(qnorm(0.45, 0, 0.36))
       f.lens[j,,i]= Proj$f.len.samp
       s.lens[j,,i]= Proj$s.len.sam
       f.ages[j,,i]= Proj$f.age.samp
       s.ages[j,,i]= Proj$s.age.samp
-      new.peak[j,,i] = Proj$new.peak[model.ass]
+      peak[j,,i]  = Proj$peak[1:total.yrs]
   }
 
   #Save as an output file 

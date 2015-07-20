@@ -38,6 +38,8 @@
   Lmin.store  <- array(NA, dim=c(1, ass.num))
   Lmax.store  <- array(NA, dim=c(1, ass.num))
   k.store     <- array(NA, dim=c(1, ass.num))
+  cv.y.store  <- array(NA, dim=c(1, ass.num))
+  cv.old.store<- array(NA, dim=c(1, ass.num))
   F.selex     <- array(NA, dim=c(6, ass.num))
   fsp1.est    <- array(NA, dim=c(1, ass.num))
   S.selex     <- array(NA, dim=c(6, ass.num))
@@ -61,3 +63,4 @@
   
  #Selectivity Adjustment Parameter
   fsp1.realized <- numeric(total.yrs)
+

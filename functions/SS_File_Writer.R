@@ -40,19 +40,19 @@ writeCtl.om <- function (ctl,y)
     #ncol = 8, byrow = F)  
 
     bio.mat <-matrix(c( 
-    #_LO    HI          INIT          PRIOR              PR_type    SD    PHASE      env-var use_dev dev_minyr   dev_maxyr   dev_stddev  Block   Block_Fxn
-    0.01,   0.6,        m.vec[1], round(log(m.vec[1]),4),  3,        .20,    -1,        c(rep(0,4), 0.5, 1,2), "#NatM_p_1_Fem_GP_1",
-    3,      35,         L1,           L1,                 -1,         10,     3,        c(rep(0,4), 0.5, 0,0), "#L_at_Amin_Fem_GP_1_",
-    45,     70,         L2f,          L2f,                -1,         10,     3,        c(rep(0,4), 0.5, 0,0), "#L_at_Amax_Fem_GP_1_",
-    0.00,   0.2,        kf,           kf,                 -1,        .25,     -3,       c(rep(0,4), 0.5, 0,0), "#VonBert_K_Fem_GP_1_",
-    0.01,   0.2,        CV1,          CV1,                -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#CV_young_Fem_GP_1_",
-    0.01,   0.1,        CV2,          CV2,                -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#CV_old_Fem_GP_1_",
-    #0.01,   m.m.est*3,  m.m.est,      round(log(m.m.est),4), 3,      .25,   do.est,     c(rep(0,4), 0.5, 0,0), "#NatM_p_1_Mal_GP_1",
-    #3,      35,         L1,           L1,                 -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#L_at_Amin_Mal_GP_1_",
-    #35,     70,         L2m,          L2m,                -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#L_at_Amax_Mal_GP_1_",
-    #0.01,   0.2,        km,           km,                 -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#VonBert_K_Mal_GP_1_",
-    #0.01,   0.2,        CV1,          CV1,                -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#CV_young_Mal_GP_1_",
-    #0.01,   0.1,        CV2,          CV2,                -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#CV_old_Mal_GP_1_",
+    #_LO    HI          INIT          PRIOR        PR_type    SD    PHASE      env-var use_dev dev_minyr   dev_maxyr   dev_stddev  Block   Block_Fxn
+    0.01,   0.6,        m,       round(log(m),4),  3,        .50,     -1,        c(rep(0,4), 0.5, 1,2), "#NatM_p_1_Fem_GP_1",
+    3,      35,         L1,           L1,         -1,         10,     -3,        c(rep(0,4), 0.5, 0,0), "#L_at_Amin_Fem_GP_1_",
+    45,     70,         L2f,          L2f,        -1,         10,     -3,        c(rep(0,4), 0.5, 0,0), "#L_at_Amax_Fem_GP_1_",
+    0.00,   0.2,        kf,           kf,         -1,        .25,     -3,        c(rep(0,4), 0.5, 0,0), "#VonBert_K_Fem_GP_1_",
+    0.01,   0.2,        CV1,          CV1,        -1,        .10,    -99,        c(rep(0,4), 0.5, 0,0), "#CV_young_Fem_GP_1_",
+    0.01,   0.1,        CV2,          CV2,        -1,        .10,    -99,        c(rep(0,4), 0.5, 0,0), "#CV_old_Fem_GP_1_",
+    #0.01,   m.m.est*3,  m.m.est,     round(log(m.m.est),4), 3,      .25,   do.est,     c(rep(0,4), 0.5, 0,0), "#NatM_p_1_Mal_GP_1",
+    #3,      35,         L1,          L1,                 -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#L_at_Amin_Mal_GP_1_",
+    #35,     70,         L2m,         L2m,                -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#L_at_Amax_Mal_GP_1_",
+    #0.01,   0.2,        km,          km,                 -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#VonBert_K_Mal_GP_1_",
+    #0.01,   0.2,        CV1,         CV1,                -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#CV_young_Mal_GP_1_",
+    #0.01,   0.1,        CV2,         CV2,                -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#CV_old_Mal_GP_1_",
     0,      0.1,        0,            0,                  -1,        .25,     -2,       c(rep(0,4), 0.5, 0,0), "#NatM_p_1_Mal_GP_1",
     0,      0.1,        0,            0,                  -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#L_at_Amin_Mal_GP_1_",
     0,      0.1,        0,            0,                  -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#L_at_Amax_Mal_GP_1_",
@@ -292,12 +292,12 @@ writeCtl <- function (ctl,y)
 
     bio.mat <-matrix(c( 
     #_LO    HI          INIT          PRIOR              PR_type    SD    PHASE      env-var use_dev dev_minyr   dev_maxyr   dev_stddev  Block   Block_Fxn
-    0.01,   0.4,        m,            round(log(m),4),     3,        .20,     m.phase,        c(rep(0,4), 0.5, 0,0), "#NatM_p_1_Fem_GP_1",
-    3,      35,         L1,           L1,                 -1,         10,     3,        c(rep(0,4), 0.5, 0,0), "#L_at_Amin_Fem_GP_1_",
-    45,     70,         L2f,          L2f,                -1,         10,     3,        c(rep(0,4), 0.5, 0,0), "#L_at_Amax_Fem_GP_1_",
-    0.00,   0.2,        kf,           kf,                 -1,        .25,     -3,       c(rep(0,4), 0.5, 0,0), "#VonBert_K_Fem_GP_1_",
-    0.01,   0.2,        CV1,          CV1,                -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#CV_young_Fem_GP_1_",
-    0.01,   0.1,        CV2,          CV2,                -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#CV_old_Fem_GP_1_",
+    0.01,   0.4,        m.prior,   round(log(m.prior),3),   3,        .20,     m.phase,  c(rep(0,4), 0.5, 0,0), "#NatM_p_1_Fem_GP_1",
+    3,      35,         lmin.prior,   lmin.prior,          -1,         10,     3,        c(rep(0,4), 0.5, 0,0), "#L_at_Amin_Fem_GP_1_",
+    45,     70,         lmax.prior,   lmax.prior,          -1,         10,     3,        c(rep(0,4), 0.5, 0,0), "#L_at_Amax_Fem_GP_1_",
+    0.00,   0.2,        k.prior,      k.prior,             -1,        .25,     4,       c(rep(0,4), 0.5, 0,0), "#VonBert_K_Fem_GP_1_",
+    0.01,   0.2,        cv1.prior,    cv1.prior,           -1,       0.20,     4,       c(rep(0,4), 0.5, 0,0), "#CV_young_Fem_GP_1_",
+    0.01,   0.1,        cv2.prior,    cv2.prior,           -1,       0.20,     4,       c(rep(0,4), 0.5, 0,0), "#CV_old_Fem_GP_1_",
     #0.01,   m.m.est*3,  m.m.est,      round(log(m.m.est),4), 3,      .25,   do.est,     c(rep(0,4), 0.5, 0,0), "#NatM_p_1_Mal_GP_1",
     #3,      35,         L1,           L1,                 -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#L_at_Amin_Mal_GP_1_",
     #35,     70,         L2m,          L2m,                -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#L_at_Amax_Mal_GP_1_",
@@ -519,7 +519,7 @@ writeStarter <- function (starter)
     0,      " #report level in CUMREPORT.SSO (0,1,2)\n",
     0,      " #include prior_like for non-estimated parameteres (0,1)\n",
     1,      " #use soft boundaries to aid convergence\n",
-    boot.files,      " #number of boostrap datafiles to produce\n",
+    boot.files," #number of boostrap datafiles to produce\n",
     end.phase, " #turn off estimation for parameters entering after this phase\n",
     1,      " #MCMC burn interval\n",
     1,      " #MCMC thin interval\n",
@@ -560,15 +560,15 @@ writeForecast <- function (forecast,y)
     #ctl.rule.tgt," # Control rule Biomass level for constant F (as frac of Bzero, e.g. 0.40)\n",
     #ctl.rule.tgt-0.001," # Control rule Biomass level for no F (as frac of Bzero, e.g. 0.10)\n",
     #buffer,     " # Control rule fraction of Flimit (e.g. 0.75)\n",
-    0.01,       " # Control rule Biomass level for constant F (as frac of Bzero, e.g. 0.40)\n",
-    0,          " # Control rule Biomass level for no F (as frac of Bzero, e.g. 0.10)\n",
-    1,          " # Control rule fraction of Flimit (e.g. 0.75)\n",
+    0.011,      " # Control rule Biomass level for constant F (as frac of Bzero, e.g. 0.40)\n",
+    0.01,       " # Control rule Biomass level for no F (as frac of Bzero, e.g. 0.10)\n",
+    buffer,     " # Control rule fraction of Flimit (e.g. 0.75)\n",
     3,          " # N forecast loops (1=OFL only; 2=ABC; 3=get F from forecast ABC catch with allocations applied)\n",
     3,          " #_First forecast loop with stochastic recruitment\n",
     0,          " #_Forecast loop control #3 (reserved for future bells&whistles)\n", 
     0,          " #_Forecast loop control #4 (reserved for future bells&whistles)\n", 
     0,          " #_Forecast loop control #5 (reserved for future bells&whistles)\n", 
-    y-2,        " #FirstYear for caps and allocations (should be after years with fixed inputs)\n", 
+    999,        " #FirstYear for caps and allocations (should be after years with fixed inputs)\n", 
     0,          " # stddev of log(realized catch/target catch) in forecast (set value>0.0 to cause active impl_error)\n",
     0,          " # Do West Coast gfish rebuilder output (0/1)\n", 
     -1,         " # Rebuilder:  first year catch could have been set to zero (Ydecl)(-1 to set to 1999)\n",
@@ -585,16 +585,20 @@ writeForecast <- function (forecast,y)
     " # fleet assignment to allocation group (enter group ID# for each fleet, 0 for not included in an alloc group)\n",
     0,          "\n", 
     append = FALSE, file=forecast, sep=" ") 
-      
+
     cat(
-    4,      " # Number of forecast catch levels to input (else calc catch from forecast F)\n", 
+    0,      " # Number of forecast catch levels to input (else calc catch from forecast F)\n", 
     99,     " # basis for input Fcast catch:  2=dead catch; 3=retained catch; 99=input Hrate(F) (units are from fleetunits; note new codes in SSV3.20)\n",
-    y + 1, 1, 1, fspr.input, "\n", 
-    y + 2, 1, 1, fspr.input, "\n", 
-    y + 3, 1, 1, fspr.input, "\n", 
-    y + 4, 1, 1, fspr.input, "\n", 
     999, append=TRUE, file=forecast, sep=" ")
-    
+      
+    #cat(
+    #4,      " # Number of forecast catch levels to input (else calc catch from forecast F)\n", 
+    #99,     " # basis for input Fcast catch:  2=dead catch; 3=retained catch; 99=input Hrate(F) (units are from fleetunits; note new codes in SSV3.20)\n",
+    #y + 1, 1, 1, fspr.input, "\n", 
+    #y + 2, 1, 1, fspr.input, "\n", 
+    #y + 3, 1, 1, fspr.input, "\n", 
+    #y + 4, 1, 1, fspr.input, "\n", 
+    #999, append=TRUE, file=forecast, sep=" ") 
 
 }
 
@@ -607,10 +611,15 @@ writeDat<-function(dat, y, survey, fore.catch)
         #fore.catch[(pre.fishery.yrs+1):y],   seq(1,(y-pre.fishery.yrs),1),    rep(1,(y-pre.fishery.yrs)) )
         fore.catch[(pre.fishery.yrs+1):y],   seq(ages,y,1),    rep(1,(y-pre.fishery.yrs)) )
 
-    ss.survey.data = cbind(
+    #ss.survey.data = cbind(
         #start.survey:(y-pre.fishery.yrs), rep(1, length(survey)), rep(2, length(survey)), 
-        start.survey:y, rep(1, length(survey)), rep(2, length(survey)), 
-        survey, rep(ss.survey.cv, length(survey)))
+        #start.survey:y, rep(1, length(survey)), rep(2, length(survey)), 
+        #survey, rep(ss.survey.cv, length(survey)))
+
+    survey.data.yrs = seq(start.survey, y, 2)
+    ss.survey.data = cbind(
+        survey.data.yrs, rep(1, length(survey.data.yrs)), rep(2, length(survey.data.yrs)), 
+        rep(5000, length(survey.data.yrs)), rep(ss.survey.cv, length(survey.data.yrs)))
         
     depl.survey    = cbind(y, 1, 3, final.depl, 0.01)
                     #cbind(y-pre.fishery.yrs, 1, 3, final.depl, 0.01)
@@ -623,11 +632,13 @@ writeDat<-function(dat, y, survey, fore.catch)
                     f.len.samp[data.yrs], data.matrix)  
 
     #data.yrs = (start.survey.len.samp - pre.fishery.yrs):(y-pre.fishery.yrs)
-    data.yrs = start.survey.len.samp:y
-    data.matrix = matrix(0, length(data.yrs), 2*length(len.step))
-    data.matrix[,1] = s.len.samp[data.yrs]
-    survey.length.data = cbind(data.yrs, rep(1, length(data.yrs)), rep(2, length(data.yrs)), rep(3, length(data.yrs)), rep(2, length(data.yrs)),
-                    s.len.samp[data.yrs], data.matrix)    
+    #data.yrs = start.survey.len.samp:y
+    data.matrix = matrix(0, length(survey.data.yrs), 2*length(len.step))
+    data.matrix[,1] = s.len.samp[survey.data.yrs]
+    survey.length.data = cbind(survey.data.yrs, 
+                    rep(1, length(survey.data.yrs)), rep(2, length(survey.data.yrs)), 
+                    rep(3, length(survey.data.yrs)), rep(2, length(survey.data.yrs)),
+                    s.len.samp[survey.data.yrs], data.matrix)    
 
     #data.yrs = (start.fishery.age.samp- pre.fishery.yrs) :(y-pre.fishery.yrs)
     data.yrs =  start.fishery.age.samp :y
@@ -638,12 +649,15 @@ writeDat<-function(dat, y, survey, fore.catch)
                     f.age.samp[data.yrs], data.matrix)  
 
     #data.yrs = (start.survey.age.samp- pre.fishery.yrs) :(y-pre.fishery.yrs)
-    data.yrs =  start.survey.age.samp : y
-    data.matrix = matrix(0, length(data.yrs), 2*ages - 2)
-    data.matrix[,1] = s.age.samp[data.yrs]
-    survey.age.data = cbind(data.yrs, rep(1, length(data.yrs)), rep(2, length(data.yrs)), rep(3, length(data.yrs)), rep(2, length(data.yrs)),
-                    rep(1, length(data.yrs)), rep(-1, length(data.yrs)), rep(-1, length(data.yrs)),
-                    s.age.samp[data.yrs], data.matrix)    
+    #data.yrs =  start.survey.age.samp : y
+    data.matrix = matrix(0, length(survey.data.yrs), 2*ages - 2)
+    data.matrix[,1] = s.age.samp[survey.data.yrs]
+    survey.age.data = cbind(survey.data.yrs, rep(1, length(survey.data.yrs)), 
+                      rep(2, length(survey.data.yrs)), rep(3, length(survey.data.yrs)), 
+                      rep(2, length(survey.data.yrs)),
+                      rep(1, length(survey.data.yrs)), rep(-1, length(survey.data.yrs)), 
+                      rep(-1, length(survey.data.yrs)),
+                      s.age.samp[survey.data.yrs], data.matrix)    
 
     n.length.obs = dim(fishery.length.data)[1] + dim(survey.length.data)[1]
     n.age.obs = dim(fishery.age.data)[1] + dim(survey.age.data)[1]

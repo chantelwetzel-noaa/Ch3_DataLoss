@@ -34,6 +34,9 @@ Rep_Summary<- function(rep.new, y, pre.fishery.yrs, do.forecast)
   Lmin = as.numeric(strsplit(rep.new[grep("L_at_Amin_Fem_GP",rep.new)], " ")[[1]][3])
   Lmax = as.numeric(strsplit(rep.new[grep("L_at_Amax_Fem_GP",rep.new)], " ")[[1]][3])
   k    = as.numeric(strsplit(rep.new[grep("VonBert_K_Fem_GP",rep.new)], " ")[[1]][3])
+  cv.young  = as.numeric(strsplit(rep.new[grep("CV_young",rep.new)], " ")[[1]][3])
+  cv.old    = as.numeric(strsplit(rep.new[grep("CV_old",rep.new)], " ")[[1]][3])
+
   #Selectivity
   F.Selex.1 = as.numeric(strsplit(rep.new[grep("SizeSel_1P_1_Fishery",rep.new)], " ")[[1]][3])
   F.Selex.2 = as.numeric(strsplit(rep.new[grep("SizeSel_1P_2_Fishery",rep.new)], " ")[[1]][3])
@@ -54,7 +57,7 @@ Rep_Summary<- function(rep.new, y, pre.fishery.yrs, do.forecast)
   }
   
   #x = start.survey:(y-pre.fishery.yrs - 1)
-  x = start.survey:(y - 1)
+  x = seq(start.survey,(y - 1), 2)
   VulBioEst <- mapply(function(x)
                VulBioEst = as.numeric(strsplit(rep.new[grep(paste(2,"Survey",x,sep=" "),rep.new)], " ")[[1]][6]), x = x)
   
@@ -81,6 +84,8 @@ Rep_Summary<- function(rep.new, y, pre.fishery.yrs, do.forecast)
   RepSummary$Lmin<- Lmin
   RepSummary$Lmax<- Lmax
   RepSummary$k   <- k
+  RepSummary$cv.young <- cv.young
+  RepSummary$cv.old <- cv.old
   if(need.blocks == TRUE){
     RepSummary$F.selex.1.adj <- F.Selex.1.adj
   }
