@@ -13,7 +13,7 @@ if (LH == "flatfish" ) {
  num.ages <- ages-1
  fishing.time <- -1         ; max.F <- 4 
 
- len.step <- seq(from=10,to=64,by=2)      ; mid.len.step <- seq(from=11,to=65,by=2)  
+ len.step <- seq(from=10,to=70,by=2)      ; mid.len.step <- seq(from=11,to=69,by=2)  
  bin <- length(len.step)
         
  m <- 0.15                  ; steep <- 0.875 
@@ -69,7 +69,7 @@ if (LH == "rockfish" ) {
  num.ages <- ages-1
  fishing.time <- -1         ; max.F <- 4 
  
- len.step <- seq(from = 10, to = 76, by = 2)      ; mid.len.step <- seq(from = 11, to = 77, by = 2)  
+ len.step <- seq(from = 10, to = 80, by = 2)      ; mid.len.step <- seq(from = 11, to = 79, by = 2)  
  bin <- length(len.step)
        
  m <- 0.08                  ; steep <- 0.60 

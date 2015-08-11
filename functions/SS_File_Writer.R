@@ -78,7 +78,7 @@ writeCtl.om <- function (ctl,y)
         m.matrix[i-1,] <- c(0.01, 0.60,  m.vec[i], round(log(m.vec[i]),4) ,  3,  0.20,  3,  paste("#M", i))
     }
 
-    sigma.set = ifelse(sigmaR == 0, 0.01, sigmaR)
+    sigma.set = ifelse(sigmaR == 0, 0.01, sigmaR-0.10)
     rec.mat <- matrix(c(
     #_LO    HI     INIT     PRIOR   PR_type     SD      PHASE
     2,      15,    log(R0), log(R0), -1,        10,      est.R0, "# log(R0)",  
@@ -200,7 +200,7 @@ writeCtl.om <- function (ctl,y)
     file = ctl, append = T)
 
     if (OM.run.1) { cat( 0, 0, 0, 2, " #Depl\n",
-              -6, 6, 0, 0, -1, 99, -1,  " #Depletion\n",
+              -6, 6, log(0.25), 0, -1, 99, -1,  " #Depletion\n",
               file = ctl, append = T) }
 
     if (fix.q > 0){ cat(-6, 6, 0, 0, -1, 99, -1,
@@ -243,7 +243,7 @@ writeCtl.om <- function (ctl,y)
     0,      " #No Tag Parameters\n",
     0,      " #Variance Adjustments\n",
     2,      " #Max_lambda_phase\n",
-    0,      " #sd_offset\n",
+    1,      " #sd_offset\n",
     0,      " #Number Lambda Changes\n",
     "#Place holder for lambdas\n",
     #5, 1, 1, 0, 1, "#Fishery Ages\n",
@@ -492,9 +492,15 @@ writeCtl <- function (ctl,y)
  
     cat(
     0,      " #No Tag Parameters\n",
-    0,      " #Variance Adjustments\n",
+    1,      " #Variance Adjustments\n",
+        0,    0,        "#_add_to_survey_CV\n",
+        0,    0,        "#_add_to_discard_stddev\n",
+        0,    0,        "#_add_to_bodywt_CV\n",
+        1,    1,     "#_mult_by_lencomp_N\n",
+        1,    1,     "#_mult_by_agecomp_N\n",
+        1,    1,        "#_mult_by_size-at-age_N\n",
     2,      " #Max_lambda_phase\n",
-    0,      " #sd_offset\n",
+    1,      " #sd_offset\n",
     0,      " #Number Lambda Changes\n",
     "#Place holder for lambdas\n",
     #5, 1, 1, 0, 1, "#Fishery Ages\n",
@@ -553,15 +559,15 @@ writeForecast <- function (forecast,y)
     0, 0, 0, 0, 0, 0, " # Benchmark years: beg_bio, end_bio, beg_selex, end_selex, bef_relF, end_relF\n",
     1,          " # Bmark_relF_Basis: 1= use year range; 2= set relF same as forecast below\n",
     do.forecast," #Forecast: 0=none; 1=F(SPR); 2=F(MSY) 3=F(Btgt); 4=F(endyr); 5=Ave F (enter yrs); 6=read Fmult\n",
-    4,          " # N forecast years\n",
+    10,          " # N forecast years\n",
     1,          " #F scalar (only used for Do_Forecast == 5)\n",
     0, 0, 0, 0, " #Fcast_years:  beg_selex, end_selex, beg_relF, end_relF\n",
     1,          " # Control rule method (1=west coast adjust catch; 2=adjust F)\n",
     #ctl.rule.tgt," # Control rule Biomass level for constant F (as frac of Bzero, e.g. 0.40)\n",
     #ctl.rule.tgt-0.001," # Control rule Biomass level for no F (as frac of Bzero, e.g. 0.10)\n",
     #buffer,     " # Control rule fraction of Flimit (e.g. 0.75)\n",
-    0.011,      " # Control rule Biomass level for constant F (as frac of Bzero, e.g. 0.40)\n",
-    0.01,       " # Control rule Biomass level for no F (as frac of Bzero, e.g. 0.10)\n",
+    hcr.high,      " # Control rule Biomass level for constant F (as frac of Bzero, e.g. 0.40)\n",
+    hcr.low,       " # Control rule Biomass level for no F (as frac of Bzero, e.g. 0.10)\n",
     buffer,     " # Control rule fraction of Flimit (e.g. 0.75)\n",
     3,          " # N forecast loops (1=OFL only; 2=ABC; 3=get F from forecast ABC catch with allocations applied)\n",
     3,          " #_First forecast loop with stochastic recruitment\n",
@@ -728,8 +734,9 @@ writeDat<-function(dat, y, survey, fore.catch)
     
     cat(len.step,"\n",
     file=dat,append=T,sep=" ")
-   
-    if (data.scenario != "ds5") {
+    
+
+    #if (data.scenario != "ds5") {
         cat(n.length.obs,  " #Number of Length Observations\n", 
         "#Year Seas Fleet Gender Partition Nsamp\n",
         file=dat,append=T,sep=" ") 
@@ -738,17 +745,12 @@ writeDat<-function(dat, y, survey, fore.catch)
         write.table(survey.length.data,file=dat, append=T,row.names=FALSE, col.names=FALSE, quote=FALSE)  
     
         cat("#\n",
-        #num.ages,           " #Number of Ages\n",
-        #seq(1,num.ages,1),  " #Age Bins\n",
         max.age,             " #Number of Ages\n",
         seq(1,max.age,1),    " #Age Bins\n",
         1,                   " #Number of Ageing Error Sets\n",
         "#Age Error Matrix\n",
         rep(-1, ages),      " #True Ages\n",
-        #rep(-1,max.age + 1),  " #True Ages\n",
-        rep(0.05,ages),     " #Age Error StDev\n",
-        #(1:ages-0.5)*0.05,    " #Age Error StDev\n",
-        #(1:(max.age+1)-0.5)*0.05, " #Age Error StDev\n",
+        (1:ages-0.5)*0.10,      " #Age Error StDev\n", 
         "#\n",
         n.age.obs,          " #Number Age Observations\n",
         3,                  " #Age-Length Bin Option: 1=poplenbins; 2=datalenbins; 3=lengths\n",
@@ -758,27 +760,60 @@ writeDat<-function(dat, y, survey, fore.catch)
     
         write.table(fishery.age.data, file=dat, append=T, row.names=FALSE, col.names=FALSE, quote=FALSE) 
         write.table(survey.age.data,  file=dat, append=T, row.names=FALSE, col.names=FALSE, quote=FALSE) 
-    }
+    #}
 
-    if (data.scenario == "ds5") {
-        cat(0,  " #Number of Length Observations\n", 
-        "#Year Seas Fleet Gender Partition Nsamp\n",
-        file=dat,append=T,sep=" ") 
-        cat("#\n",
-        num.ages,           " #Number of Ages\n",
-        seq(1,num.ages,1),  " #Age Bins\n",
-        1,                  " #Number of Ageing Error Sets\n",
-        "#Age Error Matrix\n",
-        rep(-1, ages),      " #True Ages\n",
-        #rep(0.01,ages),     " #Age Error StDev\n",
-        (1:ages-0.5)*0.05,    " #Age Error StDev\n",
-        "#\n",
-        0,                  " #Number Age Observations\n",
-        3,                  " #Age-Length Bin Option: 1=poplenbins; 2=datalenbins; 3=lengths\n",
-        0,                  " #Combine males into females at or below this bin number\n",
-        "#Year Seas Fleet Gender Partition Ageerr Lbinlo Lbinhi Nsamp\n",  
-        file=dat,append=T,sep=" ")
-    }
+    #if (data.scenario == "ds5") {
+    #    cat(n.length.obs,  " #Number of Length Observations\n", 
+    #    "#Year Seas Fleet Gender Partition Nsamp\n",
+    #    file=dat,append=T,sep=" ") 
+#
+    #    find = (fishery.length.data[,6] != 75)
+    #    negative.yrs = -1 * fishery.length.data[find,1]
+    #    fishery.length.data[find,1] = negative.yrs
+#
+    #    write.table(fishery.length.data,file=dat, append=T,row.names=FALSE, col.names=FALSE, quote=FALSE)  
+    #    write.table(survey.length.data,file=dat, append=T,row.names=FALSE, col.names=FALSE, quote=FALSE)
+#
+    #    cat("#\n",
+    #    max.age,           " #Number of Ages\n",
+    #    seq(1,max.age,1),  " #Age Bins\n",
+    #    1,                  " #Number of Ageing Error Sets\n",
+    #    "#Age Error Matrix\n",
+    #    rep(-1, ages),      " #True Ages\n",
+    #    #rep(0.01,ages),     " #Age Error StDev\n",
+    #    rep(0.05, ages),    " #Age Error StDev\n",
+    #    "#\n",
+    #    n.age.obs,                  " #Number Age Observations\n",
+    #    3,                  " #Age-Length Bin Option: 1=poplenbins; 2=datalenbins; 3=lengths\n",
+    #    0,                  " #Combine males into females at or below this bin number\n",
+    #    "#Year Seas Fleet Gender Partition Ageerr Lbinlo Lbinhi Nsamp\n",  
+    #    file=dat,append=T,sep=" ")
+#
+    #    find = (fishery.age.data[,9] != 25)
+    #    negative.yrs = -1 * fishery.age.data[find,1]
+    #    fishery.age.data[find,1] = negative.yrs
+#
+    #    write.table(fishery.age.data, file=dat, append=T, row.names=FALSE, col.names=FALSE, quote=FALSE) 
+    #    write.table(survey.age.data,  file=dat, append=T, row.names=FALSE, col.names=FALSE, quote=FALSE) 
+#
+    #    #cat(0,  " #Number of Length Observations\n", 
+    #    #"#Year Seas Fleet Gender Partition Nsamp\n",
+    #    #file=dat,append=T,sep=" ") 
+    #    #cat("#\n",
+    #    #num.ages,           " #Number of Ages\n",
+    #    #seq(1,num.ages,1),  " #Age Bins\n",
+    #    #1,                  " #Number of Ageing Error Sets\n",
+    #    #"#Age Error Matrix\n",
+    #    #rep(-1, ages),      " #True Ages\n",
+    #    ##rep(0.01,ages),     " #Age Error StDev\n",
+    #    #(1:ages-0.5)*0.05,    " #Age Error StDev\n",
+    #    #"#\n",
+    #    #0,                  " #Number Age Observations\n",
+    #    #3,                  " #Age-Length Bin Option: 1=poplenbins; 2=datalenbins; 3=lengths\n",
+    #    #0,                  " #Combine males into females at or below this bin number\n",
+    #    #"#Year Seas Fleet Gender Partition Ageerr Lbinlo Lbinhi Nsamp\n",  
+    #    #file=dat,append=T,sep=" ")
+    #}
 
     cat("#\n", 
     0, " #Number of Mean Size at Age Observations\n",

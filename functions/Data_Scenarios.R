@@ -24,7 +24,7 @@ sigma <- 0.36
 p.value <- 0.45
 auto <- FALSE
 selec.adj <- 5
-start.survey <- ages + 35 #106 #36
+
 
 AgeError <- FALSE 
 #Adjust the max age value that would be used if ageing error is included
@@ -34,19 +34,29 @@ if(AgeError == TRUE) { max.age  <- ages + 4  }
 sigmaR 	     <- 0.60  
 ss.survey.cv <- 0.50 
 survey.cv 	 <- 0.50 
-select.sd 	 <- 0  #Selectivity Time Varying StDev
-m.sd 		 <- 0
+select.sd 	 <- 0.05  #Selectivity Time Varying StDev
+m.sd 		 <- 0.05
 
-if (data.scenario == "ds2" || data.scenario == "ds3"){
-	select.sd <- 0.05
-	m.sd      <- 0.05  }
+if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds4"){
+	select.sd <- 0
+	m.sd      <- 0  }
+
+if (data.scenario == "ds6" || data.scenario == "ds7"){
+	auto <- TRUE
+}
+
+if (data.scenario == "ds_survey"){
+	ss.survey.cv = survey.cv = 0.20
+}
 
 pre.fishery.yrs <- ages - 1 
-setup.yrs   <- 50
+#setup.yrs   <- 100 #100
 project.yrs <- 100 #76
 if (LH == "flatfish") { project.yrs = 52 }
 fishery.yrs <- setup.yrs + project.yrs + 1
 total.yrs   <- pre.fishery.yrs + fishery.yrs
+
+start.survey <- ages + setup.yrs - 15 #106 #36
 
 years       <- 1:total.yrs 
 ass.num     <- (project.yrs / 4) + 1
