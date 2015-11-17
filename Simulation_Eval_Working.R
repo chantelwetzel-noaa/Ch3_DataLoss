@@ -8,13 +8,13 @@
 ############################################
 
 drive = "C:"
-run.name = "50_years_July/"
-LH = "flatfish"
-ds.list = c("ds2", "ds3","ds6", "ds7") 
-ds.list = c("ds1", "ds4","ds2", "ds3", "ds6", "ds7")
+run.name = ""
+LH = "rockfish"
+ds.list = c("ds2", "ds3") 
+#ds.list = c("ds1", "ds4","ds2", "ds3", "ds6", "ds7")
 #ds.list = c("ds2", "ds3", "ds6", "ds7")
 #ds.list = c("greatall", "normal_estM", "greathist")
-sim.range = c(1,100)
+sim.range = c(1,50)
 order = c(1,2,3,4,5,6) 
 #order = c(1,4,2,3) #c(2,1,3) #c(3,1,2,4)
 data.scenario = ""
@@ -192,7 +192,7 @@ for (spec in 1:length(ds.list))
   save (om.all, file = om.out)
 
   #Sort out the runs that were never overfished and calculate some metrics=====================================================
-  save.index = save.index.ov = 1:100
+  save.index = save.index.ov = 1:sim.range[2]
   if(data.scenario == "ds3" || data.scenario == "normal_estM") {
     #index = apply(f.lens[j, first.ass.yr:fishery.yrs,],2,sum) != 100 * sum(length(first.ass.yr:fishery.yrs))
     #index.ov = apply(f.lens[j,first.ass.yr:fishery.yrs,],2,sum) == 100 * sum(length(first.ass.yr:fishery.yrs))
@@ -201,7 +201,7 @@ for (spec in 1:length(ds.list))
     #index.ov = (f.lens[j, ass.yr[1], ] == 75 & f.lens[j, ass.yr[2], ] == 75)
     index.ov = which(depl.est[j, ass.yr[1], 1, ] > over.thres & depl.est[j, ass.yr[2], 2, ] > over.thres)
     print(paste("Number not estimated overfished", sum(index.ov)))
-    temp = 1:100
+    temp = 1:sim.range[2]
     save.index = index #temp[index]
     save.index.ov = index.ov #temp[index.ov]
     #print(temp[index==FALSE])
@@ -260,7 +260,7 @@ for (spec in 1:length(ds.list))
     m.est[j,,i]        = Est$M.store[1,1:ass.num]
     s.selex.est[j,,,i] = Est$S.selex[,1:ass.num]
     f.selex.est[j,,,i] = Est$F.selex[,1:ass.num]
-    f.selex.adj.est[j,,,i] = Est$fsp1.est[,1:ass.num]
+    f.selex.adj.est[j,,,i] = Est$fsp2.est[,1:ass.num]
     ssb0.est[j,,i]     = Est$SB[1,]/Est$Bratio[1,]
     ind = Est$recovered.est > 0 
     index = Est$recovered.est[ind]
@@ -279,7 +279,7 @@ for (spec in 1:length(ds.list))
 
   #Save as an output file 
   est.all <- list()
-  est.out <- paste(drive,"/PhD/Chapter3/", run.name, "/output/",LH,"_est_all", sep = "")
+  est.out <- paste(drive,"/PhD/Chapter3/output/",LH,"_est_all", sep = "")
   est.all$ssb.est  <- ssb.est
   est.all$ry.est   <- ry.est
   est.all$depl.est <- depl.est
@@ -608,7 +608,7 @@ for (spec in 1:length(ds.list))
   }
   
   meds.all <- list()
-  meds.out <- paste(drive,"/PhD/Chapter3/", run.name, "/output/",LH,"_meds_all", sep = "")
+  meds.out <- paste(drive,"/PhD/Chapter3/output/",LH,"_meds_all", sep = "")
 
   meds.all$med.ssb  <- med.ssb
   meds.all$med.ry   <- med.ry
@@ -707,7 +707,7 @@ for (spec in 1:length(ds.list))
   yrs.declared.all.split[j,] = yrs.declared.rec.late.all[j,index] + yrs.declared.rec.early.all[j,index]
 
   meds.split <- list()
-  meds.out.split <- paste(drive,"/PhD/Chapter3/", run.name, "/output/",LH,"_meds_split", sep = "")
+  meds.out.split <- paste(drive,"/PhD/Chapter3/output/",LH,"_meds_split", sep = "")
 
   meds.split$med.ssb  <- med.ssb.split
   meds.split$med.ry   <- med.ry.split

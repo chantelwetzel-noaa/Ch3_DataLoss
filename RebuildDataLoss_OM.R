@@ -12,25 +12,28 @@
 #source("F://PhD//Chapter3//Code//RebuildDataLoss_OM.R") 
 #source("C:/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/RebuildDataLoss_OM.R")
 
-drive <-"C:" #"//home//cwetzel//h_cwetzel"
-LH <- "rockfish"
-start.n <- 16
-end.n <- 30
-data.scenario <- "ds4" 
-tantalus <- FALSE
-github <- TRUE
-file.type = "boot" #"boot" "perfect"
-do.MLE = FALSE
+drive    <-"C:" #"//home//cwetzel//h_cwetzel"
+LH       <- "rockfish"
+start.n  <- 1
+end.n    <- 50
+data.scenario <- "ds0" 
+tantalus      <- FALSE
+github        <- TRUE
+file.type     <- "boot" #"boot" "perfect"
+determ        <- FALSE
+setup.yrs     <- 50
+do.MLE        <- FALSE
+error.struct  <- "dirich" #"multinom" #"dirich"
 if (file.type == "perfect") { do.MLE = T }
-determ = FALSE
-setup.yrs   <- 50
+
 
 #Load packages
 require(r4ss)
 require(compiler)
+require(gtools)
 
 #Set the directory and create folder
-directory <<- paste(drive,"/PhD/Chapter3/",LH, "_", data.scenario,"_",setup.yrs,"yr_sims_",start.n,"_",end.n,"/",sep="")
+directory <<- paste(drive,"/PhD/Chapter3/",LH, "_", data.scenario,"_",setup.yrs,"yr_sims_", error.struct, "_",start.n,"_",end.n,"/",sep="")
 om  <- paste( directory, "om", sep = "")
 run <- paste( directory, "run", sep = "")
 if( file.exists(directory) == FALSE) {
@@ -58,7 +61,7 @@ print(LH) ; print(paste("True Depletion", final.depl,sep=" "))
 print(paste("Survey Length", start.survey, sep=" "))
 print(paste("Auto-Correlation", auto, sep =" "))
 
-prior.matrix <- matrix(NA, end.n, 6)
+prior.matrix <- matrix(NA, end.n, 7)
 
 #Start the simulation loop
 for (nsim in start.n:end.n)
@@ -77,6 +80,7 @@ for (nsim in start.n:end.n)
 
  	equil = FALSE
     pre.dev.phase = ifelse(equil == TRUE, -3, 4)
+    sigmaR = ifelse(determ == TRUE, 0, sigmaR)
     determ = ifelse(sigmaR == 0, TRUE, FALSE)
     stop.rec.est <- ifelse(LH == "rockfish", 7, 3 )
  	# Save the run information ===========================================================================
@@ -107,19 +111,34 @@ for (nsim in start.n:end.n)
  	select.seed   <- as.numeric(seed.list[[1]][,"spare1"])
     prior.seed    <- as.numeric(seed.list[[1]][,"spare2"]) 
 	 
+    #Set comp seed -----------------------------------------------------------------------------------------------------------
+    set.seed(comp.seed[nsim])
+
 	#Catch History -----------------------------------------------------------------------------------------------------------
 	set.seed(catch.seed[nsim])
 	catch.dev <- c(rnorm(setup.yrs * 0.2,0,0.50),rnorm(setup.yrs*0.70,0,0.07),rnorm(setup.yrs*0.10,0,0.15))
 	CatchTot <- rep(0,setup.yrs) ;  CatchTot[1] <- 25
 	  
-	for (a in 2:(setup.yrs-11)) { 
-	   CatchTot[a]<- CatchTot[a-1]*1.1 
-	       if (CatchTot[a-1]*1.1 > 1000 ) { 
-	           CatchTot[a] <- 1000 }  
-	}
-	for (a in (setup.yrs-10):setup.yrs) { 
-	   CatchTot[a]<- CatchTot[a-1]*0.97 
-	}
+	#for (a in 2:(setup.yrs-11)) { 
+	#   CatchTot[a]<- CatchTot[a-1]*1.1 
+	#       if (CatchTot[a-1]*1.1 > 1000 ) { 
+	#           CatchTot[a] <- 1000 }  
+	#}
+	#for (a in (setup.yrs-10):setup.yrs) { 
+	#   CatchTot[a]<- CatchTot[a-1]*0.97 
+	#}
+
+    for (a in 2:(setup.yrs-25)) { 
+       CatchTot[a]<- CatchTot[a-1]*1.2 
+           if (CatchTot[a-1]*1.2 > 1000 ) { 
+               CatchTot[a] <- 1000 }  
+    }
+    for (a in (setup.yrs-26):(setup.yrs-6)) { 
+       CatchTot[a]<- CatchTot[a-1]*1 
+    }
+    #for (a in (setup.yrs-5):(setup.yrs)) { 
+       CatchTot[(setup.yrs-5):(setup.yrs)]<- CatchTot[(setup.yrs-6)]*1 #0.25
+    #}
 	  
 	CatchTot     <- round(CatchTot,0)    
 	CatchTot.err <- round(CatchTot+CatchTot*catch.dev,0)
@@ -147,10 +166,25 @@ for (nsim in start.n:end.n)
 	select.err     <- rnorm(total.yrs, 0, select.sd)
 	fsp1.vec       <- round(fsp1.start*exp(-0.5*select.sd*select.sd + select.err),0)
     fsp1.shift.vec <- round((fsp1.start + selec.adj)*exp(-0.5*select.sd*select.sd + select.err),0)
+    fsp2.vec       <- sample(x = c(-3, fsp2), size = total.yrs, replace = T, prob = c(0,1))
+    select.err     <- rnorm(total.yrs, 0, 0.25)
+    fsp2.shift.vec <- round((fsp2.vec + dome.adj)*exp(-0.5*select.sd*select.sd + select.err), 0)
 
     #Variation in Natural Mortality--------------------------------------------------------------------------------------------------
     set.seed(m.seed[nsim])
-    m.vec <- round(rlnorm(total.yrs, meanlog=(log(m)-0.5*m.sd^2), sdlog=m.sd),3) 
+    m.devvec <- rnorm(total.yrs, 0, m.sd)#round(rlnorm(total.yrs, meanlog=(log(m)-0.5*m.sd^2), sdlog=m.sd),3) 
+    #Apply autocorrelation in the annual variation
+    rho       <- 1/sqrt(2) #0.50
+    m.auto    <- numeric(total.yrs)
+    m.auto[1] <- m.devvec[1] 
+    for (e in 2:total.yrs){
+        m.auto[e] <- rho * m.auto[e-1] + sqrt(1 - rho * rho) * m.devvec[e]  }
+    m.vec = round(m * exp( m.auto - 0.50 * m.sd^2),3)
+
+    #Variation in growth -------------------------------------------------------------------------------------------------------------
+    k.vec = numeric(total.yrs)
+    #k.vec = rep(kf, total.yrs) 
+    k.vec = round(kf * exp(m.auto - 0.50 * m.sd^2),3)
 
     # Prior value for parameters-----------------------------------------------------------------------------------------------------
     set.seed(prior.seed[nsim])
@@ -160,15 +194,16 @@ for (nsim in start.n:end.n)
     #lmax.prior <- round(rnorm(1, L2f, 0.50),3)
     #cv.1.prior <- round(rnorm(1, CV1, 0.50),3)
     #cv.2.prior <- round(rnorm(1, CV2, 0.50),3)
-    m.prior    <- round(runif(1, m-m*0.25, m+m*0.25),3) 
-    lmin.prior <- round(runif(1, L1 -L1 *0.10, L1 +L1 *0.10),3)
-    lmax.prior <- round(runif(1, L2f-L2f*0.10, L2f+L2f*0.10),3)
-    k.prior    <- round(runif(1, kf -kf *0.10, kf +kf *0.10),3)
-    cv1.prior  <- round(runif(1, CV1-CV1*0.10, CV1+CV1*0.10),3)
-    cv2.prior  <- round(runif(1, CV2-CV2*0.10, CV2+CV2*0.10),3)
+    m.prior    <- round(runif(1,  m -  m *0.25,  m + m*0.25),3) 
+    lmin.prior <- L1 #round(runif(1, L1 - L1 *0.10, L1 + L1 *0.10),3)
+    lmax.prior <- round(runif(1, L2f- L2f*0.10, L2f + L2f*0.10),3)
+    k.prior    <- round(runif(1, kf - kf *0.10, kf  + kf *0.10),3)
+    cv1.prior  <- round(runif(1, CV1- CV1*0.10, CV1 + CV1*0.10),3)
+    cv2.prior  <- round(runif(1, CV2- CV2*0.10, CV2 + CV2*0.10),3)
+    h.prior    <- steep #round(runif(1, steep-steep*0.10, steep+steep*0.10),2)
 
-    prior.matrix[nsim,] = c(m.prior, lmin.prior, lmax.prior, k.prior, cv1.prior, cv2.prior)
-    colnames(prior.matrix) = c("m.prior", "lmin.prior", "lmax.prior", "k.prior", "cv1.prior", "cv2.prior")
+    prior.matrix[nsim,]     = c(m.prior, lmin.prior, lmax.prior, k.prior, cv1.prior, cv2.prior, h.prior)
+    colnames(prior.matrix)  = c("m.prior", "lmin.prior", "lmax.prior", "k.prior", "cv1.prior", "cv2.prior", "h.prior")
     save(prior.matrix, file = paste0(directory,"save/priors"))
 
 	# Calculate the buffer for the forecast file
@@ -197,6 +232,7 @@ for (nsim in start.n:end.n)
 	start.devs     <-  0  #start.bias + 1
 	max.bias.adj   <-  1  #0 #when no devs this results in no correction #1 # full bias adjustment = ry*exp(-0.5*sigmaR^2 + recdev)
     start.bias.est <-  85
+    full.bias.est  <- start.bias.est + 15
 
     #harvest control rule
     hcr.high = 0.011
@@ -208,6 +244,7 @@ for (nsim in start.n:end.n)
     end.phase  = 1  # Only estimate a R0 value that makes the depletion survey true
     est.R0 = 1
     m.phase = 1
+    h.phase = -2
 
     # Create the depletion survey for the data file
     fleets = "Fishery%Survey%Depl"
@@ -349,7 +386,8 @@ for (nsim in start.n:end.n)
 
             #Selectivity shift while overfished
             if (decl.overfished){
-                fsp1.vec[(y-3):(y)] = fsp1.shift.vec[(y-3):(y)] }
+                fsp1.vec[(y-3):y] = fsp1.shift.vec[(y-3):y] 
+                fsp2.vec[(y-3):y] = fsp2.shift.vec[(y-3):y]}
 
 
 			# Set up the bias adjustment parameters ----------------------------------------------------------------------------------
@@ -469,6 +507,7 @@ for (nsim in start.n:end.n)
 			SS_splitdat(inpath = om, outpath = run,
                     inname="data.ss_new", outpattern=paste(file.type,nsim,"_",y,sep=""),
                     number=F, verbose=T, fillblank=T, MLE= do.MLE)
+
 			if (counter == 1){
 				dat <- NULL
                 dat <- SS_readdat(paste(run,"/", file.type ,nsim,"_", y,".ss",sep=""))
@@ -480,6 +519,8 @@ for (nsim in start.n:end.n)
                 buffer = 0.95
                 hcr.high = ctl.rule.tgt
                 hcr.low  = ctl.rule.thres
+                dat$agecomp = Get_Samps(data.type = "age", year.vec = (pre.fishery.yrs + 1): y )
+                dat$lencomp = Get_Samps(data.type = "len", year.vec = (pre.fishery.yrs + 1): y )
 			}
     		if (counter != 1){
     			dat.new <- dat.old <- dat <- NULL
@@ -493,6 +534,9 @@ for (nsim in start.n:end.n)
     			dat.old$CPUE <- rbind(dat.old$CPUE, dat.new$CPUE[ind,])
     			dat.old$add_to_comp <- 0.00001
                 dat.old$ageerror[2,] <- rep(0.10, ages)
+                dat.new$agecomp = Get_Samps(data.type = "age", year.vec = (y - 3): y )
+                dat.new$lencomp = Get_Samps(data.type = "len", year.vec = (y - 3): y )
+
     			dat.old$N_lencomp <- dat.new$N_lencomp
     			ind = dat.new$lencomp$FltSvy == 1 ; ind.old.1 = dat.old$lencomp$FltSvy == 1
     			ind1 = (sum(ind)-3):sum(ind)
@@ -663,7 +707,8 @@ for (nsim in start.n:end.n)
         	ind                   <- y 
         	SB[1:ind,counter]     <- rep.out$SB
         	Bratio[1:ind,counter] <- rep.out$Depl
-            fsp1.est[,counter]    <- ifelse(need.blocks == F, 0, rep.out$F.selex.1.adj)
+            #fsp1.est[,counter]    <- ifelse(need.blocks == F, 0, rep.out$F.selex.1.adj)
+            fsp2.est[,counter]    <- ifelse(need.blocks == F, 0, rep.out$F.selex.2.adj)
 
         	Est[[1]] <- TotBio
         	Est[[2]] <- OFL
@@ -680,11 +725,11 @@ for (nsim in start.n:end.n)
         	Est[[13]]<- Lmin.store
         	Est[[14]]<- Lmax.store
         	Est[[15]]<- k.store
-            Est[[16]]<- fsp1.est
+            Est[[16]]<- fsp2.est #fsp1.est
             Est[[17]]<- recovered.est
 
        		names(Est) <- c("TotBio","OFL","ForeCat","Fmult","FSPR","M.store","R0.out","SB","Bratio","F.selex","S.selex","Recruits",
-                          	 "Lmin.store", "Lmax.store", "k.store", "fsp1.est", "recovered.est")
+                          	 "Lmin.store", "Lmax.store", "k.store",  "fsp2.est","recovered.est")
 	        save(Est, file=estimates)
 
             #Set the ACLs for the next four years 
@@ -737,10 +782,11 @@ for (nsim in start.n:end.n)
     	Proj[[10]]<- f.age.samp
     	Proj[[11]]<- s.age.samp
     	Proj[[12]]<- fsp1.vec
-        Proj[[13]]<- recovered.om
+        Proj[[13]]<- fsp2.vec
+        Proj[[14]]<- recovered.om
 
     	names(Proj) <- c ("SSB", "Depl","R0","Ry", "catch","ofl.true", "acl.true", "f.len.samp","s.len.sam","f.age.samp",
-    					"s.age.samp", "peak", "recovered.om")
+    					"s.age.samp", "peak", "dome", "recovered.om")
     	save(Proj, file = projections)
  	} #end projection loop
 } #end sim loop

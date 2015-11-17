@@ -8,20 +8,20 @@ writeCtl.om <- function (ctl,y)
     #25,     60,  ssp1,  ssp1,   -1,     1,    4,   0,   0,           0,          0,          0.5,        0,        0,           "#Peak",                           
     #-5,     5,   ssp2,  ssp2,   -1,     1,   -9,   0,   0,           0,          0,          0.5,        0,        0,           "#Top (Width)"),          
     #ncol=15, byrow=T)
-    #_LO    HI   INIT   PRIOR  PR_type SD  PHASE   env  use_dev      dev_minyr   dev_maxyr   dev_stddev  Block     Block_Fxn
-    25,     60,  fsp1.vec[1],  fsp1.vec[1],   -1,     1,   4,    0,   0,           0,          0,         0.20,    1, 2,   "#Peak",
-    -5,     5,   fsp2,  fsp2,   -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,           "#Top (Width)",                            
-    -10,    10,  fsp3,  fsp3,   -1,     1,   5,    0,   0,           0,          0,          0.5,        0,        0,           "#Asc_Width" ,                         
-    -2,     20,  fsp4,  fsp4,   -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,           "#Desc_Width",                         
-    -15,    15,  fsp5,  fsp5,   -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,           "#Init",                           
-    -999,  100,  -999,  -999,   -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,           "#Final",   
+    #_LO    HI   INIT           PRIOR           PR_type SD  PHASE   env  use_dev      dev_minyr   dev_maxyr   dev_stddev  Block     Block_Fxn
+    25,     60,  fsp1.vec[1],   fsp1.vec[1],   -1,     1,  -4,    0,   0,           0,          0,         0.20,    1, 2,   "#Peak",
+    -10,    10,  fsp2.vec[2],   fsp2.vec[2],   -1,     1,  -9,    0,   0,           0,          0,         0.20,    1, 2,   "#Top (Width)",                            
+    -10,    10,  fsp3,          fsp3,          -1,     1,  -5,    0,   0,           0,          0,          0.5,        0,        0,      "#Asc_Width" ,                         
+    -2,     20,  fsp4,          fsp4,          -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,      "#Desc_Width",                         
+    -15,    15,  fsp5,          fsp5,          -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,      "#Init",                           
+    -999,  100,  -999,          -999,          -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,      "#Final",   
     ##Survey                     
-    25,     60,  ssp1,  ssp1,   -1,     1,    4,   0,   0,           0,          0,          0.5,        0,        0,           "#Peak",                           
-    -5,     5,   ssp2,  ssp2,   -1,     1,   -9,   0,   0,           0,          0,          0.5,        0,        0,           "#Top (Width)",                            
-    -10,    10,  ssp3,  ssp3,   -1,     1,    5,   0,   0,           0,          0,          0.5,        0,        0,           "#Asc_Width",                          
-    -2,     20,  ssp4,  ssp4,   -1,     1,   -9,   0,   0,           0,          0,          0.5,        0,        0,           "#Desc_Width",                         
-    -15,    15,  ssp5,  ssp5,   -1,     1,   -9,   0,   0,           0,          0,          0.5,        0,        0,           "#Init",                           
-    -999,  100,  -999,  -999,   -1,     1,   -9,   0,   0,           0,          0,          0.5,        0,        0,           "#Final"),    
+    25,     60,  ssp1,  ssp1,   -1,     1,   -4,   0,   0,           0,          0,          0.5,        0,        0,      "#Peak",                           
+    -5,     5,   ssp2,  ssp2,   -1,     1,   -9,   0,   0,           0,          0,          0.5,        0,        0,      "#Top (Width)",                            
+    -10,    10,  ssp3,  ssp3,   -1,     1,   -5,   0,   0,           0,          0,          0.5,        0,        0,      "#Asc_Width",                          
+    -2,     20,  ssp4,  ssp4,   -1,     1,   -9,   0,   0,           0,          0,          0.5,        0,        0,      "#Desc_Width",                         
+    -15,    15,  ssp5,  ssp5,   -1,     1,   -9,   0,   0,           0,          0,          0.5,        0,        0,      "#Init",                           
+    -999,  100,  -999,  -999,   -1,     1,   -9,   0,   0,           0,          0,          0.5,        0,        0,      "#Final"),    
     ncol=15, byrow=T) 
 
     ageselec.mat<- matrix(c(
@@ -32,19 +32,19 @@ writeCtl.om <- function (ctl,y)
 
     block.selec <- matrix(0, y-1, 8)
     for (i in 2:y){
-        block.selec[i-1,] <- c(25, 60,  fsp1.vec[i], fsp1.vec[i] ,  -1,     1,  3,  paste("#Selec", i))
+        block.selec[i-1,] <- c(25, 60,  fsp1.vec[i], fsp1.vec[i] ,  -1,     1,  3,  paste("#Selec1_", i))
     }
-    #block.selec <- matrix(c(
-    ##_LO    HI   INIT   PRIOR  PR_type SD  PHASE
-    #25,     60,  fsp1.start + selec.adj,  fsp1.start + selec.adj,  -1,     1,  3,  "#Peak Block"),
-    #ncol = 8, byrow = F)  
+    fsp2.block <- matrix(0, y - 1, 8)
+    for(i in 2:y){
+       fsp2.block[i-1,] <- c(-10, 10,  fsp2.vec[i], fsp2.vec[i] ,  -1,     1,  3,  paste("#Selec2_", i)) 
+    }
 
     bio.mat <-matrix(c( 
     #_LO    HI          INIT          PRIOR        PR_type    SD    PHASE      env-var use_dev dev_minyr   dev_maxyr   dev_stddev  Block   Block_Fxn
-    0.01,   0.6,        m,       round(log(m),4),  3,        .50,     -1,        c(rep(0,4), 0.5, 1,2), "#NatM_p_1_Fem_GP_1",
+    0.01,   0.6,        m,   round(log(m),4),  3,        .50,     -1,        c(rep(0,4), 0.5, 1,2), "#NatM_p_1_Fem_GP_1",
     3,      35,         L1,           L1,         -1,         10,     -3,        c(rep(0,4), 0.5, 0,0), "#L_at_Amin_Fem_GP_1_",
     45,     70,         L2f,          L2f,        -1,         10,     -3,        c(rep(0,4), 0.5, 0,0), "#L_at_Amax_Fem_GP_1_",
-    0.00,   0.2,        kf,           kf,         -1,        .25,     -3,        c(rep(0,4), 0.5, 0,0), "#VonBert_K_Fem_GP_1_",
+    0.00,   0.2,        kf,           kf,         -1,        .25,     -3,        c(rep(0,4), 0.5, 1,2), "#VonBert_K_Fem_GP_1_",
     0.01,   0.2,        CV1,          CV1,        -1,        .10,    -99,        c(rep(0,4), 0.5, 0,0), "#CV_young_Fem_GP_1_",
     0.01,   0.1,        CV2,          CV2,        -1,        .10,    -99,        c(rep(0,4), 0.5, 0,0), "#CV_old_Fem_GP_1_",
     #0.01,   m.m.est*3,  m.m.est,     round(log(m.m.est),4), 3,      .25,   do.est,     c(rep(0,4), 0.5, 0,0), "#NatM_p_1_Mal_GP_1",
@@ -78,15 +78,20 @@ writeCtl.om <- function (ctl,y)
         m.matrix[i-1,] <- c(0.01, 0.60,  m.vec[i], round(log(m.vec[i]),4) ,  3,  0.20,  3,  paste("#M", i))
     }
 
-    sigma.set = ifelse(sigmaR == 0, 0.01, sigmaR-0.10)
+    k.matrix <- matrix(0, y-1, 8)
+    for (i in 2:y){
+        k.matrix[i-1,] <- c(0.01, 0.20,  k.vec[i], k.vec[i],  1,  0.20,  3,  paste("#k", i))
+    }
+
+    sigma.set = ifelse(sigmaR == 0, 0.01, sigmaR)
     rec.mat <- matrix(c(
-    #_LO    HI     INIT     PRIOR   PR_type     SD      PHASE
-    2,      15,    log(R0), log(R0), -1,        10,      est.R0, "# log(R0)",  
-    0.20,   1,     steep,   steep,   1,       0.09,     -2, "# SR_steep ",
-    0,      1.5,   sigma.set,  sigma.set,   -1,         99,     -99,"#SR_sigmaR",
-    -5,     5,     0,       0,      -1,         99,     -99,"# SR_envlink",
-    -5,     5,     0,       0,      -1,         99,     -99,"# SR_R1_offset",
-    0,   0.99,     0,       0,      -1,         99,     -99,"# SR_autocorr"), 
+    #_LO    HI     INIT         PRIOR       PR_type     SD      PHASE
+    2,      15,    log(R0),     log(R0),    -1,         10,     est.R0, "# log(R0)",  
+    0.20,   1,     steep,       steep,       1,       0.09,     -2, "# SR_steep ",
+    0,      1.5,   sigma.set,   sigma.set,  -1,         99,     -99,"#SR_sigmaR",
+    -5,     5,     0,           0,          -1,         99,     -99,"# SR_envlink",
+    -5,     5,     0,           0,          -1,         99,     -99,"# SR_R1_offset",
+    0,   0.99,     0,           0,          -1,         99,     -99,"# SR_autocorr"), 
     ncol=8, byrow=T)
                 
     
@@ -127,7 +132,9 @@ writeCtl.om <- function (ctl,y)
     cat(
     y-1, " #MG custom parameters\n",
     file = ctl, append = T, sep = "")
+
     write.table(m.matrix, file = ctl, append = T, row.names = FALSE, col.names = FALSE, quote = FALSE)
+    write.table(k.matrix, file = ctl, append = T, row.names = FALSE, col.names = FALSE, quote = FALSE)
    
     cat("#Seasonal Effects\n",
     rep(0,10), " #\n",
@@ -234,6 +241,7 @@ writeCtl.om <- function (ctl,y)
     file = ctl, append = T, sep = " ")
 
     write.table(block.selec, file = ctl, append=T, row.names = F, col.names = F, quote=F) 
+    write.table(fsp2.block,  file = ctl, append=T, row.names = F, col.names = F, quote=F) 
 
     cat(
     1,      " #seleparm_adjust\n",
@@ -264,8 +272,8 @@ writeCtl <- function (ctl,y)
     #-5,     5,   ssp2,  ssp2,   -1,     1,   -9,   0,   0,           0,          0,          0.5,        0,        0,           "#Top (Width)"),          
     #ncol=15, byrow=T)
     #_LO    HI   INIT   PRIOR  PR_type SD  PHASE   env  use_dev      dev_minyr   dev_maxyr   dev_stddev  Block     Block_Fxn
-    25,     60,  fsp1.start,   fsp1.start,   -1,     1,   4,    0,   0,           0,          0,         0.20,      block.num, block.fxn,   "#Peak",
-    -5,     5,   fsp2,  fsp2,   -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,           "#Top (Width)",                            
+    25,     60,  fsp1.start,   fsp1.start,   -1,     1,   4,    0,   0,           0,          0,         0.20,      0, 0,   "#Peak",
+    -10,    10,  fsp2,  fsp2,   -1,     1,  -9,    0,   0,           0,          0,          0.5,        block.num, block.fxn,  "#Top (Width)",                            
     -10,    10,  fsp3,  fsp3,   -1,     1,   5,    0,   0,           0,          0,          0.5,        0,        0,           "#Asc_Width" ,                         
     -2,     20,  fsp4,  fsp4,   -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,           "#Desc_Width",                         
     -15,    15,  fsp5,  fsp5,   -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,           "#Init",                           
@@ -287,15 +295,20 @@ writeCtl <- function (ctl,y)
 
     block.selec <- matrix(c(
     #_LO    HI   INIT   PRIOR  PR_type SD  PHASE
-    25,     60,  fsp1.start + selec.adj,  fsp1.start + selec.adj,  -1,     1,  3,  "#Peak Block"),
+    25,     60,  fsp1.start,  fsp1.start,  -1,     1,  3,  "#Peak Block"),
+    ncol = 8, byrow = F) 
+
+    block.selec.2 <- matrix(c(
+    #_LO    HI   INIT   PRIOR  PR_type SD  PHASE
+    -10,     10,  fsp2,  fsp2,  -1,     0.50,  3,  "#Dome Block"),
     ncol = 8, byrow = F)  
 
     bio.mat <-matrix(c( 
     #_LO    HI          INIT          PRIOR              PR_type    SD    PHASE      env-var use_dev dev_minyr   dev_maxyr   dev_stddev  Block   Block_Fxn
-    0.01,   0.4,        m.prior,   round(log(m.prior),3),   3,        .20,     m.phase,  c(rep(0,4), 0.5, 0,0), "#NatM_p_1_Fem_GP_1",
+    0.01,   0.4,        m.prior,   round(log(m.prior),3),  -3,        .20,     m.phase,  c(rep(0,4), 0.5, 0,0), "#NatM_p_1_Fem_GP_1",
     3,      35,         lmin.prior,   lmin.prior,          -1,         10,     3,        c(rep(0,4), 0.5, 0,0), "#L_at_Amin_Fem_GP_1_",
     45,     70,         lmax.prior,   lmax.prior,          -1,         10,     3,        c(rep(0,4), 0.5, 0,0), "#L_at_Amax_Fem_GP_1_",
-    0.00,   0.2,        k.prior,      k.prior,             -1,        .25,     4,       c(rep(0,4), 0.5, 0,0), "#VonBert_K_Fem_GP_1_",
+    0.00,   0.2,        k.prior,      k.prior,             -1,        .20,     4,       c(rep(0,4), 0.5, 0,0), "#VonBert_K_Fem_GP_1_",
     0.01,   0.2,        cv1.prior,    cv1.prior,           -1,       0.20,     4,       c(rep(0,4), 0.5, 0,0), "#CV_young_Fem_GP_1_",
     0.01,   0.1,        cv2.prior,    cv2.prior,           -1,       0.20,     4,       c(rep(0,4), 0.5, 0,0), "#CV_old_Fem_GP_1_",
     #0.01,   m.m.est*3,  m.m.est,      round(log(m.m.est),4), 3,      .25,   do.est,     c(rep(0,4), 0.5, 0,0), "#NatM_p_1_Mal_GP_1",
@@ -328,7 +341,8 @@ writeCtl <- function (ctl,y)
     rec.mat <- matrix(c(
     #_LO    HI     INIT     PRIOR   PR_type     SD      PHASE
     2,      15,    log(R0), log(R0), -1,        10,      est.R0, "# log(R0)",  
-    0.20,   1,     steep,   steep,   1,       0.09,     -2, "# SR_steep ",
+    #0.20,   1,     steep,   steep,   1,       0.09,     -2, "# SR_steep ",
+    0.20,   1,     h.prior,   h.prior,   1,    0.10,     h.phase, "# SR_steep ",
     0,      1.5,   sigma.set,  sigma.set,   -1,         99,     -99,"#SR_sigmaR",
     -5,     5,     0,       0,      -1,         99,     -99,"# SR_envlink",
     -5,     5,     0,       0,      -1,         99,     -99,"# SR_R1_offset",
@@ -472,7 +486,7 @@ writeCtl <- function (ctl,y)
         1,      " #Custom Block Setup\n",
         file = ctl, append = T, sep = " ")
         for (z in 1:block.pattern){
-           write.table(block.selec, file = ctl, append=T, row.names = F, col.names = F, quote=F) }
+           write.table(block.selec.2, file = ctl, append=T, row.names = F, col.names = F, quote=F) }
     }
 
     if (need.blocks == T){
@@ -750,7 +764,8 @@ writeDat<-function(dat, y, survey, fore.catch)
         1,                   " #Number of Ageing Error Sets\n",
         "#Age Error Matrix\n",
         rep(-1, ages),      " #True Ages\n",
-        (1:ages-0.5)*0.10,      " #Age Error StDev\n", 
+        rep(0.01, ages),    " #Age Error StDev\n", 
+        #(1:ages-0.5)*0.10,      " #Age Error StDev\n", 
         "#\n",
         n.age.obs,          " #Number Age Observations\n",
         3,                  " #Age-Length Bin Option: 1=poplenbins; 2=datalenbins; 3=lengths\n",

@@ -36,6 +36,9 @@ source(paste(drive,"/PhD/Chapter3/code/functions/Get_Biology.R",sep=""))
 #Overfished Selectivity Function =======================================================
 source(paste(drive,"/PhD/Chapter3/code/functions/Overfished_Selex.R",sep=""))
 
+#Sampling ==================================================================
+source(paste(drive,"/PhD/Chapter3/code/functions/Get_Samp.R",sep=""))
+
 #Storage Arrays========================================================================
 #source(paste(drive,"/PhD/Chapter3/code/functions/Arrays.R",sep=""))
 }
@@ -71,6 +74,9 @@ source(paste(drive, git.wd, "/functions/Get_Biology.R",sep=""))
 
 #Overfished Selectivity Function =======================================================
 source(paste(drive, git.wd, "/functions/Overfished_Selex.R",sep=""))
+
+#Comp Samples =======================================================
+source(paste(drive, git.wd, "/functions/Get_Samps.R",sep=""))
 
 #Storage Arrays========================================================================
 source(paste(drive, git.wd, "/functions/Arrays.R",sep=""))

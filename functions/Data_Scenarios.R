@@ -23,7 +23,8 @@
 sigma <- 0.36
 p.value <- 0.45
 auto <- FALSE
-selec.adj <- 5
+selec.adj <- 0
+dome.adj  <- -8.5
 
 
 AgeError <- FALSE 
@@ -35,7 +36,8 @@ sigmaR 	     <- 0.60
 ss.survey.cv <- 0.50 
 survey.cv 	 <- 0.50 
 select.sd 	 <- 0.05  #Selectivity Time Varying StDev
-m.sd 		 <- 0.05
+dome.sd      <- 0.20
+m.sd <- k.sd <- 0.20
 
 if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds4"){
 	select.sd <- 0
@@ -59,7 +61,7 @@ total.yrs   <- pre.fishery.yrs + fishery.yrs
 start.survey <- ages + setup.yrs - 15 #106 #36
 
 years       <- 1:total.yrs 
-ass.num     <- (project.yrs / 4) + 1
+ass.num     <- (project.yrs + 1)/ 4 + 1
 
 estimate.m = TRUE
 

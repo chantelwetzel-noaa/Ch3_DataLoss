@@ -96,11 +96,11 @@ if (LH == "rockfish" ) {
  Fmsy <- 0.05080846  
  
  fsp1.start <- 45         ; ssp1 <- 39
- fsp2 <- 3                ; ssp2 <- 3 
+ fsp2 <- 6                ; ssp2 <- 3 
  fsp3 <- 4.25             ; ssp3 <- 4.25  
  fsp4 <- 6                ; ssp4 <- 6
  fsp5 <- -12              ; ssp5 <- -12 
- fsp6 <- 80               ; ssp6 <- 80
+ fsp6 <- -999             ; ssp6 <- 80
  
  #Forecast File Values=================================================================================================
  spr.target <- spr.target.int <- 0.50         
