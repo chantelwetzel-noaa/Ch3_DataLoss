@@ -8,9 +8,9 @@
 ############################################
 
 drive = "C:"
-run.name = ""
+run.name = "Feb2016_Esth"
 LH = "rockfish"
-ds.list = c("ds2", "ds3") 
+ds.list = c("ds1","ds4","ds2", "ds3") 
 #ds.list = c("ds1", "ds4","ds2", "ds3", "ds6", "ds7")
 #ds.list = c("ds2", "ds3", "ds6", "ds7")
 #ds.list = c("greatall", "normal_estM", "greathist")
@@ -127,6 +127,7 @@ ssb.est     =  array(0, dim = c(length(ds.list), total.yrs, ass.num, sim.range[2
 ry.est      =  array(0, dim = c(length(ds.list), total.yrs, ass.num, sim.range[2]))
 depl.est    =  array(0, dim = c(length(ds.list), total.yrs, ass.num, sim.range[2]))
 m.est       =  array(0, dim = c(length(ds.list),            ass.num, sim.range[2]))
+h.est       =  array(0, dim = c(length(ds.list),            ass.num, sim.range[2]))
 k.est       =  array(0, dim = c(length(ds.list),            ass.num, sim.range[2]))
 cv.young.est=  array(0, dim = c(length(ds.list),            ass.num, sim.range[2]))
 cv.old.est  =  array(0, dim = c(length(ds.list),            ass.num, sim.range[2]))
@@ -152,7 +153,9 @@ for (spec in 1:length(ds.list))
   data.scenario = ds.list[j]
   #dir = paste(drive,"/PhD/Chapter3/", run.name, "/",LH,"_",data.scenario,"_sims_",sim.range[1],"_",sim.range[2],
   #      "/save/", sep = "")
-  dir = paste(drive,"/PhD/Chapter3/", run.name ,LH,"_",data.scenario,"_sims_",sim.range[1],"_",sim.range[2],
+  #dir = paste(drive,"/PhD/Chapter3/", run.name ,LH,"_",data.scenario,"_50yr_sims_dirich_",sim.range[1],"_",sim.range[2],
+  #      "/save/", sep = "")
+  dir = paste(drive,"/PhD/Chapter3/", run.name ,"/",LH,"_",data.scenario,"_50yr_sims_multinom_",sim.range[1],"_",sim.range[2],
         "/save/", sep = "")
   
   for (i in sim.range[1]:sim.range[2]) {
@@ -193,31 +196,31 @@ for (spec in 1:length(ds.list))
 
   #Sort out the runs that were never overfished and calculate some metrics=====================================================
   save.index = save.index.ov = 1:sim.range[2]
-  if(data.scenario == "ds3" || data.scenario == "normal_estM") {
-    #index = apply(f.lens[j, first.ass.yr:fishery.yrs,],2,sum) != 100 * sum(length(first.ass.yr:fishery.yrs))
-    #index.ov = apply(f.lens[j,first.ass.yr:fishery.yrs,],2,sum) == 100 * sum(length(first.ass.yr:fishery.yrs))
-    index = which(depl.est[j, ass.yr[1], 1, ] < over.thres | depl.est[j, ass.yr[2], 2, ] < over.thres)
-    #index = (f.lens[j, ass.yr[2], ] == 15 )
-    #index.ov = (f.lens[j, ass.yr[1], ] == 75 & f.lens[j, ass.yr[2], ] == 75)
-    index.ov = which(depl.est[j, ass.yr[1], 1, ] > over.thres & depl.est[j, ass.yr[2], 2, ] > over.thres)
-    print(paste("Number not estimated overfished", sum(index.ov)))
-    temp = 1:sim.range[2]
-    save.index = index #temp[index]
-    save.index.ov = index.ov #temp[index.ov]
-    #print(temp[index==FALSE])
-    print(index.ov)
-  
-    #re.ssb.split          = array(NA,dim = c(length(ds.list), ass.num, total.yrs, sum(save.index)))
-    #re.ssb0.split         = array(NA,dim = c(length(ds.list), ass.num,              sum(save.index)))
-    #re.m.split            = array(NA,dim = c(length(ds.list), ass.num,              sum(save.index)))
-    #re.depl.split         = array(NA,dim = c(length(ds.list), ass.num, total.yrs, sum(save.index)))
-    #re.catch.split        = array(NA,dim = c(length(ds.list), project.yrs + 1 ,     sum(save.index)))
-    #acl.min.split         = array(NA,dim = c(length(ds.list), total.yrs,            sum(save.index)))
-    #yrs.declared.all.split= array(0, dim = c(length(ds.list),                       sum(save.index)))
-    #rmse.sb0.split        = array(NA,dim = c(length(ds.list), ass.num))
-    #rmse.depl.split       = array(NA,dim = c(length(ds.list), ass.num))
-    #rmse.catch.split      = array(NA,dim = c(length(ds.list), ass.num))
-  }
+  #if(data.scenario == "ds3" || data.scenario == "normal_estM") {
+  #  #index = apply(f.lens[j, first.ass.yr:fishery.yrs,],2,sum) != 100 * sum(length(first.ass.yr:fishery.yrs))
+  #  #index.ov = apply(f.lens[j,first.ass.yr:fishery.yrs,],2,sum) == 100 * sum(length(first.ass.yr:fishery.yrs))
+  #  index = which(depl.est[j, ass.yr[1], 1, ] < over.thres | depl.est[j, ass.yr[2], 2, ] < over.thres)
+  #  #index = (f.lens[j, ass.yr[2], ] == 15 )
+  #  #index.ov = (f.lens[j, ass.yr[1], ] == 75 & f.lens[j, ass.yr[2], ] == 75)
+  #  index.ov = which(depl.est[j, ass.yr[1], 1, ] > over.thres & depl.est[j, ass.yr[2], 2, ] > over.thres)
+  #  print(paste("Number not estimated overfished", sum(index.ov)))
+  #  temp = 1:sim.range[2]
+  #  save.index = index #temp[index]
+  #  save.index.ov = index.ov #temp[index.ov]
+  #  #print(temp[index==FALSE])
+  #  print(index.ov)
+  #
+  #  #re.ssb.split          = array(NA,dim = c(length(ds.list), ass.num, total.yrs, sum(save.index)))
+  #  #re.ssb0.split         = array(NA,dim = c(length(ds.list), ass.num,              sum(save.index)))
+  #  #re.m.split            = array(NA,dim = c(length(ds.list), ass.num,              sum(save.index)))
+  #  #re.depl.split         = array(NA,dim = c(length(ds.list), ass.num, total.yrs, sum(save.index)))
+  #  #re.catch.split        = array(NA,dim = c(length(ds.list), project.yrs + 1 ,     sum(save.index)))
+  #  #acl.min.split         = array(NA,dim = c(length(ds.list), total.yrs,            sum(save.index)))
+  #  #yrs.declared.all.split= array(0, dim = c(length(ds.list),                       sum(save.index)))
+  #  #rmse.sb0.split        = array(NA,dim = c(length(ds.list), ass.num))
+  #  #rmse.depl.split       = array(NA,dim = c(length(ds.list), ass.num))
+  #  #rmse.catch.split      = array(NA,dim = c(length(ds.list), ass.num))
+  #}
 
   
   #Split the never determined overfished from the correct deterimination runs===================================================
@@ -258,6 +261,7 @@ for (spec in 1:length(ds.list))
     catch.est[j,,i]    = Est$ForeCat[1:total.yrs]
     ofl.est[j,,i]      = Est$OFL[1:total.yrs]
     m.est[j,,i]        = Est$M.store[1,1:ass.num]
+    h.est[j,,i]        = Est$h[1,1:ass.num]
     s.selex.est[j,,,i] = Est$S.selex[,1:ass.num]
     f.selex.est[j,,,i] = Est$F.selex[,1:ass.num]
     f.selex.adj.est[j,,,i] = Est$fsp2.est[,1:ass.num]
@@ -286,6 +290,7 @@ for (spec in 1:length(ds.list))
   est.all$catch.est<- catch.est
   est.all$ofl.est  <- ofl.est
   est.all$m.est    <- m.est
+  est.all$h.est    <- h.est
   est.all$s.selex.est <- s.selex.est
   est.all$f.selex.est <- f.selex.est
   est.all$f.selex.adj.est <- f.selex.adj.est
@@ -302,9 +307,10 @@ for (spec in 1:length(ds.list))
   est.split$catch.est   <- catch.est[,, save.index]
   est.split$ofl.est     <- ofl.est[,, save.index]
   est.split$m.est       <- m.est[,, save.index]
+  est.split$h.est       <- h.est[,, save.index]
   est.split$s.selex.est <- s.selex.est[,,,save.index]
   est.split$f.selex.est <- f.selex.est[,,,save.index]
-  est.split$f.selex.adj.est <- f.selex.est[,,,save.index]
+  est.split$f.selex.adj.est <- f.selex.adj.est[,,,save.index]
   est.split$ssb.est.no  <- ssb.est[,,,save.index.ov]
   est.split$ssb0.est.no <- ssb0.est[,,save.index.ov]
   est.split$ry.est.no   <- ry.est[,,,save.index.ov]
@@ -608,7 +614,7 @@ for (spec in 1:length(ds.list))
   }
   
   meds.all <- list()
-  meds.out <- paste(drive,"/PhD/Chapter3/output/",LH,"_meds_all", sep = "")
+  meds.out <- paste(drive,"/PhD/Chapter3/", run.name,"/output/",LH,"_meds_all", sep = "")
 
   meds.all$med.ssb  <- med.ssb
   meds.all$med.ry   <- med.ry
@@ -707,7 +713,7 @@ for (spec in 1:length(ds.list))
   yrs.declared.all.split[j,] = yrs.declared.rec.late.all[j,index] + yrs.declared.rec.early.all[j,index]
 
   meds.split <- list()
-  meds.out.split <- paste(drive,"/PhD/Chapter3/output/",LH,"_meds_split", sep = "")
+  meds.out.split <- paste(drive,"/PhD/Chapter3/", run.name, "/output/",LH,"_meds_split", sep = "")
 
   meds.split$med.ssb  <- med.ssb.split
   meds.split$med.ry   <- med.ry.split

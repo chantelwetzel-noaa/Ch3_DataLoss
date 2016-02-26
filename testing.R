@@ -1,7 +1,7 @@
 LH= "rockfish"
 hist.len = "50_yr"
 #wd = paste("C:/PhD/Chapter3/",LH,"_ds7_50yr_sims_1_25/save/",sep="") 
-wd = paste("C:/PhD/Chapter3/",LH,"_ds2_50yr_sims_dirich_1_10/save/",sep="") 
+wd = paste("C:/PhD/Chapter3/Feb2016_Esth/",LH,"_ds4_50yr_sims_multinom_1_50/save/",sep="") 
 par(mfrow =c (4,3), oma =c(1,1,1,1), mar = c(2,4,2,3))
 hist.len = "50_yr"
 
@@ -10,7 +10,7 @@ hist.len = "50_yr"
 #wd = "C:/PhD/Chapter3/flatfish_ds3_sims_1_100/save/"
 #wd = "C:/PhD/Chapter3/flatfish_ds4_sims_1_100/save/"
 setwd(wd)
-sims = 10
+sims = 14
 start.year = 1
 if (LH == "rockfish") {
 	ss.years = 246#271#221#142
@@ -242,6 +242,7 @@ lmax.mat = matrix(NA, ass.length, sims)
 f.selex = array(NA, dim = c(2, ass.length, sims))
 s.selex = array(NA, dim = c(2, ass.length, sims))
 f.adj   = matrix(NA, ass.length, sims)
+h.mat   = matrix(NA, ass.length, sims)
 for (i in 1:sims){
 	#if (i < 26) { temp = 25 + i }
 	#if (i > 25) { temp = 50 + i }
@@ -253,17 +254,19 @@ for (i in 1:sims){
  	lmax.mat[,i] = Est$Lmax.store
  	f.selex[,,i] = Est$F.selex[c(1,3),]
  	s.selex[,,i] = Est$S.selex[c(1,3),]
- 	f.adj[,i] = Est[[16]]
+ 	#f.adj[,i] = Est[[16]]
+ 	h.mat[,i] = Est$h
 }
 
 par(mfrow=c(3,3))
 boxplot(t(M.mat), ylim = c(0.04, 0.12), ylab = "M") ; abline (h = 0.08, col =2)
+boxplot(t(h.mat), ylim = c(0.20, 1), ylab = "h") ; abline (h = 0.60, col =2)
 boxplot(t(k.mat), ylim = c(0, 0.10), ylab = "k") ; abline (h = 0.05 , col =2)
 boxplot(t(lmin.mat), ylim = c(10, 20), ylab = "Lmin") ; abline (h = 18, col =2)
 boxplot(t(lmax.mat), ylim = c(60, 70), ylab = "Lmax") ; abline (h = 64, col =2)
 boxplot(t(f.selex[1,,]), ylim = c(42, 48), ylab = "F Peak Select") ; abline (h = 45, col =2)
 boxplot(t(f.selex[2,,]), ylim = c(4, 5), ylab = "F Slope Select") ; abline (h = 4.25, col =2)
-boxplot(t(f.adj), ylim = c(-10, 0), ylab = "F Peak Adj Select"); abline (h = 6, col = 2)
+#boxplot(t(f.adj), ylim = c(-10, 0), ylab = "F Peak Adj Select"); abline (h = 6, col = 2)
 boxplot(t(s.selex[1,,]), ylim = c(36, 43), ylab = "S Peak Select") ; abline (h = 39, col =2)
 boxplot(t(s.selex[2,,]), ylim = c(4, 5), ylab = "S Slope Select") ; abline (h = 4.25, col =2)
 

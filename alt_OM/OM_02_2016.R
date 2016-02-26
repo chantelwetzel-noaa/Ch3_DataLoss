@@ -46,8 +46,8 @@ github = TRUE
  
  #Source in external functions
  if (github == TRUE) { 
-  git.wd = "/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/archive_10_15/"
-  source(paste(drive, git.wd, "/Functions.R", sep = "")) }
+  git.wd = "/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/"
+  source(paste(drive, git.wd, "functions/Functions.R", sep = "")) }
  if (github == FALSE){ source(paste(drive,"/PhD/Chapter3/code/functions/Functions.R",sep="")) }
  
  print(LH) ; print(paste("True Depletion", final.depl,sep=" "))

@@ -37,6 +37,8 @@ for (a in 1:100){
   selec[,a] <- asc * (1-join1) + join1 * (1 - join2 + dsc * join2) 
 }
 
+par(mfrow = c(2,1))
+plot(len.step, fix.selec[,1], type = 'l')
 plot(len.step, selec[,1], type = 'l')
 for(b in 2:100){
 	lines(len.step, selec[,b])

@@ -16,15 +16,16 @@ drive    <-"C:" #"//home//cwetzel//h_cwetzel"
 LH       <- "rockfish"
 start.n  <- 1
 end.n    <- 50
-data.scenario <- "ds0" 
+data.scenario <- "ds4" 
 tantalus      <- FALSE
 github        <- TRUE
 file.type     <- "boot" #"boot" "perfect"
 determ        <- FALSE
 setup.yrs     <- 50
 do.MLE        <- FALSE
-error.struct  <- "dirich" #"multinom" #"dirich"
+error.struct  <- "multinom" #"multinom" #"dirich"
 if (file.type == "perfect") { do.MLE = T }
+AgeError      <- FALSE
 
 
 #Load packages
@@ -183,8 +184,8 @@ for (nsim in start.n:end.n)
 
     #Variation in growth -------------------------------------------------------------------------------------------------------------
     k.vec = numeric(total.yrs)
-    #k.vec = rep(kf, total.yrs) 
-    k.vec = round(kf * exp(m.auto - 0.50 * m.sd^2),3)
+    k.vec = rep(kf, total.yrs) 
+    #k.vec = round(kf * exp(m.auto - 0.50 * m.sd^2),3)
 
     # Prior value for parameters-----------------------------------------------------------------------------------------------------
     set.seed(prior.seed[nsim])
@@ -200,7 +201,7 @@ for (nsim in start.n:end.n)
     k.prior    <- round(runif(1, kf - kf *0.10, kf  + kf *0.10),3)
     cv1.prior  <- round(runif(1, CV1- CV1*0.10, CV1 + CV1*0.10),3)
     cv2.prior  <- round(runif(1, CV2- CV2*0.10, CV2 + CV2*0.10),3)
-    h.prior    <- steep #round(runif(1, steep-steep*0.10, steep+steep*0.10),2)
+    h.prior    <- round(runif(1, steep-steep*0.10, steep+steep*0.10),2)
 
     prior.matrix[nsim,]     = c(m.prior, lmin.prior, lmax.prior, k.prior, cv1.prior, cv2.prior, h.prior)
     colnames(prior.matrix)  = c("m.prior", "lmin.prior", "lmax.prior", "k.prior", "cv1.prior", "cv2.prior", "h.prior")
@@ -243,8 +244,8 @@ for (nsim in start.n:end.n)
 	boot.files = 3 # Create a true, perfect, bootstrapped data set
     end.phase  = 1  # Only estimate a R0 value that makes the depletion survey true
     est.R0 = 1
-    m.phase = 1
-    h.phase = -2
+    m.phase = 5
+    h.phase = 6
 
     # Create the depletion survey for the data file
     fleets = "Fishery%Survey%Depl"
@@ -699,6 +700,7 @@ for (nsim in start.n:end.n)
         	Lmin.store[,counter]  <- rep.out$Lmin
         	Lmax.store[,counter]  <- rep.out$Lmax
         	k.store[,counter]     <- rep.out$k
+            h.store[,counter]     <- rep.out$h
             cv.y.store[,counter]  <- rep.out$cv.young
             cv.old.store[,counter]<- rep.out$cv.old
         	R0.out[,counter]      <- rep.out$R0
@@ -727,9 +729,10 @@ for (nsim in start.n:end.n)
         	Est[[15]]<- k.store
             Est[[16]]<- fsp2.est #fsp1.est
             Est[[17]]<- recovered.est
+            Est[[18]]<- h.store
 
        		names(Est) <- c("TotBio","OFL","ForeCat","Fmult","FSPR","M.store","R0.out","SB","Bratio","F.selex","S.selex","Recruits",
-                          	 "Lmin.store", "Lmax.store", "k.store",  "fsp2.est","recovered.est")
+                          	 "Lmin.store", "Lmax.store", "k.store",  "fsp2.est","recovered.est", "h")
 	        save(Est, file=estimates)
 
             #Set the ACLs for the next four years 
