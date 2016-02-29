@@ -1,31 +1,29 @@
 #Arrays----------------------------------------------------------------------------------------------------
   age.bins <- seq(1,num.ages,1)
-  numbers <- array(0,dim=c((total.yrs+1), ages, sexes)) #; rownames(numbers)<-years
+  numbers <- array(0,dim=c((total.yrs+1), ages, sexes)) 
   biomass <- array(0,dim=c(total.yrs, ages, sexes)) 
   
   #Matrix Storage for output to R list
-  vul.total.obs        <- matrix(0, total.yrs, 1) #fishery.yrs, 1)
-  index.expect         <- matrix(0, total.yrs, 1) #fishery.yrs, 1)
-  survey.catch.age.len <- array(NA,c(total.yrs, ages, length(len.step), sexes)) #fishery.yrs, ages, length(len.step), sexes))
+  vul.total.obs        <- matrix(0, total.yrs, 1) 
+  index.expect         <- matrix(0, total.yrs, 1) 
+  survey.catch.age.len <- array(NA,c(total.yrs, ages, length(len.step), sexes)) 
   fsp1.om <- numeric(total.yrs)
   recovered.om <- numeric(total.yrs)
 
   #Storage matrices for data samples
-  f.lengths            <- matrix(0, total.yrs, (2*length(len.step))) #fishery.yrs, (2*length(len.step)))
-  s.lengths            <- matrix(0, total.yrs, (2*length(len.step))) #fishery.yrs, (2*length(len.step)))
-  #f.a.ca               <- matrix(0, fishery.yrs, (ages*2-2))
-  #s.a.ca               <- matrix(0, fishery.yrs, (ages*2-2))
-  f.a.ca               <- matrix(0, total.yrs, (max.age*2)) #fishery.yrs, (max.age*2))
-  s.a.ca               <- matrix(0, total.yrs, (max.age*2)) #fishery.yrs, (max.age*2))
-  f.sample.size        <- rep(0, total.yrs) #fishery.yrs)
-  s.sample.size        <- rep(0, total.yrs) #fishery.yrs)
+  f.lengths            <- matrix(0, total.yrs, (2*length(len.step))) 
+  s.lengths            <- matrix(0, total.yrs, (2*length(len.step))) 
+  f.a.ca               <- matrix(0, total.yrs, (max.age*2)) 
+  s.a.ca               <- matrix(0, total.yrs, (max.age*2)) 
+  f.sample.size        <- rep(0, total.yrs) 
+  s.sample.size        <- rep(0, total.yrs) 
 
   #Arrays to Store the Estimation Results from SS
-  SB          <- array(NA, dim=c(total.yrs, ass.num)) #fishery.yrs, ass.num))
-  Bratio      <- array(NA, dim=c(total.yrs, ass.num)) #fishery.yrs, ass.num))
-  TotBio      <- array(NA, dim=c(total.yrs, ass.num)) #fishery.yrs, ass.num))
-  VulBioEst   <- array(NA, dim=c(total.yrs, ass.num)) #fishery.yrs, ass.num))
-  Recruits    <- array(NA, dim=c(total.yrs, ass.num)) #fishery.yrs, ass.num))
+  SB          <- array(NA, dim=c(total.yrs, ass.num)) 
+  Bratio      <- array(NA, dim=c(total.yrs, ass.num)) 
+  TotBio      <- array(NA, dim=c(total.yrs, ass.num)) 
+  VulBioEst   <- array(NA, dim=c(total.yrs, ass.num)) 
+  Recruits    <- array(NA, dim=c(total.yrs, ass.num)) 
   OFL         <- array(NA, dim=c(total.yrs + 5))
   ForeCat     <- array(NA, dim=c(total.yrs + 5))
   FSPR        <- array(NA, dim=c(1, ass.num))
@@ -49,8 +47,8 @@
   fspr.est.vec<- numeric(total.yrs)
   
   #Dynamics
-  Ry           <- matrix(0, total.yrs+1, 1)#;  rownames(Ry) <-years
-  SSB          <- matrix(0, total.yrs+1, 1)#;  rownames(SSB)<-years
+  Ry           <- matrix(0, total.yrs+1, 1)
+  SSB          <- matrix(0, total.yrs+1, 1)
   depl         <- matrix(0, total.yrs+1, 1)
   ofl.true     <- matrix(0, total.yrs+1, 1)
   acl.true     <- matrix(0, total.yrs+1, 1)

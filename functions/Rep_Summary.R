@@ -64,6 +64,8 @@ Rep_Summary<- function(rep.new, y, pre.fishery.yrs, do.forecast)
   VulBioEst <- mapply(function(x)
                VulBioEst = as.numeric(strsplit(rep.new[grep(paste(2,"Survey",x,sep=" "),rep.new)], " ")[[1]][6]), x = x)
   
+  gradient = as.numeric(strsplit(rep.new[grep("Convergence_Level",rep.new)], " ")[[1]][2]) 
+
   Depl = SB/SB.virgin
   
   RepSummary <- list()
@@ -90,6 +92,7 @@ Rep_Summary<- function(rep.new, y, pre.fishery.yrs, do.forecast)
   RepSummary$cv.young <- cv.young
   RepSummary$cv.old <- cv.old
   RepSummary$h <- h
+  RepSummary$gradient <- gradient
   if(need.blocks == TRUE){
     #RepSummary$F.selex.1.adj <- F.Selex.1.adj
     RepSummary$F.selex.2.adj <- F.Selex.2.adj

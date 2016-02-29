@@ -1,6 +1,6 @@
 ##          SS3 OPERATING MODEL             ###
 ##            CHANTEL WETZEL                ###
-##           UPDATED 2/20/14                ###
+##           UPDATED 2/20/16                ###
 
 #/usr/bin/R-64-v3.0.0
 #source("//even_more_home//h_cwetzel//PhD//Chapter3//code//OM_10302014.R") 
@@ -11,70 +11,69 @@
 # ************************  RECRUITMENT AUTO-CORRELATION IS CURRENTLY TURNED ON ***************************************
 # ************************  THE BASE SAMPLE SIZES HAVE BEEN ALTERED 12/24   *******************************************
 
-drive <-"C:" #"//home//cwetzel//h_cwetzel"
-LH <- "rockfish"
-start.n <- 1
-end.n <- 1
-data.scenario <- "ds0" 
-tantalus <- FALSE
+drive         <-"C:" #"//home//cwetzel//h_cwetzel"
 
-github = TRUE
+start.n       <- 1
+end.n         <- 1
+data.scenario <- "ds0" #ds0 - ds4
+tantalus      <- FALSE
+error.struct  <- "multinom" #"multinom" #"dirich"
 
+if (!tantalus) { github <- TRUE }
+if (tantalus)  { github <- FALSE }
 
-#DoSim <- function(drive, LH, start.n, end.n, data.scenario) {
+seed.list <- list()
+ 
+require(compiler)
+require(r4ss)
+ 
+# Set the directory 
+directory <<- paste(drive,"/PhD/Chapter3/",LH, "_", data.scenario,"_sims_",start.n,"_",end.n,"/",sep="")
+dir.create(directory)
+dir.create(paste(directory,"/save",sep=""))
+dir.create(paste(directory,"/ctl", sep=""))
 
- NSIM         <<- end.n
- seed.list <- list()
- 
- require(compiler)
- require(r4ss)
- #update_r4ss_files(save=FALSE,local="C:/Program Files/R/R-3.1.0/library/r4ss_update_May132014")
- 
- 
- #Set the directory 
- directory <<- paste(drive,"/PhD/Chapter3/",LH, "_", data.scenario,"_sims_",start.n,"_",end.n,"/",sep="")
- dir.create(directory)
- dir.create(paste(directory,"/save",sep=""))
- dir.create(paste(directory,"/ctl", sep=""))
-
- #Move the executable to the correct folder to run simulations
- if (tantalus == F) {
- file.copy(paste(drive,"/PhD/Chapter3/ss3_opt.exe",sep=""),paste(directory,"/ss3_opt.exe",sep="")) }
- 
- if (tantalus == T) {
- file.copy(paste(drive,"/PhD/Chapter3/SS3_opt",sep=""),paste(directory,"/SS3_opt",sep="")) }
- 
- #Source in external functions
- if (github == TRUE) { 
+# Move the executable to the correct folder to run simulations
+if (!tantalus) {
+  file.copy(paste(drive,"/PhD/Chapter3/ss3.exe",sep=""),paste(directory,"/ss3.exe",sep="")) 
   git.wd = "/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/"
-  source(paste(drive, git.wd, "functions/Functions.R", sep = "")) }
- if (github == FALSE){ source(paste(drive,"/PhD/Chapter3/code/functions/Functions.R",sep="")) }
+  source(paste0(drive, git.wd, "functions/Functions.R") }
  
- print(LH) ; print(paste("True Depletion", final.depl,sep=" "))
- print(paste("Survey Length", start.survey, sep=" "))
- print(paste("Auto-Correlation", auto, sep =" "))
-
-#Parameter Section =================================================================================== 
-
-#Bound for solving for R0
- if (LH == "flatfish") { 
-    low.bound <- 1500 ; upper.bound <- 15000 ; first.R0 <- 10000}
+if (tantalus) {
+  file.copy(paste0(drive,"/PhD/Chapter3/SS3"), paste(directory,"/SS3")) 
+  source(paste0(drive,"/PhD/Chapter3/code/functions/Functions.R")) }
  
- if (LH == "rockfish") { 
-    low.bound <- 500  ; upper.bound <- 15000 ; first.R0 <- 13000 }
+ 
+print(paste("True Depletion", final.depl))
+print(paste("Survey Length", start.survey))
+print(paste("Auto-Correlation", auto))
 
+# Parameter Section =================================================================================== 
+
+# Bound for solving for R0
+low.bound <- 500  ; upper.bound <- 15000 ; first.R0 <- 13000 
+
+# Read in the Seeds ==================================================================================
+  load0(paste(drive,"/PhD/Chapter3/seed_list")
+  recruit.seed  <- as.numeric(seed.list[[1]][,"recruit.seed"])
+  catch.seed    <- as.numeric(seed.list[[1]][,"catch.seed"])
+  survey.seed   <- as.numeric(seed.list[[1]][,"survey.seed"])
+  comp.seed     <- as.numeric(seed.list[[1]][,"comp.seed"]) 
+  m.seed        <- as.numeric(seed.list[[1]][,"m.seed"])   
+  select.seed   <- as.numeric(seed.list[[1]][,"spare1"])
+  prior.seed    <- as.numeric(seed.list[[1]][,"spare2"]) 
 
 #---------------------------------------------------------------------------------------------------
 for (nsim in start.n:end.n)
- {
+{
   
-  if (github == TRUE) { 
+  if (!tantalus) {
     git.wd = "/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/"
-    source(paste(drive, git.wd, "functions/Functions.R", sep = "")) 
-  }
-  if (github == FALSE){ 
-    source(paste(drive,"/PhD/Chapter3/code/functions/Functions.R",sep="")) 
-  }
+    source(paste0(drive, git.wd, "functions/Functions.R") }
+ 
+  if (tantalus) {
+    source(paste0(drive,"/PhD/Chapter3/code/functions/Functions.R")) }
+     
 
  #nsim = 1 ; 
  #sigmaR = 0 ; 
@@ -96,99 +95,114 @@ for (nsim in start.n:end.n)
                      file = paste(directory,'/save/Run_Details.txt',sep="")) 
 
 
- #Save Output
- projections <- paste(directory,"save/om_proj_",nsim,sep="")
- estimates   <- paste(directory,"save/ss_ests_",nsim,sep="")
+  # Save Output
+  projections <- paste(directory,"save/om_proj_",nsim,sep="")
+  estimates   <- paste(directory,"save/ss_ests_",nsim,sep="")
  
- #Read in the seeds 
- load(paste(drive,"/PhD/Chapter3/seed_list",sep=""))
- recruit.seed  <- as.numeric(seed.list[[1]][,"recruit.seed"])
- catch.seed    <- as.numeric(seed.list[[1]][,"catch.seed"])
- survey.seed   <- as.numeric(seed.list[[1]][,"survey.seed"])
- comp.seed     <- as.numeric(seed.list[[1]][,"comp.seed"])  
- age.err.seed  <- as.numeric(seed.list[[1]][,"spare1"]) 
- select.seed   <- as.numeric(seed.list[[1]][,"spare2"])
+  # Set comp seed -----------------------------------------------------------------------------------------------------------
+  set.seed(comp.seed[nsim])
 
- #Set up the bias adjustment parameters -----------------------------------------------------------------------------------
- #Bias adjustment parameters
- main.rec.start <- start.survey
- main.rec.end   <- setup.yrs - 6            
- start.bias     <- start.survey - (ages - 1)
- full.bias      <- start.survey - (ages - 1)/2
- last.bias      <- setup.yrs - 5        
- last.no.bias   <- setup.yrs - 4
- max.bias.adj   <- 0.80
- pre.model.devs <- -(ages - 1)
-  
- #Catch History -----------------------------------------------------------------------------------------------------------
- set.seed(catch.seed[nsim])
- catch.dev <- c(rnorm(10,0,0.50),rnorm(30,0,0.07),rnorm(10,0,0.15))
- CatchTot <- rep(0,setup.yrs) ;  CatchTot[1] <- 25
+  # Catch History -----------------------------------------------------------------------------------------------------------
+  set.seed(catch.seed[nsim])
+  catch.dev <- c(rnorm(setup.yrs * 0.2,0,0.50),rnorm(setup.yrs*0.70,0,0.07),rnorm(setup.yrs*0.10,0,0.15))
+  CatchTot <- rep(0,setup.yrs) ;  CatchTot[1] <- 25
+    
+  for (a in 2:(setup.yrs-25)) { 
+     CatchTot[a]<- CatchTot[a-1]*1.2 
+         if (CatchTot[a-1]*1.2 > 1000 ) { 
+             CatchTot[a] <- 1000 }  
+  }
+  for (a in (setup.yrs-26):(setup.yrs-6)) { 
+     CatchTot[a]<- CatchTot[a-1]*1 
+  }
+
+  CatchTot[(setup.yrs-5):(setup.yrs)]<- CatchTot[(setup.yrs-6)]*1    
+  CatchTot     <- round(CatchTot,0)    
+  CatchTot.err <- round(CatchTot+CatchTot*catch.dev,0)
+  catch        <- c(rep(0,pre.fishery.yrs),CatchTot.err)
    
- for (y in 2:(setup.yrs-11)) { 
-    CatchTot[y]<- CatchTot[y-1]*1.4 
-        if (CatchTot[y-1]*1.4 > 1000 ) { 
-            CatchTot[y] <- 1000 }  
- }
- for (y in (setup.yrs-10):setup.yrs) { 
-    CatchTot[y]<- CatchTot[y-1]*0.97 
- }
-   
- CatchTot     <- round(CatchTot,0)    
- CatchTot.err <- round(CatchTot+CatchTot*catch.dev,0)
- hist.catch   <- c(rep(0,pre.fishery.yrs),CatchTot.err)
-  
- #Draw recruitment deviations----------------------------------------------------------------------------------------------------- 
- set.seed(recruit.seed[nsim])
- rho      <- 0
- if (auto == TRUE) { rho <- 1 / sqrt(2) }
- recdevs  <- rnorm(total.yrs, 0, sigmaR)
- autocorr <- rep(0, total.yrs)
- autocorr[1] <- recdevs[1]  
- for (e in 2:total.yrs) { 
-    autocorr[e] <- rho*autocorr[e-1]+sqrt(1-rho*rho)*recdevs[e] 
- }
- 
- #This will start the population in equilibrium
- autocorr[1:(ages-1)] <- 0
- 
- #Draw Survey Error---------------------------------------------------------------------------------------------------------------  
- set.seed(survey.seed[nsim])
- survey.err <<- rnorm(fishery.yrs, 0, survey.CV)
+  # Draw recruitment deviations----------------------------------------------------------------------------------------------------- 
+  set.seed(recruit.seed[nsim])
+  rho      <- 0
+  if (auto) { rho <- 1 / sqrt(2) }
+  recdevs  <- rnorm((total.yrs+1), 0, sigmaR)
+  autocorr <- matrix(0, total.yrs + 4, 1)
+  autocorr[1] <- recdevs[1]  
+  for (e in 2:(total.yrs + 1)) { 
+     autocorr[e] <- rho*autocorr[e-1]+sqrt(1-rho*rho)*recdevs[e]  }
 
- #Variation in Selectivity----------------------------------------------------------------------------------------------------------
- set.seed(select.seed[nsim])
- select.err   <- rnorm(total.yrs, 0, tv.err)
- inflec.selec <- numeric(total.yrs)
+  #This will start the population in equilibrium
+  if (equil) { autocorr[1:(ages+1)] <- 0 }
+      
+  # Draw Survey Error---------------------------------------------------------------------------------------------------------------  
+  set.seed(survey.seed[nsim])
+  survey.err <- rnorm(fishery.yrs, 0, survey.cv)
 
- #Calculate the buffer
- buffer <- exp(qnorm(p.value,0,sigma))
- 
- #Recruits Spawning biomass  Vulnerable biomas------------------------------------------------------------------------------------
- Update_Dynamics <- function(R0, catch = hist.catch, biology)
- {
+  # Variation in Selectivity----------------------------------------------------------------------------------------------------------
+  set.seed(select.seed[nsim])
+  select.err     <- rnorm(total.yrs, 0, select.sd)
+  fsp1.vec       <- round(fsp1.start*exp(-0.5*select.sd*select.sd + select.err),0)
+  fsp1.shift.vec <- round((fsp1.start + selec.adj)*exp(-0.5*select.sd*select.sd + select.err),0)
+  fsp2.vec       <- sample(x = c(-3, fsp2), size = total.yrs, replace = T, prob = c(0,1))
+  select.err     <- rnorm(total.yrs, 0, 0.25)
+  fsp2.shift.vec <- round((fsp2.vec + dome.adj)*exp(-0.5*select.sd*select.sd + select.err), 0)
+
+  # Variation in Natural Mortality--------------------------------------------------------------------------------------------------
+  set.seed(m.seed[nsim])
+  m.devvec <- rnorm(total.yrs, 0, m.sd) 
+  #Apply autocorrelation in the annual variation
+  rho       <- 1/sqrt(2) 
+  m.auto    <- numeric(total.yrs)
+  m.auto[1] <- m.devvec[1] 
+  for (e in 2:total.yrs){
+      m.auto[e] <- rho * m.auto[e-1] + sqrt(1 - rho * rho) * m.devvec[e]  }
+  m.vec = round(m * exp( m.auto - 0.50 * m.sd^2),3)
+
+  # Variation in growth -------------------------------------------------------------------------------------------------------------
+  k.vec = numeric(total.yrs)
+  #k.vec = rep(kf, total.yrs) 
+  k.vec = round(kf * exp(m.auto - 0.50 * m.sd^2),3)
+
+  # Prior value for parameters-----------------------------------------------------------------------------------------------------
+  set.seed(prior.seed[nsim])
+  m.prior    <- round(runif(1,  m -  m *0.25,  m + m*0.25),3) 
+  lmin.prior <- L1 
+  lmax.prior <- round(runif(1, L2f- L2f*0.10, L2f + L2f*0.10),3)
+  k.prior    <- round(runif(1, kf - kf *0.10, kf  + kf *0.10),3)
+  cv1.prior  <- round(runif(1, CV1- CV1*0.10, CV1 + CV1*0.10),3)
+  cv2.prior  <- round(runif(1, CV2- CV2*0.10, CV2 + CV2*0.10),3)
+  h.prior    <- round(runif(1, steep-steep*0.10, steep+steep*0.10),2)
+
+  prior.matrix[nsim,]     = c(m.prior, lmin.prior, lmax.prior, k.prior, cv1.prior, cv2.prior, h.prior)
+  colnames(prior.matrix)  = c("m.prior", "lmin.prior", "lmax.prior", "k.prior", "cv1.prior", "cv2.prior", "h.prior")
+  save(prior.matrix, file = paste0(directory,"save/priors"))
+
+  # Calculate the buffer for the forecast file
+  buffer <- 0.95 #exp(qnorm(p.value, 0, sigma))
+
+  # Recruits Spawning biomass  Vulnerable biomas------------------------------------------------------------------------------------
+  Update_Dynamics <- function(R0, catch = hist.catch, biology)
+  {
     UpdateDyn <- list() 
     
     #Virgin Population Structure ----------------------------------------------------------------------------------------------------
-    Ry[1]<- R0 / 2
-    numbers[1,1:(ages-1),] <- (R0 / 2) * exp(-m * (0:(ages-2)))
-    numbers[1,ages,]       <- numbers[1,ages-1,] * exp( -m ) / (1 - exp(-m)) 
+    Ry[1] <- R0 / 2
+    numbers[1,1:(ages-1),] <- (R0 / 2) * exp(-m.vec[y] * (0:(ages-2)))
+    numbers[1,ages,]       <- numbers[1,ages-1,] * exp( -m.vec[y] ) / (1 - exp(-m.vec[y])) 
        
     #Virgin Biomass By Age  
     SSB0 <- SSB[1] <- sum(numbers[1,,1] * biology$fecund)
 
     #Find F values based on catch-----------------------------------------------------------------------------------------------------
     Findf <- function(f){
-       z.m <- (1 - exp(-(m + selec.age.m * f))) / (m + selec.age.m * f)
-       z.f <- (1 - exp(-(m + selec.age.f * f))) / (m + selec.age.f * f)
+       z.m <- (1 - exp(-(m.vec[y] + selec.age.m * f))) / (m.vec[y] + selec.age.m * f)
+       z.f <- (1 - exp(-(m.vec[y] + selec.age.f * f))) / (m.vec[y] + selec.age.f * f)
        #Catch at Age
        catch.at.age.f <- f * (numbers[y,,1] * selec.age.f) * z.f
        catch.at.age.m <- f * (numbers[y,,2] * selec.age.m) * z.m
        #Catch At Length
        mid.temp.f <- numbers[y,,1] * z.f 
        mid.temp.m <- numbers[y,,2] * z.m 
-       #mid.temp.f <- numbers[y,,1] * exp(m+selec.age.f * f ) #numbers[y,,1] * z.f
-       #mid.temp.m <- numbers[y,,2] * exp(m+selec.age.m * f ) #numbers[y,,2] * z.m
 
        catch.at.len.f <- ((biology$mid.phi.f * selec[y,,1]) %*% (mid.temp.f))
        catch.at.len.m <- ((biology$mid.phi.m * selec[y,,2]) %*% (mid.temp.m))
@@ -212,9 +226,9 @@ for (nsim in start.n:end.n)
        return(obj.fun.f) 
     }
          
-    for(y in 1:(pre.fishery.yrs+setup.yrs - 1)) {  
-
-      #Time-Varying Selectivity---------------------------------------------------------------------------------------------------------
+    for(y in 1:(pre.fishery.yrs+setup.yrs - 1)) 
+    {  
+      # Time-Varying Selectivity---------------------------------------------------------------------------------------------------------
       inflec.selec[y] <- fsp1 * exp(-0.50 * tv.err * tv.err + select.err[y])
       selec.out       <- TimeVarying_Selex(mid.phi.m = biology$mid.phi.m, mid.phi.f = biology$mid.phi.f, sel.para = inflec.selec[y])
       selec.age.m     <- selec.out$selec.age.m
@@ -235,14 +249,14 @@ for (nsim in start.n:end.n)
       catch.wght.values[y] <- find.f$catch.wght
         
       # survival at age by gender
-      S.f <- exp(-(m + selec.age.f * f))
-      S.m <- exp(-(m + selec.age.m * f))
+      S.f <- exp(-(m.vec[y] + selec.age.f * f))
+      S.m <- exp(-(m.vec[y] + selec.age.m * f))
         
       #Update the numbers and remove the catch by applying the solved for f value
       numbers[y+1, 2:ages, 1] <- numbers[y, 1:(ages-1), 1] * S.f[1:(ages-1)]
       numbers[y+1, 2:ages, 2] <- numbers[y, 1:(ages-1), 2] * S.m[1:(ages-1)]
-      numbers[y+1, ages, 1]   <- numbers[y+1, ages, 1] + numbers[y, ages, 1] * exp(-m - selec.age.f[ages] * f)
-      numbers[y+1, ages, 2]   <- numbers[y+1, ages, 2] + numbers[y, ages, 2] * exp(-m - selec.age.m[ages] * f)
+      numbers[y+1, ages, 1]   <- numbers[y+1, ages, 1] + numbers[y, ages, 1] * exp(-m.vec[y] - selec.age.f[ages] * f)
+      numbers[y+1, ages, 2]   <- numbers[y+1, ages, 2] + numbers[y, ages, 2] * exp(-m.vec[y] - selec.age.m[ages] * f)
         
       SSB[y+1] <- sum(numbers[y+1, 2:ages, 1] * biology$fecund[2:ages])
   
@@ -266,66 +280,59 @@ for (nsim in start.n:end.n)
     names(UpdateDyn) <- c("f.values","catch.wght.values","catch.at.age","catch.at.len","numbers","SSB","Ry", "selec", 
                     "selec.age", "new.peak")
     return(UpdateDyn)
- }
+  }
 
-#=================================================================================================================================
+  # =================================================================================================================================
 
- #Objective Function to solve for R0
- Test.R0 <- function(R0) {
+  #Objective Function to solve for R0
+  Test.R0 <- function(R0) {
      SSB<- Update_Dynamics(R0, catch=hist.catch, biology = cmp_bio())$SSB
      obj.fun <- (SSB[pre.fishery.yrs + setup.yrs] / SSB[1] - final.depl)^2
      return(obj.fun) 
- }
+  }
 
- #Find R0 that results in the correct depletion level
- start.time <- Sys.time()
- r0.value   <- optimize(Test.R0, interval = c(low.bound, upper.bound))
- end.time   <- Sys.time()
- R0         <- r0.value$minimum
- end.time   <- Sys.time()
- print(end.time-start.time)
+  # Find R0 that results in the correct depletion level
+  start.time <- Sys.time()
+  r0.value   <- optimize(Test.R0, interval = c(low.bound, upper.bound))
+  end.time   <- Sys.time()
+  R0         <- r0.value$minimum
+  end.time   <- Sys.time()
+  print(end.time-start.time)
 
- # Create Virgin population
- dyn      <- Update_Dynamics(R0, catch = hist.catch, biology = Get_Biology())
- Dyn      <- list() 
- Dyn[[1]] <- dyn$numbers
- Dyn[[2]] <- dyn$SSB
- Dyn[[3]] <- dyn$Ry
- Dyn[[4]] <- dyn$SSB / dyn$SSB[1]
- Dyn[[5]] <- dyn$f.values
- Dyn[[6]] <- dyn$z.rate
- Dyn[[7]] <- dyn$catch.wght.values
- Dyn[[8]] <- dyn$catch.at.age
- Dyn[[9]] <- dyn$catch.at.len
- Dyn[[10]]<- dyn$selec
- Dyn[[11]]<- dyn$selec.age
- Dyn[[12]]<- dyn$new.peak
- names(Dyn) <- c("numbers", "SSB", "Ry", "Depl", "f.values", "z.rate", "catch.wght.values", "catch.at.age", "catch.at.len",
-                  "selec", "selec.age", "new.peak")
- #rm(dyn) 
+  # Create Virgin population
+  dyn      <- Update_Dynamics(R0, catch = hist.catch, biology = Get_Biology())
+  Dyn      <- list() 
+  Dyn[[1]] <- dyn$numbers
+  Dyn[[2]] <- dyn$SSB
+  Dyn[[3]] <- dyn$Ry
+  Dyn[[4]] <- dyn$SSB / dyn$SSB[1]
+  Dyn[[5]] <- dyn$f.values
+  Dyn[[6]] <- dyn$z.rate
+  Dyn[[7]] <- dyn$catch.wght.values
+  Dyn[[8]] <- dyn$catch.at.age
+  Dyn[[9]] <- dyn$catch.at.len
+  Dyn[[10]]<- dyn$selec
+  Dyn[[11]]<- dyn$selec.age
+  Dyn[[12]]<- dyn$new.peak
+  names(Dyn) <- c("numbers", "SSB", "Ry", "Depl", "f.values", "z.rate", "catch.wght.values", "catch.at.age", "catch.at.len",
+                  "selec", "selec.age", "new.peak") 
 
-#Format Data ----------------------------------------------------------------------------------------------------------
- #Get the survey data from the start of the survey until year 50
- survey.dur     <- start.survey:(setup.yrs-1)
- survey.out     <- Do_Survey(biology = Get_Biology(), f.values = Dyn$f.values , numbers = Dyn$numbers, 
+  # Format Data ----------------------------------------------------------------------------------------------------------
+  # Get the survey data from the start of the survey until year 50
+  survey.dur     <- start.survey:(setup.yrs-1)
+  survey.out     <- Do_Survey(biology = Get_Biology(), f.values = Dyn$f.values , numbers = Dyn$numbers, 
                              index = survey.dur,  sel.matrix = Dyn$selec.age)
- survey.proj    <- numeric(fishery.yrs)
- survey.proj[survey.dur]    <- survey.out$temp.index
- survey.catch.age.len[survey.dur,,,] <- survey.out$temp.cal
+  survey.proj    <- numeric(fishery.yrs)
+  survey.proj[survey.dur]    <- survey.out$temp.index
+  survey.catch.age.len[survey.dur,,,] <- survey.out$temp.cal
  
- #Control file M estimation
- m.f.est  <- m  #set the initial prior equal to the true M
- m.m.est  <- m  #set the initial prior equal to the true M
- do.est   <- 2  #phase for M estimation
-
+  # Generate Data for the base fishery years -----------------------------------------------------------------------------
+  # Bring in the needed population values from the fishery
+  catch.at.age         <- Dyn$catch.at.age[(pre.fishery.yrs+1):(pre.fishery.yrs+fishery.yrs), , ]
+  catch.at.len         <- Dyn$catch.at.len[(pre.fishery.yrs+1):(pre.fishery.yrs+fishery.yrs), , ]
  
-#Generate Data for the base fishery years -----------------------------------------------------------------------------
- #Bring in the needed population values from the fishery
- catch.at.age         <- Dyn$catch.at.age[(pre.fishery.yrs+1):(pre.fishery.yrs+fishery.yrs), , ]
- catch.at.len         <- Dyn$catch.at.len[(pre.fishery.yrs+1):(pre.fishery.yrs+fishery.yrs), , ]
- 
- #Set the seed for the composition sampling
- set.seed(comp.seed[nsim])
+  # Set the seed for the composition sampling
+  set.seed(comp.seed[nsim])
 
  for (a in 1:length(survey.dur)) {
      #Format the survey data for sampling
@@ -478,10 +485,8 @@ for (nsim in start.n:end.n)
 
     dev.yr2 = setup.yrs
     if (data.scenario == "ds0" || data.scenario == "ds1") { dev.yr2 = y - pre.fishery.yrs - 1 }
-
-    do.ass = y
-    if(LH == "flatfish") { do.ass = y - 2}     
-    if ( do.ass %% 4 == 0 ){
+    
+    if ( y %% 4 == 0 ){
         counter = counter + 1
         if (decl.overfished == TRUE && need.blocks == TRUE) { 
 
@@ -505,6 +510,29 @@ for (nsim in start.n:end.n)
             bind.block = 3
           } 
           print(cat(y, decl.overfished, block.yrs, overfished.counter, decl.yr, end.yr))
+        }
+
+        if (counter != 1) {
+          start.devs     <- 1
+          main.rec.start <- ifelse(start.survey - ages < ages, ages, start.survey - ages)
+          start.bias     <- start.bias.est 
+          full.bias      <- full.bias.est  
+          last.bias      <- y - stop.rec.est 
+          last.no.bias   <- ifelse( LH == "rockfish", y-6 , y-4 ) 
+          main.rec.end   <- y 
+          max.bias.adj   <- max.bias.adj.est
+        }
+
+        if ( counter == 1){
+          start.devs     <- 1 
+          main.rec.start <- ifelse(start.survey - ages < ages, ages, start.survey - ages)
+          start.bias     <- ifelse(start.survey - ages - floor(ages/2) < ages, 1, 
+                                            start.survey - ages - floor(ages/2))
+          full.bias      <- start.survey - floor(ages/2) 
+          last.bias      <- y - stop.rec.est 
+          last.no.bias   <- y 
+          main.rec.end   <- y 
+          max.bias.adj   <- 0.80    
         }
 
         writeStarter(starter = "starter.ss")

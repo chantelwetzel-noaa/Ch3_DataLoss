@@ -15,7 +15,7 @@
 drive    <-"C:" #"//home//cwetzel//h_cwetzel"
 LH       <- "rockfish"
 start.n  <- 1
-end.n    <- 50
+end.n    <- 1
 data.scenario <- "ds4" 
 tantalus      <- FALSE
 github        <- TRUE
@@ -160,7 +160,7 @@ for (nsim in start.n:end.n)
     	
 	#Draw Survey Error---------------------------------------------------------------------------------------------------------------  
 	set.seed(survey.seed[nsim])
-	survey.err <- rnorm(fishery.yrs, 0, survey.cv)
+	survey.err <- rnorm(total.yrs, 0, survey.cv)
 
 	#Variation in Selectivity----------------------------------------------------------------------------------------------------------
 	set.seed(select.seed[nsim])
@@ -275,6 +275,7 @@ for (nsim in start.n:end.n)
     #This will produce the true ofl and acls for the next four years
     rep.new   <- readLines(paste(om, "/Report.sso", sep=""))
     R0 <- exp(as.numeric(strsplit(rep.new[grep(paste("SR_LN",sep=""),rep.new)]," ")[[1]][3]))
+
     #Remove the depletion survey
     dat <- NULL
     dat <- SS_readdat(paste(om,"/om.dat",sep=""))
@@ -310,6 +311,7 @@ for (nsim in start.n:end.n)
     #Read in the report file and save needed quantities
     rep.new   <- readLines(paste(om, "/Report.sso", sep=""))
     rep.out   <- Rep_Summary(rep.new, y, pre.fishery.yrs, do.forecast)
+    index     <- Do_Survey(file = rep.new, ind = seq(start.survey, y, 2), survey.err)
 
     SSB [1:y]      <- rep.out$SB
     Ry  [1:(y-1)]  <- rep.out$Recruits
@@ -433,6 +435,7 @@ for (nsim in start.n:end.n)
 
     		rep.new   <- readLines(paste(om, "/Report.sso", sep=""))
     		rep.out   <- Rep_Summary(rep.new, y, pre.fishery.yrs, do.forecast)
+
             check.depl<- rep.out$Depl[y]
             if (check.depl > bio.target){
                 #fspr.input = 0.95*fspr.om # ifelse(LH == "rockfish", 0.05, 0.20)#fspr.om
@@ -445,7 +448,8 @@ for (nsim in start.n:end.n)
                 rep.new   <- readLines(paste(om, "/Report.sso", sep=""))
                 rep.out   <- Rep_Summary(rep.new, y, pre.fishery.yrs, do.forecast)
             }
-		
+
+            index     <- c(index, Do_Survey(file = rep.new, ind = seq(y-2, y, 2), survey.err))
             SSB [1:y]   <- rep.out$SB
             Ry  [1:(y-1)]  <- rep.out$Recruits
             depl[1:y]  <- rep.out$Depl
@@ -479,10 +483,8 @@ for (nsim in start.n:end.n)
         		full.bias      <- full.bias.est  
 				last.bias      <- y - stop.rec.est 
         		last.no.bias   <- ifelse( LH == "rockfish", y-6 , y-4 ) 
-        		main.rec.end   <- y # 
-                #main.rec.end   <- ifelse(LH == "rockfish", y-5 , y - 3) 
+        		main.rec.end   <- y 
         		max.bias.adj   <- max.bias.adj.est
-                #print(c(main.rec.end, start.bias, full.bias, last.bias, last.no.bias, max.bias.adj))
         	}
 
     		if ( counter == 1){
@@ -493,8 +495,8 @@ for (nsim in start.n:end.n)
 				full.bias      <- start.survey - floor(ages/2) 
 				last.bias      <- y - stop.rec.est 
         		last.no.bias   <- y 
-        		main.rec.end   <- y #ifelse(LH == "rockfish", y-5 , y - 3)
-				max.bias.adj   <- 0.80 # full bias adjustment = ry*exp(-0.5*sigmaR^2 + recdev)		  
+        		main.rec.end   <- y 
+				max.bias.adj   <- 0.80 	  
             }
 
             est.R0 = 1
@@ -522,6 +524,8 @@ for (nsim in start.n:end.n)
                 hcr.low  = ctl.rule.thres
                 dat$agecomp = Get_Samps(data.type = "age", year.vec = (pre.fishery.yrs + 1): y )
                 dat$lencomp = Get_Samps(data.type = "len", year.vec = (pre.fishery.yrs + 1): y )
+                # Read the expected values and generate my own survey data
+                dat$CPUE[,4] <- index
 			}
     		if (counter != 1){
     			dat.new <- dat.old <- dat <- NULL
@@ -530,9 +534,12 @@ for (nsim in start.n:end.n)
     			dat.old$endyr <- dat.new$endyr
     			dat.old$N_catch <- dat.new$N_catch
     			dat.old$catch <- cbind(catch[1:y], dat.new$catch[,2:3])#cbind(catch[(pre.fishery.yrs+1):y], dat.new$catch[,2:3])
-    			dat.old$N_cpue <- dat.new$N_cpue
-    			ind = (dim(dat.new$CPUE)[1]-1):(dim(dat.new$CPUE)[1])
-    			dat.old$CPUE <- rbind(dat.old$CPUE, dat.new$CPUE[ind,])
+    		
+                dat.old$N_cpue <- dat.new$N_cpue
+    			#ind = (dim(dat.new$CPUE)[1]-1):(dim(dat.new$CPUE)[1])
+    			#dat.old$CPUE <- rbind(dat.old$CPUE, dat.new$CPUE[ind,])
+                dat.new$CPUE[,4] <- index
+                dat.old$CPUE <- dat.new$CPUE
     			dat.old$add_to_comp <- 0.00001
                 dat.old$ageerror[2,] <- rep(0.10, ages)
                 dat.new$agecomp = Get_Samps(data.type = "age", year.vec = (y - 3): y )
@@ -599,6 +606,7 @@ for (nsim in start.n:end.n)
     		#Make sure the model converged
             rerun = 0
     		rep.new   <- readLines(paste(run, "/Report.sso", sep=""))
+            gradient  <- as.numeric(strsplit(rep.new[grep("Convergence_Level",rep.new)], " ")[[1]][2]) 
         	virgin.SB <- as.numeric(strsplit(rep.new[grep(paste("SPB_Virgin",sep=""),rep.new)]," ")[[1]][3])
         	while(virgin.SB < (SB0/4) || virgin.SB > (SB0*4)) {
         	  rerun = rerun + 1  
@@ -620,6 +628,23 @@ for (nsim in start.n:end.n)
         	  }
         	  if(rerun > 1) { break () }
         	}
+
+            # Now check the gradient
+            grad.rerun = 0
+            if (gradient > 0.50){
+                grad.rerun = grad.rerun + 1
+                starter.file = SS_readstarter(paste(run, "/starter.ss", sep = ""))
+                starter.file$jitter_fraction = 0.10
+                SS_writestarter(starter.file, paste(directory, sep = ""), overwrite = T )
+                if (y <= (pre.fishery.yrs + setup.yrs + 9)){
+                    if (tantalus == T) { system("./SS3 > test.txt 2>&1")  }
+                    if (tantalus == F) { shell("ss3.exe > test.txt 2>&1")  }
+                }
+                if (y > (pre.fishery.yrs + setup.yrs + 9)){
+                    if (tantalus == T) { system("./SS3 -nohess > test.txt 2>&1")  }
+                    if (tantalus == F) { shell("ss3.exe -nohess > test.txt 2>&1")  }
+                }
+            }
 	
 			if (determ == FALSE & y <= (pre.fishery.yrs + setup.yrs + 9)){
                 if(rerun == 2){
@@ -709,6 +734,8 @@ for (nsim in start.n:end.n)
         	ind                   <- y 
         	SB[1:ind,counter]     <- rep.out$SB
         	Bratio[1:ind,counter] <- rep.out$Depl
+            grad.out[counter]     <- rep.out$gradient
+            grad.check[counter]   <- grad.rerun
             #fsp1.est[,counter]    <- ifelse(need.blocks == F, 0, rep.out$F.selex.1.adj)
             fsp2.est[,counter]    <- ifelse(need.blocks == F, 0, rep.out$F.selex.2.adj)
 

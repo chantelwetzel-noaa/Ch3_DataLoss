@@ -7,15 +7,15 @@ Get_Biology<- function()
  mid.len <- matrix(0,ages,sexes)
  
  #L infinity (cm)
-  Linf_f <- L1 + ((L2f - L1) / (1 - exp( -kf * (a4 - a3))))
-  Linf_m <- L1 + ((L2m - L1) / (1 - exp( -km * (a4 - a3))))
+  Linf_f <- L1 + ((L2f - L1) / (1 - exp( -k * (a4 - a3))))
+  Linf_m <- L1 + ((L2m - L1) / (1 - exp( -k * (a4 - a3))))
   len.slope <- (L1-len.step[1])/a3
  
  #Length at the start of the year (cm)
   len[1:(a.linear+1),]<-len.step[1]+len.slope*(seq(1,(a.linear+1),1)-1)  #For smallest fish length is a linear function  
   #Growth based on the VB
-  len[(a.linear+2):ages,2]<-Linf_m+(L1-Linf_m)*exp(-km*((seq(a.linear+2,ages,1)-1)-a3))
-  len[(a.linear+2):ages,1]<-Linf_f+(L1-Linf_f)*exp(-kf*((seq(a.linear+2,ages,1)-1)-a3))
+  len[(a.linear+2):ages,2]<-Linf_m+(L1-Linf_m)*exp(-k*((seq(a.linear+2,ages,1)-1)-a3))
+  len[(a.linear+2):ages,1]<-Linf_f+(L1-Linf_f)*exp(-k*((seq(a.linear+2,ages,1)-1)-a3))
   #Plus Group Growth
   temp1 <- sum(exp(-0.20*(ages:(ages*2)-ages))*(len[ages,2]+((ages:(ages*2)-ages)/ages)*(Linf_m-len[ages,2])))
   temp2 <- sum(exp(-0.20*(ages:(ages*2)-ages)))
@@ -29,8 +29,8 @@ Get_Biology<- function()
  #Mid-year lengths   (cm)
   mid.len[1:a.linear,]<-mean(len[1:2,1])+len.slope*(seq(1,a.linear,1)-1)   #For smallest fish length is a linear function 
   #Growth bases on VB
-  mid.len[(a.linear+1):ages,2]<-len[(a.linear+1):ages,2]+(len[(a.linear+1):ages,2]-Linf_m)*(exp(-0.5*km)-1) 
-  mid.len[(a.linear+1):ages,1]<-len[(a.linear+1):ages,1]+(len[(a.linear+1):ages,1]-Linf_f)*(exp(-0.5*kf)-1)
+  mid.len[(a.linear+1):ages,2]<-len[(a.linear+1):ages,2]+(len[(a.linear+1):ages,2]-Linf_m)*(exp(-0.5*k)-1) 
+  mid.len[(a.linear+1):ages,1]<-len[(a.linear+1):ages,1]+(len[(a.linear+1):ages,1]-Linf_f)*(exp(-0.5*k)-1)
   #Plus Group Growth
   temp1 <- sum(exp(-0.20*(ages:(ages*2)-ages))*(mid.len[ages,2]+((ages:(ages*2)-ages)/ages)*(Linf_m-mid.len[ages,2])))
   temp2 <- sum(exp(-0.20*(ages:(ages*2)-ages)))
@@ -45,7 +45,6 @@ Get_Biology<- function()
  Len[[1]] <- len
  Len[[2]] <- mid.len
  names(Len) <- c("len","mid.len")
- #rm(len, mid.len, Linf_f, Linf_m, len.slope)
 
 #=================================================================================================================
 #Calculate the Transisition Matrix
@@ -117,7 +116,6 @@ Get_Biology<- function()
  Phi[[5]] <- mid.phi.m
  Phi[[6]] <- mid.phi.f
  names(Phi) <- c("mid.sigma","sigma.phi","phi.m","phi.f","mid.phi.m","mid.phi.f")
- #rm(sigma.phi, mid.sigma, phi.m, phi.f, mid.phi.m, mid.phi.f, total.m, total.f, a, b, p1, p2)
  
 #GetWght==========================================================================================
  Wght <- list()
@@ -145,7 +143,6 @@ Get_Biology<- function()
  Wght[[3]] <- wght
  Wght[[4]] <- mid.wght
  names(Wght) <- c("wght.at.len","mid.wght.at.len","wght","mid.wght")
- #rm(wght, mid.wght, wght.at.len, mid.wght.at.len)
 
 #Fecundity================================================================================================
  Fecund <- list()
@@ -162,48 +159,6 @@ Get_Biology<- function()
  Fecund[[2]] <- mature.len
  Fecund[[3]] <- fecund
  names(Fecund) <- c("mature.age","mature.len","fecund")
- #rm(mature.len, mature.age, fecund)
-
-#Selectivity Function=====================================================================================
-  Selex <- list()
-  selec <- matrix(NA,length(len.step),sexes)
-  selec.age.m<-matrix(0,ages,1)
-  selec.age.f<-matrix(0,ages,1) 
-  
-  #Double Normal Selectivity
-  startbin <- 1
-  peak <- fsp1
-  upselex <- exp(fsp3)
-  downselex <- exp(fsp4)
-  final <- fsp6
-
-  point1 <- 1 / (1 + exp(-fsp5)) 
-  t1min <- exp(-((len.step[startbin] + 1) - peak)^2 / upselex)
-  peak2 <- peak + 2 + (0.99 * (len.step[length(len.step)] + 1) - peak - 2) / (1 + exp(-fsp2))
-  point2 <- 1 / (1 + exp(-final))
-  t2min <- exp(-((len.step[length(len.step)] + 1) - peak2)^2 / downselex)
-  t1 <- len.step + 1 - peak
-  t2 <- len.step + 1 - peak2
-  join1 <- 1 / (1 + exp(-(20 / (1 + abs(t1))) * t1))
-  join2 <- 1 / (1 + exp(-(20 / (1 + abs(t2))) * t2))
-  asc <- point1 + (1 - point1) * (exp(-t1^2 / upselex) - t1min) / (1 - t1min)
-  if (fsp5 <= -999) { asc <-  exp(-(t1^2) / upselex)}
-  dsc <- 1 +(point2-1)*(exp(-t2^2 / downselex) - 1) / (t2min - 1)
-  if (fsp6 <- -999) { dsc <- exp(-(t2^2) / downselex)}
-
-  selec[,1] <- asc * (1-join1) + join1 * (1 - join2 + dsc * join2) 
-  selec[,2] <- selec[,1]
-
-
-  #Mid-year Selectivity by Age
-  selec.age.m <-(t(Phi$mid.phi.m)) %*% selec[,2]
-  selec.age.f <-(t(Phi$mid.phi.f)) %*% selec[,1]
-  
-  Selex[[1]] <- selec
-  Selex[[2]] <- selec.age.f
-  Selex[[3]] <- selec.age.m
-  Selex[[4]] <- peak
-  names(Selex) <- c("selec","selec.age.f","selec.age.m", "peak")
 
 #Obs_Selectivity =========================================================================================================================================
  Obs.Selex <- list()
@@ -258,17 +213,11 @@ Get_Biology<- function()
  Bio[[11]]<- Len$len
  Bio[[12]]<- Fecund$fecund
  Bio[[13]]<- Phi$sigma.len
- Bio[[14]]<- Selex$selec
- Bio[[15]]<- Selex$selec.age.f
- Bio[[16]]<- Selex$selec.age.m
- Bio[[17]]<- Obs.Selex$obs.selec
- Bio[[18]]<- Obs.Selex$obs.selec.age.f
- Bio[[19]]<- Obs.Selex$obs.selec.age.m
- Bio[[20]]<- Selex$peak
+ Bio[[14]]<- Obs.Selex$obs.selec
+ Bio[[15]]<- Obs.Selex$obs.selec.age.f
+ Bio[[16]]<- Obs.Selex$obs.selec.age.m
+
  names(Bio) <- c("phi.f","phi.m","mid.phi.m","mid.phi.f","mid.wght","wght","mid.wght.at.len","wght.at.len",
-                "mid.len","wght","len","fecund","sigma.len","selec","selec.age.f","selec.age.m","obs.selec",
-                "obs.selec.age.f","obs.selec.age.m", "peak")
+                "mid.len","wght","len","fecund","sigma.len","obs.selec","obs.selec.age.f","obs.selec.age.m")
  return(Bio)
 }
-
-#cmp_bio = cmpfun(Get_Biology)

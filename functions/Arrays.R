@@ -47,6 +47,8 @@
   S.selex     <- array(NA, dim=c(6, ass.num))
   recovered.est <- numeric(total.yrs)
   fspr.est.vec<- numeric(total.yrs)
+  grad.check  <- numeric(ass.num) 
+  grad.out    <- numeric(ass.num)
   
   #Dynamics
   Ry           <- matrix(0, total.yrs+1, 1)#;  rownames(Ry) <-years
