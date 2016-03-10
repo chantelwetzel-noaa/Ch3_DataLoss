@@ -628,13 +628,7 @@ writeDat<-function(dat, y, survey, fore.catch)
 
     landings <- cbind(
         #Value of Catch                          #Year                              #Fleet          
-        #fore.catch[(pre.fishery.yrs+1):y],   seq(1,(y-pre.fishery.yrs),1),    rep(1,(y-pre.fishery.yrs)) )
         fore.catch[(pre.fishery.yrs+1):y],   seq(ages,y,1),    rep(1,(y-pre.fishery.yrs)) )
-
-    #ss.survey.data = cbind(
-        #start.survey:(y-pre.fishery.yrs), rep(1, length(survey)), rep(2, length(survey)), 
-        #start.survey:y, rep(1, length(survey)), rep(2, length(survey)), 
-        #survey, rep(ss.survey.cv, length(survey)))
 
     survey.data.yrs = seq(start.survey, y, 2)
     ss.survey.data = cbind(
@@ -649,10 +643,11 @@ writeDat<-function(dat, y, survey, fore.catch)
     data.matrix = matrix(0, length(data.yrs), 2*length(len.step))
     data.matrix[,1] = f.len.samp[data.yrs]
     fishery.length.data = cbind(data.yrs, rep(1, length(data.yrs)), rep(1, length(data.yrs)), rep(3, length(data.yrs)), rep(2, length(data.yrs)),
-                    f.len.samp[data.yrs], data.matrix)  
+                    f.len.samp[data.yrs], data.matrix) 
+    #Filter out the zero sample years
+    keep = fishery.length.data[,6] != 0
+    fishery.length.data = fishery.length.data[keep,] 
 
-    #data.yrs = (start.survey.len.samp - pre.fishery.yrs):(y-pre.fishery.yrs)
-    #data.yrs = start.survey.len.samp:y
     data.matrix = matrix(0, length(survey.data.yrs), 2*length(len.step))
     data.matrix[,1] = s.len.samp[survey.data.yrs]
     survey.length.data = cbind(survey.data.yrs, 
@@ -667,6 +662,9 @@ writeDat<-function(dat, y, survey, fore.catch)
     fishery.age.data = cbind(data.yrs, rep(1, length(data.yrs)), rep(1, length(data.yrs)), rep(3, length(data.yrs)), rep(2, length(data.yrs)),
                     rep(1, length(data.yrs)), rep(-1, length(data.yrs)), rep(-1, length(data.yrs)),
                     f.age.samp[data.yrs], data.matrix)  
+    #Filter out the zero sample years
+    keep = fishery.age.data[,9] != 0
+    fishery.age.data = fishery.age.data[keep,]
 
     #data.yrs = (start.survey.age.samp- pre.fishery.yrs) :(y-pre.fishery.yrs)
     #data.yrs =  start.survey.age.samp : y
@@ -764,9 +762,12 @@ writeDat<-function(dat, y, survey, fore.catch)
         1,                   " #Number of Ageing Error Sets\n",
         "#Age Error Matrix\n",
         rep(-1, ages),      " #True Ages\n",
-        rep(0.01, ages),    " #Age Error StDev\n", 
-        #(1:ages-0.5)*0.10,      " #Age Error StDev\n", 
-        "#\n",
+        file=dat,append=T,sep=" ")
+
+        if (AgeError == TRUE)  { cat(0.10*1:ages,        " #Age Error StDev\n", file=dat,append=T,sep=" ")}
+        if (AgeError == FALSE) { cat(rep(0.10, ages),    " #Age Error StDev\n", file=dat,append=T,sep=" ")}
+
+        cat("#\n",
         n.age.obs,          " #Number Age Observations\n",
         3,                  " #Age-Length Bin Option: 1=poplenbins; 2=datalenbins; 3=lengths\n",
         0,                  " #Combine males into females at or below this bin number\n",

@@ -15,8 +15,8 @@
 drive    <-"C:" #"//home//cwetzel//h_cwetzel"
 LH       <- "rockfish"
 start.n  <- 1
-end.n    <- 1
-data.scenario <- "ds4" 
+end.n    <- 50
+data.scenario <- "ds6" 
 tantalus      <- FALSE
 github        <- TRUE
 file.type     <- "boot" #"boot" "perfect"
@@ -25,7 +25,7 @@ setup.yrs     <- 50
 do.MLE        <- FALSE
 error.struct  <- "multinom" #"multinom" #"dirich"
 if (file.type == "perfect") { do.MLE = T }
-AgeError      <- FALSE
+AgeError      <- TRUE
 
 
 #Load packages
@@ -34,7 +34,7 @@ require(compiler)
 require(gtools)
 
 #Set the directory and create folder
-directory <<- paste(drive,"/PhD/Chapter3/",LH, "_", data.scenario,"_",setup.yrs,"yr_sims_", error.struct, "_",start.n,"_",end.n,"/",sep="")
+directory <<- paste(drive,"/PhD/Chapter3/",LH, "_", data.scenario,"_",setup.yrs,"yr_sims_", error.struct, "_","AE_", AgeError, "_",start.n,"_",end.n,"/",sep="")
 om  <- paste( directory, "om", sep = "")
 run <- paste( directory, "run", sep = "")
 if( file.exists(directory) == FALSE) {
@@ -336,29 +336,29 @@ for (nsim in start.n:end.n)
             hcr.high = 0.011
             hcr.low  = 0.01
 
-            if (data.scenario == "ds3" || data.scenario == "ds4" || data.scenario == "ds7" || data.scenario == "ds5") {
+            if (data.scenario == "ds3" || data.scenario == "ds4" || data.scenario == "ds7") {
                 f.len.samp[y] <- floor(0.20 * f.len.samp[y])
                 s.len.samp[y] <- s.len.samp[y]
                 f.age.samp[y] <- floor(0.20 * f.age.samp[y])
                 s.age.samp[y] <- s.age.samp[y]
             }
-            if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds2" || data.scenario == "ds6") {
+            if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds2" ) {
                 f.len.samp[y] <- f.len.samp[y]
                 s.len.samp[y] <- s.len.samp[y]
                 f.age.samp[y] <- f.age.samp[y]
                 s.age.samp[y] <- s.age.samp[y]
             }
-            #if (data.scenario == "ds5"){
-            #    f.len.samp[y] <- 0
-            #    s.len.samp[y] <- 0
-            #    f.age.samp[y] <- 0
-            #    s.age.samp[y] <- 0
-            #}
+            if (data.scenario == "ds5" || data.scenario == "ds6"){
+                f.len.samp[y] <- 0
+                #s.len.samp[y] <- 0
+                f.age.samp[y] <- 0
+                #s.age.samp[y] <- 0
+            }
         }
 
-        if (data.scenario == "ds5") {
+        if (data.scenario == "ds5" || data.scenario == 'ds6') {
             need.blocks = FALSE
-            block.number = block.fxn = 0 }
+            block.num = block.fxn = 0 }
  		
  		do.ass = y
         if(LH == "rockfish") { 
@@ -448,8 +448,10 @@ for (nsim in start.n:end.n)
                 rep.new   <- readLines(paste(om, "/Report.sso", sep=""))
                 rep.out   <- Rep_Summary(rep.new, y, pre.fishery.yrs, do.forecast)
             }
-
-            index     <- c(index, Do_Survey(file = rep.new, ind = seq(y-2, y, 2), survey.err))
+            
+            ind <- seq(y-2, y, 2)
+            if (data.scenario == "ds0") { ind = seq(y-3, y, 2)}
+            index     <- c(index, Do_Survey(file = rep.new, ind , survey.err))
             SSB [1:y]   <- rep.out$SB
             Ry  [1:(y-1)]  <- rep.out$Recruits
             depl[1:y]  <- rep.out$Depl
@@ -516,7 +518,7 @@ for (nsim in start.n:end.n)
                 dat <- SS_readdat(paste(run,"/", file.type ,nsim,"_", y,".ss",sep=""))
     			dat$catch[,1] <- catch[1:y]#[(pre.fishery.yrs +1):y]
     			dat$add_to_comp <- 0.00001
-                dat$ageerror[2,] <- rep(0.10, ages)
+                #dat$ageerror[2,] <- rep(0.10, ages)
                 #This value is just a filler, the model will be rerun below with the estimated and adjusted value
                 #fspr.input = 0.95*fspr.om
                 buffer = 0.95
@@ -541,34 +543,39 @@ for (nsim in start.n:end.n)
                 dat.new$CPUE[,4] <- index
                 dat.old$CPUE <- dat.new$CPUE
     			dat.old$add_to_comp <- 0.00001
-                dat.old$ageerror[2,] <- rep(0.10, ages)
+                #dat.old$ageerror[2,] <- rep(0.10, ages)
                 dat.new$agecomp = Get_Samps(data.type = "age", year.vec = (y - 3): y )
                 dat.new$lencomp = Get_Samps(data.type = "len", year.vec = (y - 3): y )
 
     			dat.old$N_lencomp <- dat.new$N_lencomp
     			ind = dat.new$lencomp$FltSvy == 1 ; ind.old.1 = dat.old$lencomp$FltSvy == 1
-    			ind1 = (sum(ind)-3):sum(ind)
+                if ( sum(ind) != sum(ind.old.1) ) { ind1 = (sum(ind)-3):sum(ind) }
+                if ( sum(ind) == sum(ind.old.1) ) { ind1 = 0}
+    			#ind1 = ifelse(sum(ind) != sum(ind.old.1), (sum(ind)-3):sum(ind), 0)
     			ind = dat.new$lencomp$FltSvy == 2 ; ind.old.2 = dat.old$lencomp$FltSvy == 2
-    			ind2 = (length(ind)-1):length(ind)
-    			dat.old$lencomp <- rbind(dat.old$lencomp[ind.old.1,], dat.new$lencomp[ind1,], 
+                ind2 = (length(ind)-1):length(ind)
+                if (sum(ind1) != 0){
+                    dat.old$lencomp <- rbind(dat.old$lencomp[ind.old.1,], dat.new$lencomp[ind1,], 
                                          dat.old$lencomp[ind.old.2,], dat.new$lencomp[ind2,])
+                }
+                if (sum(ind1) == 0){
+                    dat.old$lencomp <- rbind(dat.old$lencomp[ind.old.1,], 
+                                         dat.old$lencomp[ind.old.2,], dat.new$lencomp[ind2,])
+                }
     			dat.old$N_agecomp <- dat.new$N_agecomp
 				ind = dat.new$agecomp$FltSvy == 1 ; ind.old.1 = dat.old$agecomp$FltSvy == 1
-    			ind1 = (sum(ind)-3):sum(ind)
+    			if ( sum(ind) != sum(ind.old.1) ) { ind1 = (sum(ind)-3):sum(ind) }
+                if ( sum(ind) == sum(ind.old.1) ) { ind1 = 0}
     			ind = dat.new$agecomp$FltSvy == 2 ; ind.old.2 = dat.old$agecomp$FltSvy == 2
     			ind2 = (length(ind)-1):length(ind)
-    			dat.old$agecomp <- rbind(dat.old$agecomp[ind.old.1,], dat.new$agecomp[ind1,], 
-                                          dat.old$agecomp[ind.old.2,], dat.new$agecomp[ind2,])
+                if (sum(ind1) != 0){
+                    dat.old$agecomp <- rbind(dat.old$agecomp[ind.old.1,], dat.new$agecomp[ind1,], 
+                                            dat.old$agecomp[ind.old.2,], dat.new$agecomp[ind2,]) }
+                if (sum(ind1) == 0){
+                    dat.old$agecomp <- rbind(dat.old$agecomp[ind.old.1,], 
+                                            dat.old$agecomp[ind.old.2,], dat.new$agecomp[ind2,])                    
+                }              
 
-                if (data.scenario == "ds5"){
-                    find = (dat.old$lencomp[,6] == 15)
-                    negative.yrs = -1 * dat.old$lencomp[find,1]
-                    dat.old$lencomp[find,1] = negative.yrs
-
-                    find = (dat.old$agecomp[,9] == 5)
-                    negative.yrs = -1 * dat.old$agecomp[find,1]
-                    dat.old$agecomp[find,1] = negative.yrs
-                }
     			dat = dat.old
 
                 if(decl.overfished == FALSE) { 
@@ -776,7 +783,7 @@ for (nsim in start.n:end.n)
                 overfished.counter = 1 + overfished.counter 
                 need.blocks = TRUE
                 block.num = block.pattern = 1; block.fxn = 2
-                if (data.scenario == "ds5") {
+                if (data.scenario == "ds5" || data.scenario == "ds6") {
                     need.blocks = FALSE
                     block.number = block.fxn = 0 }
                 decl.yr = y + 1
