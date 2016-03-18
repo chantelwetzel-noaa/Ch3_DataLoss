@@ -27,7 +27,7 @@
   VulBioEst   <- array(NA, dim=c(total.yrs, ass.num)) #fishery.yrs, ass.num))
   Recruits    <- array(NA, dim=c(total.yrs, ass.num)) #fishery.yrs, ass.num))
   OFL         <- array(NA, dim=c(total.yrs + 5))
-  ForeCat     <- array(NA, dim=c(total.yrs + 5))
+  ACL         <- array(NA, dim=c(total.yrs + 5))
   FSPR        <- array(NA, dim=c(1, ass.num))
   Fmult       <- array(NA, dim=c(1, ass.num))
   LLsurvey    <- array(NA, dim=c(1, ass.num))

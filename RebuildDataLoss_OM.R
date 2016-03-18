@@ -15,8 +15,8 @@
 drive    <-"C:" #"//home//cwetzel//h_cwetzel"
 LH       <- "rockfish"
 start.n  <- 1
-end.n    <- 50
-data.scenario <- "ds6" 
+end.n    <- 20
+data.scenario <- "ds1" 
 tantalus      <- FALSE
 github        <- TRUE
 file.type     <- "boot" #"boot" "perfect"
@@ -24,9 +24,8 @@ determ        <- FALSE
 setup.yrs     <- 50
 do.MLE        <- FALSE
 error.struct  <- "multinom" #"multinom" #"dirich"
-if (file.type == "perfect") { do.MLE = T }
 AgeError      <- TRUE
-
+if (file.type == "perfect") { do.MLE = T }
 
 #Load packages
 require(r4ss)
@@ -34,7 +33,7 @@ require(compiler)
 require(gtools)
 
 #Set the directory and create folder
-directory <<- paste(drive,"/PhD/Chapter3/",LH, "_", data.scenario,"_",setup.yrs,"yr_sims_", error.struct, "_","AE_", AgeError, "_",start.n,"_",end.n,"/",sep="")
+directory <<- paste(drive,"/PhD/Chapter3/",LH, "_", data.scenario,"_",setup.yrs,"yr_sims_", error.struct,"_",file.type, "_","AE_", AgeError, "_",start.n,"_",end.n,"/",sep="")
 om  <- paste( directory, "om", sep = "")
 run <- paste( directory, "run", sep = "")
 if( file.exists(directory) == FALSE) {
@@ -83,7 +82,7 @@ for (nsim in start.n:end.n)
     pre.dev.phase = ifelse(equil == TRUE, -3, 4)
     sigmaR = ifelse(determ == TRUE, 0, sigmaR)
     determ = ifelse(sigmaR == 0, TRUE, FALSE)
-    stop.rec.est <- ifelse(LH == "rockfish", 7, 3 )
+    stop.rec.est <- ifelse(LH == "rockfish", 8, 3 )
  	# Save the run information ===========================================================================
  	capture.output(list(Survey_Start = start.survey, 
                      Overfished_Selectivity_Shift = selec.adj,
@@ -120,14 +119,6 @@ for (nsim in start.n:end.n)
 	catch.dev <- c(rnorm(setup.yrs * 0.2,0,0.50),rnorm(setup.yrs*0.70,0,0.07),rnorm(setup.yrs*0.10,0,0.15))
 	CatchTot <- rep(0,setup.yrs) ;  CatchTot[1] <- 25
 	  
-	#for (a in 2:(setup.yrs-11)) { 
-	#   CatchTot[a]<- CatchTot[a-1]*1.1 
-	#       if (CatchTot[a-1]*1.1 > 1000 ) { 
-	#           CatchTot[a] <- 1000 }  
-	#}
-	#for (a in (setup.yrs-10):setup.yrs) { 
-	#   CatchTot[a]<- CatchTot[a-1]*0.97 
-	#}
 
     for (a in 2:(setup.yrs-25)) { 
        CatchTot[a]<- CatchTot[a-1]*1.2 
@@ -141,9 +132,14 @@ for (nsim in start.n:end.n)
        CatchTot[(setup.yrs-5):(setup.yrs)]<- CatchTot[(setup.yrs-6)]*1 #0.25
     #}
 	  
-	CatchTot     <- round(CatchTot,0)    
-	CatchTot.err <- round(CatchTot+CatchTot*catch.dev,0)
-	catch   <- c(rep(0,pre.fishery.yrs),CatchTot.err)
+    #Constant Catch
+    CatchTot[1:setup.yrs] <- 500
+
+	CatchTot    <- round(CatchTot,0)    
+    catch       <- c( rep(0,pre.fishery.yrs), CatchTot)
+
+	#CatchTot.err <- round(CatchTot+CatchTot*catch.dev,0)
+	#catch   <- c(rep(0,pre.fishery.yrs),CatchTot.err)
 	 
 	#Draw recruitment deviations----------------------------------------------------------------------------------------------------- 
 	set.seed(recruit.seed[nsim])
@@ -154,7 +150,7 @@ for (nsim in start.n:end.n)
 	autocorr[1] <- recdevs[1]  
 	for (e in 2:(total.yrs + 1)) { 
 	   autocorr[e] <- rho*autocorr[e-1]+sqrt(1-rho*rho)*recdevs[e]  }
-	#rownames(autocorr) = c(-ages:-1,0,1:(setup.yrs + project.yrs + 5))
+
 	#This will start the population in equilibrium
     if (equil) { autocorr[1:(ages+1)] <- 0 }
     	
@@ -168,14 +164,14 @@ for (nsim in start.n:end.n)
 	fsp1.vec       <- round(fsp1.start*exp(-0.5*select.sd*select.sd + select.err),0)
     fsp1.shift.vec <- round((fsp1.start + selec.adj)*exp(-0.5*select.sd*select.sd + select.err),0)
     fsp2.vec       <- sample(x = c(-3, fsp2), size = total.yrs, replace = T, prob = c(0,1))
-    select.err     <- rnorm(total.yrs, 0, 0.25)
-    fsp2.shift.vec <- round((fsp2.vec + dome.adj)*exp(-0.5*select.sd*select.sd + select.err), 0)
+    select.err     <- rnorm(total.yrs, 0, dome.sd)
+    fsp2.shift.vec <- round((fsp2.vec + dome.adj)*exp(-0.5*dome.sd*dome.sd + select.err), 1)
 
     #Variation in Natural Mortality--------------------------------------------------------------------------------------------------
     set.seed(m.seed[nsim])
-    m.devvec <- rnorm(total.yrs, 0, m.sd)#round(rlnorm(total.yrs, meanlog=(log(m)-0.5*m.sd^2), sdlog=m.sd),3) 
+    m.devvec <- rnorm(total.yrs, 0, m.sd)
     #Apply autocorrelation in the annual variation
-    rho       <- 1/sqrt(2) #0.50
+    rho       <- 1/sqrt(2) 
     m.auto    <- numeric(total.yrs)
     m.auto[1] <- m.devvec[1] 
     for (e in 2:total.yrs){
@@ -196,7 +192,7 @@ for (nsim in start.n:end.n)
     #cv.1.prior <- round(rnorm(1, CV1, 0.50),3)
     #cv.2.prior <- round(rnorm(1, CV2, 0.50),3)
     m.prior    <- round(runif(1,  m -  m *0.25,  m + m*0.25),3) 
-    lmin.prior <- L1 #round(runif(1, L1 - L1 *0.10, L1 + L1 *0.10),3)
+    lmin.prior <- L1 
     lmax.prior <- round(runif(1, L2f- L2f*0.10, L2f + L2f*0.10),3)
     k.prior    <- round(runif(1, kf - kf *0.10, kf  + kf *0.10),3)
     cv1.prior  <- round(runif(1, CV1- CV1*0.10, CV1 + CV1*0.10),3)
@@ -212,14 +208,11 @@ for (nsim in start.n:end.n)
 
 	# Create the operating model historical population ---------------------------------------------------------------------
 	setwd(om)
-	y = setup.yrs + pre.fishery.yrs 
+	y = setup.yrs + pre.fishery.yrs - 1
 	OM = OM.run.1 = TRUE
     fix.q = ifelse(OM ==TRUE, 2, 0)
-    #fsp1.om[1:y] <- fsp1.start
     fsp1 <- fsp1.start
-	#n.devs = length(autocorr[1:y])
-	#write.devs = cbind(c((-1*pre.fishery.yrs+1):1,0, 1:(y - pre.fishery.yrs)), autocorr[1:y])
-    #write.devs = cbind(c((-1*ages):-1, 0, 1:(y - pre.fishery.yrs + 4)), autocorr[1:(y + 6)])
+
     write.devs = cbind(c(1:(ages-1), ages:y), autocorr[1:y])
     n.devs = dim(write.devs)[1]
 
@@ -236,12 +229,14 @@ for (nsim in start.n:end.n)
     full.bias.est  <- start.bias.est + 15
 
     #harvest control rule
-    hcr.high = 0.011
-    hcr.low  = 0.01
+    #hcr.high = 0.011
+    #hcr.low  = 0.01
+    hcr.high = ctl.rule.tgt
+    hcr.low = ctl.rule.thres
 
 	# This is the constant added to the proportional composition data
 	add.const  = 0
-	boot.files = 3 # Create a true, perfect, bootstrapped data set
+	boot.files = 3  # Create a true, perfect, bootstrapped data set
     end.phase  = 1  # Only estimate a R0 value that makes the depletion survey true
     est.R0 = 1
     m.phase = 5
@@ -298,6 +293,7 @@ for (nsim in start.n:end.n)
     OM.run.1 = FALSE
     writeCtl.om(ctl = "om.ctl", y = y)
     do.forecast = 3
+    #buffer = 1 #0.75
     writeForecast(forecast = "forecast.ss", y = y)
     if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
     if (!tantalus) { shell("ss3.exe -nohess > test.txt 2>&1")  }
@@ -329,37 +325,6 @@ for (nsim in start.n:end.n)
     #Start the projection loop
     ###################################################################################################################
  	for (y in (pre.fishery.yrs + setup.yrs):total.yrs) {
-
-
-        #Change the data levels based upon the status and data scenario
-        if (decl.overfished  == TRUE) {
-            hcr.high = 0.011
-            hcr.low  = 0.01
-
-            if (data.scenario == "ds3" || data.scenario == "ds4" || data.scenario == "ds7") {
-                f.len.samp[y] <- floor(0.20 * f.len.samp[y])
-                s.len.samp[y] <- s.len.samp[y]
-                f.age.samp[y] <- floor(0.20 * f.age.samp[y])
-                s.age.samp[y] <- s.age.samp[y]
-            }
-            if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds2" ) {
-                f.len.samp[y] <- f.len.samp[y]
-                s.len.samp[y] <- s.len.samp[y]
-                f.age.samp[y] <- f.age.samp[y]
-                s.age.samp[y] <- s.age.samp[y]
-            }
-            if (data.scenario == "ds5" || data.scenario == "ds6"){
-                f.len.samp[y] <- 0
-                #s.len.samp[y] <- 0
-                f.age.samp[y] <- 0
-                #s.age.samp[y] <- 0
-            }
-        }
-
-        if (data.scenario == "ds5" || data.scenario == 'ds6') {
-            need.blocks = FALSE
-            block.num = block.fxn = 0 }
- 		
  		do.ass = y
         if(LH == "rockfish") { 
             do.ass = y - 2
@@ -370,101 +335,6 @@ for (nsim in start.n:end.n)
             do.ass = y 
             if (setup.yrs == 50) { do.ass = y - 2 }
         } 
-
-    	##################################################################
- 		#Operating Model
- 		##################################################################
- 		if (do.ass %% 4 == 0 & counter > 0){
- 			# do not have a depl survey
- 			# fix the R0 at the estimated initial R0
- 			# check how the samples sizes are set during this period to ensure reduction
- 			setwd(om)
- 			OM = TRUE
-            fix.q = ifelse(OM ==TRUE, 2, 0)
-
-            write.devs = cbind(1:y, autocorr[1:y])
-            n.devs = dim(write.devs)[1]
-			#survey = rep(5000, length(start.survey:(y-pre.fishery.yrs)))
-            survey = rep(5000, length(start.survey:y))
-
-            #Selectivity shift while overfished
-            if (decl.overfished){
-                fsp1.vec[(y-3):y] = fsp1.shift.vec[(y-3):y] 
-                fsp2.vec[(y-3):y] = fsp2.shift.vec[(y-3):y]}
-
-
-			# Set up the bias adjustment parameters ----------------------------------------------------------------------------------
-			main.rec.start <-  1
-			main.rec.end   <-  y           
-			start.bias     <- -2 
-			full.bias      <- -1 
-			last.bias      <-  y       
-			last.no.bias   <-  y+1
-			start.devs     <-  0
-			max.bias.adj   <-  1 #0 #when no devs this results in no correction #1 # full bias adjustment = ry*exp(-0.5*sigmaR^2 + recdev)
-				
-			# This is the constant added to the proportional composition data
-			add.const  = 0
-            est.R0 = 1
-
-    		writeDat(dat = "om.dat", y = y, survey , fore.catch = catch)
-    		data = NULL
-    		dat <- SS_readdat(paste(om,"/om.dat",sep=""))
-    		dat$Nsurveys <- 1 
-    		dat$fleetnames <- c("Fishery", "Survey")
-    		dat$areas <- c(1,1)
-    		dat$surveytiming <- c(0.5, 0.5) 
-    		dat$N_cpue <- dat$N_cpue - 1 #length(survey)
-    		dat$CPUEinfo <- dat$CPUEinfo[1:2,]
-    		dat$CPUE <- dat$CPUE[1:dat$N_cpue,]
-    		SS_writedat(datlist=dat, outfile=paste(om,"/om.dat",sep=""),overwrite=TRUE,verbose=TRUE)
-
- 			starter <- SS_readstarter(file=paste(om,"/starter.ss",sep=""))
-    		starter$last_estimation_phase <- 0
-    		SS_writestarter(starter,dir=paste(om,"/",sep=""),file="starter.ss", overwrite=TRUE,verbose=TRUE)
-    		#Remove the depletion survey from the control file and set the new estimated R0 value
-    		get.forecast = TRUE
- 			writeCtl.om(ctl = "om.ctl", y = y)
-            #do.true.fspr  = TRUE
-    		#fspr.input =0.75*fspr.om # ifelse(LH == "rockfish", 0.02, 0.10)#0.75*fspr.om
-            buffer = 0.75
-            do.forecast = 3
-    		writeForecast(forecast = "forecast.ss", y = y)
-    		if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
-    		if (!tantalus) { shell("ss3.exe -nohess > test.txt 2>&1")  }
-
-    		rep.new   <- readLines(paste(om, "/Report.sso", sep=""))
-    		rep.out   <- Rep_Summary(rep.new, y, pre.fishery.yrs, do.forecast)
-
-            check.depl<- rep.out$Depl[y]
-            if (check.depl > bio.target){
-                #fspr.input = 0.95*fspr.om # ifelse(LH == "rockfish", 0.05, 0.20)#fspr.om
-                buffer = 0.95
-                hcr.high = ctl.rule.tgt
-                hcr.low  = ctl.rule.thres
-                writeForecast(forecast = "forecast.ss", y = y)
-                if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
-                if (!tantalus) { shell("ss3.exe -nohess > test.txt 2>&1")  }
-                rep.new   <- readLines(paste(om, "/Report.sso", sep=""))
-                rep.out   <- Rep_Summary(rep.new, y, pre.fishery.yrs, do.forecast)
-            }
-            
-            ind <- seq(y-2, y, 2)
-            if (data.scenario == "ds0") { ind = seq(y-3, y, 2)}
-            index     <- c(index, Do_Survey(file = rep.new, ind , survey.err))
-            SSB [1:y]   <- rep.out$SB
-            Ry  [1:(y-1)]  <- rep.out$Recruits
-            depl[1:y]  <- rep.out$Depl
-            ofl.true[(y+1):(y+4)] <- rep.out$OFL
-            acl.true[(y+1):(y+4)] <- rep.out$ACL
-
-            file.rename(paste(om,"/Report.sso",sep =""), paste(om,"/Report",nsim,"_",y,".sso",sep ="")) 
-            file.copy(paste(om,"/data.ss_new",sep =""), paste(om,"/data",nsim,"_",y,".ss_new",sep =""), overwrite = TRUE) 
-            file.copy(paste(om,"/om.dat",sep =""), paste(om,"/om",nsim,"_",y,".dat",sep =""), overwrite = TRUE)
-            file.copy(paste(om,"/om.ctl",sep =""), paste(om,"/om",nsim,"_",y,".ctl",sep =""), overwrite = TRUE) 
-            file.copy(paste(om,"/forecast.ss",sep =""), paste(om,"/forecast",nsim,"_",y,".ss",sep =""), overwrite = TRUE)
-            file.copy(paste(om,"/Forecast-report.sso",sep =""), paste(om,"/Forecast-report",nsim,"_",y,".sso",sep =""), overwrite = TRUE) 
- 		}
 
  		#################################################################
     	#Estimation Model
@@ -484,9 +354,9 @@ for (nsim in start.n:end.n)
     			start.bias     <- start.bias.est 
         		full.bias      <- full.bias.est  
 				last.bias      <- y - stop.rec.est 
-        		last.no.bias   <- ifelse( LH == "rockfish", y-6 , y-4 ) 
-        		main.rec.end   <- y 
-        		max.bias.adj   <- max.bias.adj.est
+        		last.no.bias   <- ifelse( LH == "rockfish", y-7 , y-5 ) 
+        		main.rec.end   <- y - 1
+        		max.bias.adj   <- ifelse(determ == FALSE, max.bias.adj.est, 0.80)
         	}
 
     		if ( counter == 1){
@@ -496,8 +366,8 @@ for (nsim in start.n:end.n)
                                             start.survey - ages - floor(ages/2))
 				full.bias      <- start.survey - floor(ages/2) 
 				last.bias      <- y - stop.rec.est 
-        		last.no.bias   <- y 
-        		main.rec.end   <- y 
+        		last.no.bias   <- y - 1
+        		main.rec.end   <- y - 1
 				max.bias.adj   <- 0.80 	  
             }
 
@@ -516,16 +386,13 @@ for (nsim in start.n:end.n)
 			if (counter == 1){
 				dat <- NULL
                 dat <- SS_readdat(paste(run,"/", file.type ,nsim,"_", y,".ss",sep=""))
-    			dat$catch[,1] <- catch[1:y]#[(pre.fishery.yrs +1):y]
+    			dat$catch[,1] <- catch[1:(y-1)]
     			dat$add_to_comp <- 0.00001
-                #dat$ageerror[2,] <- rep(0.10, ages)
-                #This value is just a filler, the model will be rerun below with the estimated and adjusted value
-                #fspr.input = 0.95*fspr.om
-                buffer = 0.95
+                #buffer = 1 #0.95
                 hcr.high = ctl.rule.tgt
                 hcr.low  = ctl.rule.thres
-                dat$agecomp = Get_Samps(data.type = "age", year.vec = (pre.fishery.yrs + 1): y )
-                dat$lencomp = Get_Samps(data.type = "len", year.vec = (pre.fishery.yrs + 1): y )
+                dat$agecomp = Get_Samps(data.type = "age", year.vec = (pre.fishery.yrs + 1): (y - 1) )
+                dat$lencomp = Get_Samps(data.type = "len", year.vec = (pre.fishery.yrs + 1): (y - 1) )
                 # Read the expected values and generate my own survey data
                 dat$CPUE[,4] <- index
 			}
@@ -533,25 +400,22 @@ for (nsim in start.n:end.n)
     			dat.new <- dat.old <- dat <- NULL
     			dat.new <- SS_readdat(paste(run,"/", file.type, nsim,"_", y,".ss",sep=""))
     			dat.old <- SS_readdat(paste(run,"/", file.type ,nsim,"_", y-4,".ss",sep=""))
-    			dat.old$endyr <- dat.new$endyr
-    			dat.old$N_catch <- dat.new$N_catch
-    			dat.old$catch <- cbind(catch[1:y], dat.new$catch[,2:3])#cbind(catch[(pre.fishery.yrs+1):y], dat.new$catch[,2:3])
+    			dat.old$endyr    <- dat.new$endyr
+    			dat.old$N_catch  <- dat.new$N_catch
+    			dat.old$catch    <- cbind(catch[1:(y-1)], dat.new$catch[,2:3])
     		
-                dat.old$N_cpue <- dat.new$N_cpue
-    			#ind = (dim(dat.new$CPUE)[1]-1):(dim(dat.new$CPUE)[1])
-    			#dat.old$CPUE <- rbind(dat.old$CPUE, dat.new$CPUE[ind,])
+                dat.old$N_cpue   <- dat.new$N_cpue
                 dat.new$CPUE[,4] <- index
-                dat.old$CPUE <- dat.new$CPUE
+                dat.old$CPUE     <- dat.new$CPUE
     			dat.old$add_to_comp <- 0.00001
-                #dat.old$ageerror[2,] <- rep(0.10, ages)
-                dat.new$agecomp = Get_Samps(data.type = "age", year.vec = (y - 3): y )
-                dat.new$lencomp = Get_Samps(data.type = "len", year.vec = (y - 3): y )
+                dat.new$agecomp     <- Get_Samps(data.type = "age", year.vec = (y - 4): (y - 1) )
+                dat.new$lencomp     <- Get_Samps(data.type = "len", year.vec = (y - 4): (y - 1) )
 
     			dat.old$N_lencomp <- dat.new$N_lencomp
     			ind = dat.new$lencomp$FltSvy == 1 ; ind.old.1 = dat.old$lencomp$FltSvy == 1
                 if ( sum(ind) != sum(ind.old.1) ) { ind1 = (sum(ind)-3):sum(ind) }
-                if ( sum(ind) == sum(ind.old.1) ) { ind1 = 0}
-    			#ind1 = ifelse(sum(ind) != sum(ind.old.1), (sum(ind)-3):sum(ind), 0)
+                if ( sum(ind) == sum(ind.old.1) ) { ind1 = 0 }
+
     			ind = dat.new$lencomp$FltSvy == 2 ; ind.old.2 = dat.old$lencomp$FltSvy == 2
                 ind2 = (length(ind)-1):length(ind)
                 if (sum(ind1) != 0){
@@ -578,17 +442,16 @@ for (nsim in start.n:end.n)
 
     			dat = dat.old
 
-                if(decl.overfished == FALSE) { 
-                    #fspr.input = 0.95*fspr.est }#ifelse(LH == "rockfish", 0.05, 0.20) }#fspr.est }
-                    buffer = 0.95
-                    hcr.high = ctl.rule.tgt
-                    hcr.low = ctl.rule.thres }#0.95 }
+                #if(decl.overfished == FALSE) { 
+                #    buffer = 1 #0.95
+                #    hcr.high = ctl.rule.tgt
+                #    hcr.low = ctl.rule.thres }
     		}
 
             SS_writedat(datlist=dat,outfile=paste(run,"/", file.type,nsim,"_",y,".ss",sep=""),overwrite=TRUE,verbose=TRUE)
-            if(decl.overfished == TRUE) { 
-                buffer = 0.75  }
-            get.forecast = FALSE #do.true.fspr  = FALSE
+            #if(decl.overfished == TRUE) { 
+            #    buffer = 1 } #0.75  }
+            get.forecast = FALSE 
             do.forecast = 3 #This switches on and off the forecast, forecast catches coincide with btarget
             writeForecast(forecast = "forecast.ss", y = y)
 
@@ -600,12 +463,12 @@ for (nsim in start.n:end.n)
     		SS_writestarter(starter,dir=paste(run,"/",sep=""),file="starter.ss", overwrite=TRUE,verbose=TRUE)
 		
     		#Run SS
-    		if (y <= (pre.fishery.yrs + setup.yrs + 9)){
+    		if (counter <= 2 ){
     			if (tantalus)  { system("./SS3  > test.txt 2>&1")  }
     			if (!tantalus) { shell("ss3.exe > test.txt 2>&1")  }
     		}
 
-    		if (y > (pre.fishery.yrs + setup.yrs + 9)){
+    		if (counter > 2){
     			if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
     			if (!tantalus) { shell("ss3.exe -nohess > test.txt 2>&1")  }
     		}
@@ -620,11 +483,11 @@ for (nsim in start.n:end.n)
         	  starter.file = SS_readstarter(paste(run, "/starter.ss", sep = ""))
         	  starter.file$jitter_fraction = 0.10
         	  SS_writestarter(starter.file, paste(directory, sep = ""), overwrite = T )
-        	  if (y <= (pre.fishery.yrs + setup.yrs + 9)){
+        	  if (counter <= 2){
              	if (tantalus == T) { system("./SS3 > test.txt 2>&1")  }
         	  	if (tantalus == F) { shell("ss3.exe > test.txt 2>&1")  }
         	  }
-        	  if (y > (pre.fishery.yrs + setup.yrs + 9)){
+        	  if (counter > 2){
         	  	if (tantalus == T) { system("./SS3 -nohess > test.txt 2>&1")  }
         	  	if (tantalus == F) { shell("ss3.exe -nohess > test.txt 2>&1")  }
         	  }
@@ -643,22 +506,22 @@ for (nsim in start.n:end.n)
                 starter.file = SS_readstarter(paste(run, "/starter.ss", sep = ""))
                 starter.file$jitter_fraction = 0.10
                 SS_writestarter(starter.file, paste(directory, sep = ""), overwrite = T )
-                if (y <= (pre.fishery.yrs + setup.yrs + 9)){
+                if (counter <= 2){
                     if (tantalus == T) { system("./SS3 > test.txt 2>&1")  }
                     if (tantalus == F) { shell("ss3.exe > test.txt 2>&1")  }
                 }
-                if (y > (pre.fishery.yrs + setup.yrs + 9)){
+                if (counter > 2){
                     if (tantalus == T) { system("./SS3 -nohess > test.txt 2>&1")  }
                     if (tantalus == F) { shell("ss3.exe -nohess > test.txt 2>&1")  }
                 }
             }
 	
-			if (determ == FALSE & y <= (pre.fishery.yrs + setup.yrs + 9)){
+			if (determ == FALSE & counter <= 2){
                 if(rerun == 2){
                     start.bias <- start.bias.est
                     full.bias <- full.bias.est
                     last.bias <- y - stop.rec.est
-                    last.no.bias <- y
+                    last.no.bias <- y -1
                     max.bias.adj <- max.bias.adj.est
                     main.rec.end <- main.rec.end.est
                 }
@@ -668,52 +531,54 @@ for (nsim in start.n:end.n)
                     rep.bias     <- SS_output(run, covar = TRUE, printstats = FALSE)
                     new.bias     <- SS_fitbiasramp(rep.bias, 
                                         startvalues = c(start.bias, full.bias , last.bias, last.no.bias ,max.bias.adj))
-                    start.bias   <- start.bias.est <- new.bias$df[1,1]
-                    full.bias    <- full.bias.est  <- new.bias$df[2,1]
-                    last.bias    <- last.bias.est <- new.bias$df[3,1] #y - stop.rec.est 
+                    start.bias   <- start.bias.est   <- new.bias$df[1,1]
+                    full.bias    <- full.bias.est    <- new.bias$df[2,1]
+                    last.bias    <- last.bias.est    <- new.bias$df[3,1] #y - stop.rec.est 
                     last.no.bias <- last.no.bias.est <- new.bias$df[4,1] #y 
                     max.bias.adj <- max.bias.adj.est <-new.bias$df[5,1]
-                    main.rec.end <- main.rec.end.est <- y 
+                    main.rec.end <- main.rec.end.est <- y - 1
                 }
 
                 #Rewrite the control file with the new bias adjustment values
                 writeCtl(ctl = "est.ctl", y = y)
                 rep.new   <- readLines(paste(run, "/Report.sso", sep=""))
-                rep.out   <- Rep_Summary(rep.new, y, pre.fishery.yrs, do.forecast)
-                check.depl <- rep.out$Depl[y] 
-                if (decl.overfished == FALSE && check.depl < over.thres){
-                    buffer = 0.75
-                    hcr.high = 0.011
-                    hcr.low  = 0.01
-                    writeForecast(forecast = "forecast.ss", y = y)
-                }  
+                temp.sb = mapply(function(x) as.numeric(strsplit(rep.new[grep(paste("SPB_",x,sep=""),rep.new)]," ")[[1]][3]), x = 1:y)
+                #rep.out   <- Rep_Summary(rep.new, y, pre.fishery.yrs, do.forecast)
+                check.depl <- temp.sb[y]/temp.sb[1] #rep.out$Depl[y] 
+                #if (decl.overfished == FALSE && check.depl < over.thres){
+                #    buffer = 1 #0.75
+                #    #hcr.high = 0.011
+                #    #hcr.low  = 0.01
+                #    writeForecast(forecast = "forecast.ss", y = y)
+                #}  
                 #Rerun the model with the new bias values
                 if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
                 if (!tantalus) { shell("ss3.exe -nohess > test.txt 2>&1")  }                    
         	}
 
             rep.new   <- readLines(paste(run, "/Report.sso", sep=""))
-            rep.out   <- Rep_Summary(rep.new, y, pre.fishery.yrs, do.forecast)
-            check.depl<- rep.out$Depl[y]
-            if (decl.overfished == FALSE && counter != 1 && check.depl < over.thres){
-                buffer = 0.75
-                hcr.high = 0.011
-                hcr.low  = 0.01
-                writeForecast(forecast = "forecast.ss", y = y)
-                if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
-                if (!tantalus) { shell("ss3.exe -nohess > test.txt 2>&1")  } 
-            }
+            temp.sb = mapply(function(x) as.numeric(strsplit(rep.new[grep(paste("SPB_",x,sep=""),rep.new)]," ")[[1]][3]), x = 1:y)
+            #rep.out   <- Rep_Summary(rep.new, y, pre.fishery.yrs, do.forecast)
+            check.depl<- temp.sb[y]/temp.sb[1] #rep.out$Depl[y]
+            #if (decl.overfished == FALSE && counter != 1 && check.depl < over.thres){
+            #    buffer = 1 #0.75
+            #    #hcr.high = 0.011
+            #    #hcr.low  = 0.01
+            #    writeForecast(forecast = "forecast.ss", y = y)
+            #    if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
+            #    if (!tantalus) { shell("ss3.exe -nohess > test.txt 2>&1")  } 
+            #}
 
             #Determine if the stock is rebuilt and adjust the harvest if so
-            if (decl.overfished == TRUE && check.depl > bio.target){
-                #Change harvest rate to fspr
-                buffer = 0.95
-                hcr.high = ctl.rule.tgt
-                hcr.low  = ctl.rule.thres
-                writeForecast(forecast = "forecast.ss", y = y)
-                if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
-                if (!tantalus) { shell("ss3.exe -nohess > test.txt 2>&1")  } 
-            }
+            #if (decl.overfished == TRUE && check.depl > bio.target){
+            #    #Change harvest rate to fspr
+            #    buffer = 1 #0.95
+            #    hcr.high = ctl.rule.tgt
+            #    hcr.low  = ctl.rule.thres
+            #    writeForecast(forecast = "forecast.ss", y = y)
+            #    if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
+            #    if (!tantalus) { shell("ss3.exe -nohess > test.txt 2>&1")  } 
+            #}
 
 		
 			#Read the report file and save values
@@ -721,14 +586,14 @@ for (nsim in start.n:end.n)
 			rep.out   <- Rep_Summary(rep.new, y, pre.fishery.yrs, do.forecast)
             fspr.est  <- as.numeric(strsplit(rep.new[grep(paste("SPR_Btgt",sep=""),rep.new)]," ")[[1]][3])
         	ind       <- y - 1 
-        	TotBio[1:ind,counter]    <- rep.out$TotBio
+        	#TotBio[1:ind,counter]    <- rep.out$TotBio
         	Recruits[1:ind,counter]  <- rep.out$Recruits
         	
-        	OFL[(y+1):(y+4)]      <- rep.out$OFL
-        	ForeCat[(y+1):(y+4)]  <- mapply(function(x) ForeCat = ifelse(rep.out$ForeCatch[x] < 1, 10, rep.out$ForeCatch[x]), x = 1:4)
+        	OFL[y:(y+3)]          <- rep.out$OFL
+        	ACL[y:(y+3)]          <- mapply(function(x)  ifelse(rep.out$ACL[x] < 5, 5, rep.out$ACL[x]), x = 1:4)
         	FSPR[,counter]        <- rep.out$FSPR
         	Fmult[,counter]       <- fspr.est
-        	M.store[,counter]     <- rep.out$M
+        	M.store[1,counter]    <- rep.out$M
         	Lmin.store[,counter]  <- rep.out$Lmin
         	Lmax.store[,counter]  <- rep.out$Lmax
         	k.store[,counter]     <- rep.out$k
@@ -743,12 +608,11 @@ for (nsim in start.n:end.n)
         	Bratio[1:ind,counter] <- rep.out$Depl
             grad.out[counter]     <- rep.out$gradient
             grad.check[counter]   <- grad.rerun
-            #fsp1.est[,counter]    <- ifelse(need.blocks == F, 0, rep.out$F.selex.1.adj)
             fsp2.est[,counter]    <- ifelse(need.blocks == F, 0, rep.out$F.selex.2.adj)
 
-        	Est[[1]] <- TotBio
+        	Est[[1]] <- NULL #TotBio
         	Est[[2]] <- OFL
-        	Est[[3]] <- ForeCat
+        	Est[[3]] <- ACL
         	Est[[4]] <- Fmult
         	Est[[5]] <- FSPR
         	Est[[6]] <- M.store
@@ -761,16 +625,18 @@ for (nsim in start.n:end.n)
         	Est[[13]]<- Lmin.store
         	Est[[14]]<- Lmax.store
         	Est[[15]]<- k.store
-            Est[[16]]<- fsp2.est #fsp1.est
+            Est[[16]]<- fsp2.est 
             Est[[17]]<- recovered.est
             Est[[18]]<- h.store
+            Est[[19]]<- grad.out
+            Est[[20]]<- grad.check
 
-       		names(Est) <- c("TotBio","OFL","ForeCat","Fmult","FSPR","M.store","R0.out","SB","Bratio","F.selex","S.selex","Recruits",
-                          	 "Lmin.store", "Lmax.store", "k.store",  "fsp2.est","recovered.est", "h")
+       		names(Est) <- c("TotBio","OFL","ACL","Fmult","FSPR","M.store","R0.out","SB","Bratio","F.selex","S.selex","Recruits",
+                          	 "Lmin.store", "Lmax.store", "k.store",  "fsp2.est","recovered.est", "h", 'grad.out', 'grad.check')
 	        save(Est, file=estimates)
 
             #Set the ACLs for the next four years 
-            catch[(y+1):(y+4)] <- ForeCat[(y+1):(y+4)] 
+            catch[y:(y+3)] <- ACL[y:(y+3)] 
     
             #Rename the ctl and data files
             file.rename(paste(run,"/Report.sso",sep =""), paste(run,"/Report",nsim,"_",y,".sso",sep ="")) 
@@ -778,7 +644,8 @@ for (nsim in start.n:end.n)
             file.rename(paste(run,"/forecast.ss",sep =""), paste(run,"/forecast",nsim,"_",y,".ss",sep =""))
 
             #Determine is the stock if assessed overfished for the first time
-            if (decl.overfished == FALSE & Bratio[y,counter] < over.thres) {
+            #if (decl.overfished == FALSE & Bratio[y,counter] < over.thres) {
+            if (counter == 1) {
                 decl.overfished = TRUE 
                 overfished.counter = 1 + overfished.counter 
                 need.blocks = TRUE
@@ -786,12 +653,12 @@ for (nsim in start.n:end.n)
                 if (data.scenario == "ds5" || data.scenario == "ds6") {
                     need.blocks = FALSE
                     block.number = block.fxn = 0 }
-                decl.yr = y + 1
+                decl.yr = y
                 recovered.est[y] <- decl.yr
             } 
 
             if(decl.overfished == TRUE){
-                end.yr = y + 4
+                end.yr = y + 3
                 block.yrs = c(decl.yr, end.yr)
                 if(Bratio[y,counter] >= bio.target){
                     decl.overfished = FALSE 
@@ -802,6 +669,124 @@ for (nsim in start.n:end.n)
             }           
 
 		} #end assessment loop
+        ############################################################################################################
+        ############################################################################################################
+
+        #Change the data levels based upon the status and data scenario
+        if (decl.overfished  == TRUE) {
+
+            if (data.scenario == "ds3" || data.scenario == "ds4" || data.scenario == "ds7") {
+                f.len.samp[y] <- floor(0.20 * f.len.samp[y])
+                s.len.samp[y] <- s.len.samp[y]
+                f.age.samp[y] <- floor(0.20 * f.age.samp[y])
+                s.age.samp[y] <- s.age.samp[y]
+            }
+            if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds2" ) {
+                f.len.samp[y] <- f.len.samp[y]
+                s.len.samp[y] <- s.len.samp[y]
+                f.age.samp[y] <- f.age.samp[y]
+                s.age.samp[y] <- s.age.samp[y]
+            }
+            if (data.scenario == "ds5" || data.scenario == "ds6"){
+                f.len.samp[y] <- 0
+                f.age.samp[y] <- 0
+            }
+        }
+
+        if (data.scenario == "ds5" || data.scenario == 'ds6') {
+            need.blocks = FALSE
+            block.num = block.fxn = 0 }
+
+
+        ############################################################################################################
+        ############################################################################################################
+        #Operating Model
+        ############################################################################################################
+        ############################################################################################################
+
+        setwd(om)
+        OM = TRUE
+        fix.q = ifelse(OM ==TRUE, 2, 0)
+        write.devs = cbind(1:y, autocorr[1:y])
+        n.devs = dim(write.devs)[1]
+        survey = rep(5000, length(start.survey:y))
+
+        #Selectivity shift while overfished
+        if (decl.overfished){
+            fsp1.vec[y] = fsp1.shift.vec[y] 
+            fsp2.vec[y] = fsp2.shift.vec[y]
+            #fsp1.vec[(y-3):y] = fsp1.shift.vec[(y-3):y] 
+            #fsp2.vec[(y-3):y] = fsp2.shift.vec[(y-3):y]
+        }
+
+        # Set up the bias adjustment parameters ----------------------------------------------------------------------------------
+        main.rec.start <-  1
+        main.rec.end   <-  y -1           
+        start.bias     <- -2 
+        full.bias      <- -1 
+        last.bias      <-  y - 1      
+        last.no.bias   <-  y
+        start.devs     <-  0
+        max.bias.adj   <-  1 #0 #when no devs this results in no correction #1 # full bias adjustment = ry*exp(-0.5*sigmaR^2 + recdev)
+            
+        # This is the constant added to the proportional composition data
+        add.const  = 0
+        est.R0 = 1
+        writeDat(dat = "om.dat", y = y , survey , fore.catch = catch)
+        data = NULL
+        dat <- SS_readdat(paste(om,"/om.dat",sep=""))
+        dat$Nsurveys <- 1 
+        dat$fleetnames <- c("Fishery", "Survey")
+        dat$areas <- c(1,1)
+        dat$surveytiming <- c(0.5, 0.5) 
+        dat$N_cpue <- dat$N_cpue - 1 #length(survey)
+        dat$CPUEinfo <- dat$CPUEinfo[1:2,]
+        dat$CPUE <- dat$CPUE[1:dat$N_cpue,]
+        SS_writedat(datlist=dat, outfile=paste(om,"/om.dat",sep=""),overwrite=TRUE,verbose=TRUE)
+        starter <- SS_readstarter(file=paste(om,"/starter.ss",sep=""))
+        starter$last_estimation_phase <- 0
+        SS_writestarter(starter,dir=paste(om,"/",sep=""),file="starter.ss", overwrite=TRUE,verbose=TRUE)
+        #Remove the depletion survey from the control file and set the new estimated R0 value
+        get.forecast = TRUE
+        writeCtl.om(ctl = "om.ctl", y = y)
+        #buffer = 1 #0.75
+        do.forecast = 3
+        writeForecast(forecast = "forecast.ss", y = y)
+
+        if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
+        if (!tantalus) { shell("ss3.exe -nohess > test.txt 2>&1")  }
+
+        rep.new   <- readLines(paste(om, "/Report.sso", sep=""))
+        temp.sb = mapply(function(x) as.numeric(strsplit(rep.new[grep(paste("SPB_",x,sep=""),rep.new)]," ")[[1]][3]), x = 1:y)       
+        #rep.out   <- Rep_Summary(rep.new, y, pre.fishery.yrs, do.forecast)
+        check.depl<- temp.sb[y]/temp.sb[1] #rep.out$Depl[y]
+        if (check.depl > bio.target){
+            #buffer = 1 #0.95
+            #hcr.high = ctl.rule.tgt
+            #hcr.low  = ctl.rule.thres
+            writeForecast(forecast = "forecast.ss", y = y)
+            if (tantalus)  { system("./SS3 -nohess > test.txt 2>&1")  }
+            if (!tantalus) { shell("ss3.exe -nohess > test.txt 2>&1")  }
+        }
+
+        rep.new        <- readLines(paste(om, "/Report.sso", sep=""))
+        if (y %% 2 == 0){
+            index          <- c(index, Do_Survey(file = rep.new, y , survey.err))
+        }  
+        SSB [y]        <- as.numeric(strsplit(rep.new[grep(paste("SPB_",y,sep=""),rep.new)]," ")[[1]][3])
+        Ry  [y-1]      <- as.numeric(strsplit(rep.new[grep(paste(1, y - 1,"TIME",sep=" "),rep.new)]," ")[[1]][8])
+        depl[y]        <- SSB[y]/SB0
+        ofl.true[y+1]  <- as.numeric(strsplit(rep.new[grep(paste("OFLCatch_", y + 1,sep=""),rep.new)], " ")[[1]][3])
+        acl.true[y+1]  <- as.numeric(strsplit(rep.new[grep(paste("ForeCatch_",y + 1,sep=""),rep.new)], " ")[[1]][3])
+
+        if (y %% 10 == 0){
+            file.rename(paste(om,"/Report.sso",sep =""), paste(om,"/Report",nsim,"_",y,".sso",sep ="")) 
+            file.copy(paste(om,"/data.ss_new",sep =""), paste(om,"/data",nsim,"_",y,".ss_new",sep =""), overwrite = TRUE) 
+            file.copy(paste(om,"/om.dat",sep =""), paste(om,"/om",nsim,"_",y,".dat",sep =""), overwrite = TRUE)
+            file.copy(paste(om,"/om.ctl",sep =""), paste(om,"/om",nsim,"_",y,".ctl",sep =""), overwrite = TRUE) 
+            file.copy(paste(om,"/forecast.ss",sep =""), paste(om,"/forecast",nsim,"_",y,".ss",sep =""), overwrite = TRUE)
+            file.copy(paste(om,"/Forecast-report.sso",sep =""), paste(om,"/Forecast-report",nsim,"_",y,".sso",sep =""), overwrite = TRUE) 
+        }
 
         if (sum(recovered.om) == 0){
             recovered.om[y] <- ifelse(depl[y] > bio.target, y, 0)
@@ -821,9 +806,10 @@ for (nsim in start.n:end.n)
     	Proj[[12]]<- fsp1.vec
         Proj[[13]]<- fsp2.vec
         Proj[[14]]<- recovered.om
+        Proj[[15]]<- index
 
     	names(Proj) <- c ("SSB", "Depl","R0","Ry", "catch","ofl.true", "acl.true", "f.len.samp","s.len.sam","f.age.samp",
-    					"s.age.samp", "peak", "dome", "recovered.om")
+    					"s.age.samp", "peak", "dome", "recovered.om", "index")
     	save(Proj, file = projections)
  	} #end projection loop
 } #end sim loop

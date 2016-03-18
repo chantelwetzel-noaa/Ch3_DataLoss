@@ -110,7 +110,7 @@ if (LH == "rockfish" ) {
  over.thres <- 0.25
  
  #Depletion value in year 50 of the fishery ===========================================================================
- final.depl <- 0.10
+ final.depl <- 0.15
 }
 
 

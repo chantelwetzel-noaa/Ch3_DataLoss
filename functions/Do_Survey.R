@@ -5,5 +5,6 @@ Do_Survey <- function(file, ind, survey.err){
 			  x = ind)
 
 	index  <- surv.exp * exp(survey.err[ind] - 0.5 * (survey.err[ind])^2)
+	if (file.type == "perfect") { index  <- surv.exp }
 	return(index)
 }

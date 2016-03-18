@@ -8,28 +8,30 @@
 ############################################
 
 drive = "C:"
-run.name = "March2016_FixSurv"
+run.name = ""
 LH = "rockfish"
-ds.list = c("ds1","ds4","ds2", "ds3") 
+#ds.list = c("ds1","ds4","ds6", "ds2", "ds3", "ds5") 
+ds.list = c("ds1","ds2","ds4", "ds3", "ds6", "ds5") 
 
-sim.range = c(1,50)
+sim.range = c(1, 50)
 order = c(1,2,3,4,5,6) 
-#order = c(1,4,2,3) #c(2,1,3) #c(3,1,2,4)
 data.scenario = ""
 setup.yrs = 50
+
+set.quant = c(0.10, 0.50, 0.90)
+
 
 #Dimensions by life-history
 git.wd = "C:/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/"
 source(paste(git.wd, "/functions/LH_parameter_values.R", sep=""))
 source(paste(git.wd, "/functions/Data_Scenarios.R", sep=""))
-#source(paste(drive,":/PhD/Chapter3/code/functions/LH_parameter_values.R",sep=""))
+
 if (file.exists( file = paste(drive,"/PhD/Chapter3/", run.name, "/output", sep = "") ) == FALSE ){
   dir.create(paste0(drive,"/PhD/Chapter3/", run.name, "/output"))
 }
 
 first.ass.yr <- total.yrs - project.yrs - 1
-end.catch = first.ass.yr + 5
-if (LH == "rockfish") { end.catch = first.ass.yr + 26}
+end.catch = first.ass.yr + 26
 ass.yr = seq(first.ass.yr, total.yrs, 4)
 
 med.ssb         = array(0, dim = c(length(ds.list), total.yrs, 3))
@@ -41,7 +43,7 @@ med.acl         = array(0, dim = c(length(ds.list), total.yrs, 3))
 med.ssb.est     = array(0, dim = c(length(ds.list), total.yrs, ass.num, 3))
 med.ry.est      = array(0, dim = c(length(ds.list), total.yrs, ass.num, 3))
 med.depl.est    = array(0, dim = c(length(ds.list), total.yrs, ass.num, 3))
-med.catch.est   = array(0, dim = c(length(ds.list), total.yrs, 3))
+med.acl.est     = array(0, dim = c(length(ds.list), total.yrs, 3))
 med.ofl.est     = array(0, dim = c(length(ds.list), total.yrs, 3))
 med.m.est       = array(0, dim = c(length(ds.list), ass.num, 3))
 med.s.selex.est = array(0, dim = c(length(ds.list), 2, ass.num, 3))
@@ -72,7 +74,7 @@ med.acl.split          = array(0, dim = c(length(ds.list), total.yrs, 3))
 med.ssb.est.split      = array(0, dim = c(length(ds.list), total.yrs, ass.num, 3))
 med.ry.est.split       = array(0, dim = c(length(ds.list), total.yrs, ass.num, 3))
 med.depl.est.split     = array(0, dim = c(length(ds.list), total.yrs, ass.num, 3))
-med.catch.est.split    = array(0, dim = c(length(ds.list), total.yrs, 3))
+med.acl.est.split      = array(0, dim = c(length(ds.list), total.yrs, 3))
 med.ofl.est.split      = array(0, dim = c(length(ds.list), total.yrs, 3))
 med.m.est.split        = array(0, dim = c(length(ds.list), ass.num, 3))
 med.s.selex.est.split  = array(0, dim = c(length(ds.list), 2, ass.num, 3))
@@ -114,13 +116,17 @@ s.lens= array(0, dim = c(length(ds.list), total.yrs, sim.range[2]))
 f.ages= array(0, dim = c(length(ds.list), total.yrs, sim.range[2]))
 s.ages= array(0, dim = c(length(ds.list), total.yrs, sim.range[2]))
 peak  = array(0, dim=  c(length(ds.list), total.yrs, sim.range[2]))
+dome  = array(0, dim=  c(length(ds.list), total.yrs, sim.range[2]))
 recovery.yr = array(0, dim=  c(length(ds.list), 1,   sim.range[2]))
 om.time.over= matrix(0, length(ds.list), sim.range[2])
 
 #estimation values storage arrays  ================================================================
 ssb.est     =  array(0, dim = c(length(ds.list), total.yrs, ass.num, sim.range[2]))
+ssb0.est    =  array(0, dim = c(length(ds.list),            ass.num, sim.range[2]))
 ry.est      =  array(0, dim = c(length(ds.list), total.yrs, ass.num, sim.range[2]))
 depl.est    =  array(0, dim = c(length(ds.list), total.yrs, ass.num, sim.range[2]))
+acl.est   =  array(0, dim = c(length(ds.list), total.yrs,          sim.range[2]))
+ofl.est     =  array(0, dim = c(length(ds.list), total.yrs,          sim.range[2]))
 m.est       =  array(0, dim = c(length(ds.list),            ass.num, sim.range[2]))
 h.est       =  array(0, dim = c(length(ds.list),            ass.num, sim.range[2]))
 h.est       =  array(0, dim = c(length(ds.list),            ass.num, sim.range[2]))
@@ -130,9 +136,8 @@ cv.old.est  =  array(0, dim = c(length(ds.list),            ass.num, sim.range[2
 s.selex.est =  array(0, dim = c(length(ds.list), 6,         ass.num, sim.range[2]))
 f.selex.est =  array(0, dim = c(length(ds.list), 6,         ass.num, sim.range[2]))
 f.selex.adj.est =  array(0, dim = c(length(ds.list), 1,     ass.num, sim.range[2]))
-catch.est   =  array(0, dim = c(length(ds.list), total.yrs,   sim.range[2]))
-ofl.est     =  array(0, dim = c(length(ds.list), total.yrs,   sim.range[2]))
-ssb0.est    =  array(0, dim = c(length(ds.list), ass.num, sim.range[2]))
+
+
 yr.decl.est = array(0, dim=  c(length(ds.list), 3,   sim.range[2]))
 yr.recr.est = array(0, dim=  c(length(ds.list), 3,   sim.range[2]))
 
@@ -147,11 +152,9 @@ for (spec in 1:length(ds.list))
 {
   j = order[spec]
   data.scenario = ds.list[j]
-  #dir = paste(drive,"/PhD/Chapter3/", run.name, "/",LH,"_",data.scenario,"_sims_",sim.range[1],"_",sim.range[2],
-  #      "/save/", sep = "")
-  #dir = paste(drive,"/PhD/Chapter3/", run.name ,LH,"_",data.scenario,"_50yr_sims_dirich_",sim.range[1],"_",sim.range[2],
-  #      "/save/", sep = "")
-  dir = paste(drive,"/PhD/Chapter3/", run.name ,"/",LH,"_",data.scenario,"_50yr_sims_multinom_",sim.range[1],"_",sim.range[2],
+
+  dir = paste(drive,"/PhD/Chapter3/", run.name ,LH,"_",data.scenario,"_50yr_sims_multinom_AE_TRUE_",
+        sim.range[1],"_",sim.range[2],
         "/save/", sep = "")
   
   for (i in sim.range[1]:sim.range[2]) {
@@ -160,18 +163,21 @@ for (spec in 1:length(ds.list))
       ssb[j,,i]   = Proj$SSB[1:total.yrs]
       ry[j,,i]    = Proj$Ry[1:total.yrs]*2
       depl[j,,i]  = Proj$Depl[1:total.yrs]
-      catch[j,,i] = Proj$catch[1:total.yrs]
+      acl[j,,i]   = Proj$acl[1:total.yrs]
       ofl[j,,i]   = Proj$ofl.true[1:total.yrs]
-      #acl[j,,i]   = ofl[j,,i]*exp(qnorm(0.45, 0, 0.36))
+      # Correct the OFL for the first 4 years of the projection period
+      if (i == 1) { print("ACL catch correction being performed") }
+      acl[j,121:124,i] = Proj$ofl[121:124] * 0.75
       f.lens[j,,i]= Proj$f.len.samp
       s.lens[j,,i]= Proj$s.len.sam
       f.ages[j,,i]= Proj$f.age.samp
       s.ages[j,,i]= Proj$s.age.samp
+      dome[j,,i]  = Proj$dome
+      peak[j,,i]  = Proj$peak
       ind = Proj$recovered.om > 0
       recovery.yr[j,,i] = ifelse(sum(ind) != 0, Proj$recovered.om[ind], 0)
       om.time.over[j,i] = max(Proj$recovered.om) - first.ass.yr
       if(om.time.over[j,i] < 0) { om.time.over[j,i] = ifelse(LH == "rockfish", 101, 51) }
-      #peak[j,,i]  = Proj$peak[1:total.yrs]
   }
 
   #Save as an output file 
@@ -187,39 +193,41 @@ for (spec in 1:length(ds.list))
   om.all$s.lens   <- s.lens
   om.all$f.ages   <- f.ages
   om.all$s.ages   <- s.ages
-  #om.all$new.peak <- new.peak
+  om.all$peak     <- peak
+  om.all$dome     <- dome
+  om.all$om.time.over <- om.time.over
   save (om.all, file = om.out)
 
   #Sort out the runs that were never overfished and calculate some metrics=====================================================
   save.index = save.index.ov = 1:sim.range[2]
-  
-  #Split the never determined overfished from the correct deterimination runs===================================================
-  om.split <- list()
-  om.out.split <- paste(drive,"/PhD/Chapter3/", run.name, "/output/",LH,"_om_split", sep = "")
-  om.split$ssb    <- ssb[,,save.index]
-  om.split$ry     <- ry[,,save.index]
-  om.split$depl   <- depl[,,save.index]
-  om.split$catch  <- catch[,,save.index]
-  om.split$ofl    <- ofl[,,save.index]
-  om.split$acl    <- acl[,,save.index]
-  om.split$f.lens   <- f.lens[,,save.index]
-  om.split$s.lens   <- s.lens[,,save.index]
-  om.split$f.ages   <- f.ages[,,save.index]
-  om.split$s.ages   <- s.ages[,,save.index]
-  #om.split$new.peak <- new.peak[,,save.index]
-  om.split$ssb.no   <- ssb[,,save.index.ov]
-  om.split$ry.no    <- ry[,, save.index.ov]
-  om.split$depl.no  <- depl[,,save.index.ov]
-  om.split$catch.no <- catch[,,save.index.ov]
-  om.split$ofl.no   <- ofl[,,save.index.ov]
-  om.split$acl.no   <- acl[,,save.index.ov]
-  om.split$f.lens.no   <- f.lens[,,save.index.ov]
-  om.split$s.lens.no   <- s.lens[,,save.index.ov]
-  om.split$f.ages.no   <- f.ages[,,save.index.ov]
-  om.split$s.ages.no   <- s.ages[,,save.index.ov]
-  om.split$om.time.over<- om.time.over
-  #om.split$new.peak.no <- new.peak[,,save.index.ov]
-  save (om.split, file = om.out.split)
+  #
+  ##Split the never determined overfished from the correct deterimination runs===================================================
+  #om.split <- list()
+  #om.out.split <- paste(drive,"/PhD/Chapter3/", run.name, "/output/",LH,"_om_split", sep = "")
+  #om.split$ssb    <- ssb[,,save.index]
+  #om.split$ry     <- ry[,,save.index]
+  #om.split$depl   <- depl[,,save.index]
+  #om.split$catch  <- catch[,,save.index]
+  #om.split$ofl    <- ofl[,,save.index]
+  #om.split$acl    <- acl[,,save.index]
+  #om.split$f.lens   <- f.lens[,,save.index]
+  #om.split$s.lens   <- s.lens[,,save.index]
+  #om.split$f.ages   <- f.ages[,,save.index]
+  #om.split$s.ages   <- s.ages[,,save.index]
+  ##om.split$new.peak <- new.peak[,,save.index]
+  #om.split$ssb.no   <- ssb[,,save.index.ov]
+  #om.split$ry.no    <- ry[,, save.index.ov]
+  #om.split$depl.no  <- depl[,,save.index.ov]
+  #om.split$catch.no <- catch[,,save.index.ov]
+  #om.split$ofl.no   <- ofl[,,save.index.ov]
+  #om.split$acl.no   <- acl[,,save.index.ov]
+  #om.split$f.lens.no   <- f.lens[,,save.index.ov]
+  #om.split$s.lens.no   <- s.lens[,,save.index.ov]
+  #om.split$f.ages.no   <- f.ages[,,save.index.ov]
+  #om.split$s.ages.no   <- s.ages[,,save.index.ov]
+  #om.split$om.time.over<- om.time.over
+  ##om.split$new.peak.no <- new.peak[,,save.index.ov]
+  #save (om.split, file = om.out.split)
   
   for (i in sim.range[1]:sim.range[2]){
     est = paste(dir,"ss_ests_",i,sep="")
@@ -228,7 +236,7 @@ for (spec in 1:length(ds.list))
     ssb.est[j,,,i]     = Est$SB[,1:ass.num]
     ry.est[j,,,i]      = Est$Recruit[,1:ass.num]
     depl.est[j,,,i]    = Est$Bratio[,1:ass.num]
-    catch.est[j,,i]    = Est$ForeCat[1:total.yrs]
+    acl.est[j,,i]    = Est$ForeCat[1:total.yrs]
     ofl.est[j,,i]      = Est$OFL[1:total.yrs]
     m.est[j,,i]        = Est$M.store[1,1:ass.num]
     h.est[j,,i]        = Est$h[1,1:ass.num]
@@ -256,7 +264,7 @@ for (spec in 1:length(ds.list))
   est.all$ssb.est  <- ssb.est
   est.all$ry.est   <- ry.est
   est.all$depl.est <- depl.est
-  est.all$catch.est<- catch.est
+  est.all$acl.est  <- acl.est
   est.all$ofl.est  <- ofl.est
   est.all$m.est    <- m.est
   est.all$h.est    <- h.est
@@ -264,34 +272,37 @@ for (spec in 1:length(ds.list))
   est.all$f.selex.est <- f.selex.est
   est.all$f.selex.adj.est <- f.selex.adj.est
   est.all$ssb0.est    <- ssb0.est
+  est.all$yr.decl.est <- yr.decl.est
+  est.all$yr.recr.est <- yr.recr.est
+  est.all$time.over   <- time.over
   save(est.all, file = est.out)
   
   #Save the filtered output for simulations that were not deemed overfished 
-  est.split <- list()
-  est.out.split <- paste(drive,"/PhD/Chapter3/", run.name, "/output/",LH,"_est_split", sep = "")
-  est.split$ssb.est     <- ssb.est[,,, save.index]
-  est.split$ssb0.est    <- ssb0.est[,, save.index]
-  est.split$ry.est      <- ry.est[,,, save.index]
-  est.split$depl.est    <- depl.est[,,, save.index]
-  est.split$catch.est   <- catch.est[,, save.index]
-  est.split$ofl.est     <- ofl.est[,, save.index]
-  est.split$m.est       <- m.est[,, save.index]
-  est.split$h.est       <- h.est[,, save.index]
-  est.split$s.selex.est <- s.selex.est[,,,save.index]
-  est.split$f.selex.est <- f.selex.est[,,,save.index]
-  est.split$f.selex.adj.est <- f.selex.adj.est[,,,save.index]
-  est.split$ssb.est.no  <- ssb.est[,,,save.index.ov]
-  est.split$ssb0.est.no <- ssb0.est[,,save.index.ov]
-  est.split$ry.est.no   <- ry.est[,,,save.index.ov]
-  est.split$depl.est.no <- depl.est[,,,save.index.ov]
-  est.split$catch.est.no<- catch.est[,,save.index.ov]
-  est.split$ofl.est.no  <- ofl.est[,,save.index.ov]
-  est.split$m.est.no    <- m.est[,,save.index.ov]
-  est.split$s.selex.est.no <- s.selex.est[,,,save.index.ov]
-  est.split$f.selex.est.no <- f.selex.est[,,,save.index.ov]
-  est.split$f.selex.adj.est.no <- f.selex.adj.est[,,,save.index.ov]
-  est.split$time.over   <- time.over
-  save(est.split, file = est.out.split)
+  #est.split <- list()
+  #est.out.split <- paste(drive,"/PhD/Chapter3/", run.name, "/output/",LH,"_est_split", sep = "")
+  #est.split$ssb.est     <- ssb.est[,,, save.index]
+  #est.split$ssb0.est    <- ssb0.est[,, save.index]
+  #est.split$ry.est      <- ry.est[,,, save.index]
+  #est.split$depl.est    <- depl.est[,,, save.index]
+  #est.split$catch.est   <- catch.est[,, save.index]
+  #est.split$ofl.est     <- ofl.est[,, save.index]
+  #est.split$m.est       <- m.est[,, save.index]
+  #est.split$h.est       <- h.est[,, save.index]
+  #est.split$s.selex.est <- s.selex.est[,,,save.index]
+  #est.split$f.selex.est <- f.selex.est[,,,save.index]
+  #est.split$f.selex.adj.est <- f.selex.adj.est[,,,save.index]
+  #est.split$ssb.est.no  <- ssb.est[,,,save.index.ov]
+  #est.split$ssb0.est.no <- ssb0.est[,,save.index.ov]
+  #est.split$ry.est.no   <- ry.est[,,,save.index.ov]
+  #est.split$depl.est.no <- depl.est[,,,save.index.ov]
+  #est.split$catch.est.no<- catch.est[,,save.index.ov]
+  #est.split$ofl.est.no  <- ofl.est[,,save.index.ov]
+  #est.split$m.est.no    <- m.est[,,save.index.ov]
+  #est.split$s.selex.est.no <- s.selex.est[,,,save.index.ov]
+  #est.split$f.selex.est.no <- f.selex.est[,,,save.index.ov]
+  #est.split$f.selex.adj.est.no <- f.selex.adj.est[,,,save.index.ov]
+  #est.split$time.over   <- time.over
+  #save(est.split, file = est.out.split)
   
 
   #Calculate when the stock is rebuilt but not estimated as such=============================================================================  
@@ -376,13 +387,15 @@ for (spec in 1:length(ds.list))
     }
   }
   
+  # Not sure about this calculation..................................................
   failed.to.detect.rec.all[j,]     = apply(failed.to.detect.rec, 1, sum)
   failed.to.detect.over.all[j,]    = apply(failed.to.detect.over, 1, sum)
   incorrect.rebuild.all[j,]        = apply(incorrect.rebuild,1, sum)
 
   # This should only run over the retained runs
+  # Calculates the number of estimated overfished stocks over the 26 assessments called n.overfished
   depl.temp = depl.est[,,,save.index]
-  for(a in 1:length(save.index)) { #sum(save.index)){
+  for(a in 1:length(save.index)) { 
     overfished = FALSE
     for(b in 1:ass.num){
       temp = first.ass.yr + b*4 - 4
@@ -397,12 +410,11 @@ for (spec in 1:length(ds.list))
       if(depl.temp[j,temp,b,a] > ctl.rule.tgt && overfished == TRUE){
         overfished = FALSE
       }
-
     }
   }
 
   depl.temp = depl[,,save.index]
-  for(a in 1:length(save.index)) { #sum(save.index)){
+  for(a in 1:length(save.index)) { 
     overfished = FALSE
     for(b in 1:ass.num){
       temp = first.ass.yr + b*4 - 4
@@ -416,59 +428,61 @@ for (spec in 1:length(ds.list))
       if(depl.temp[j,temp,a] > ctl.rule.tgt && overfished == TRUE){
         overfished = FALSE
       }
-
     }
   }
 
 
+  # The below calculations were repative with the more simple calculation of
+  #           om.time.over - time.over
+  #
   #Calculate how many years before the correct determination was made=====================================
-  yrs.declared.rec.early <-  matrix(0, ass.num, sim.range[2])
-  yrs.declared.rec.late  <-  matrix(0, ass.num, sim.range[2])
-  
-  for(a in 1:sim.range[2]){
-    overfished = FALSE
-    true.overfished = TRUE
-    for(b in 1:ass.num){
-      temp = first.ass.yr + b*4 - 4
-      ind = first.ass.yr + b*4 - 4
-  
-      if (depl.est[j,temp,b,a] < over.thres && overfished == FALSE) { 
-        overfished = TRUE 
-      }
-  
-      if (depl[j,ind,a] < ctl.rule.tgt && true.overfished == TRUE) {
-        if (b != 1 ){
-          if (depl.est[j,temp,b,a] > ctl.rule.tgt || yrs.declared.rec.early[b-1,a] == 1){
-            yrs.declared.rec.early[b,a] <- -1
-          }
-        }
-      }
-  
-      if (depl[j,ind,a] > ctl.rule.tgt && true.overfished == TRUE) {
-        true.overfished = FALSE
-        if (depl.est[j,temp,b,a] < ctl.rule.tgt && overfished == TRUE){
-          yrs.declared.rec.late[b,a] <- 1
-        }
-        if (depl.est[j,temp,b,a] > ctl.rule.tgt && overfished == FALSE){
-          yrs.declared.rec.early[b,a] <- -1
-        }
-      }
-  
-      if (depl[j,ind,a] > ctl.rule.tgt && true.overfished == FALSE){
-        if(depl.est[j,temp,b,a] < ctl.rule.tgt && overfished == TRUE){
-          yrs.declared.rec.late[b,a] <- 1
-        }
-      }
-  
-      if(depl.est[j,temp,b,a] > ctl.rule.tgt && overfished == TRUE){
-        overfished = FALSE
-      }
-    }
-  }
-
-  yrs.declared.rec.late.all[j,] = 4*(apply(yrs.declared.rec.late, 2, sum))
-  yrs.declared.rec.early.all[j,] = 4*(apply(yrs.declared.rec.early, 2, sum))
-  yrs.declared.all[j,] = yrs.declared.rec.late.all[j,] + yrs.declared.rec.early.all[j,]
+  #yrs.declared.rec.early <-  matrix(0, ass.num, sim.range[2])
+  #yrs.declared.rec.late  <-  matrix(0, ass.num, sim.range[2])
+  #
+  #for(a in 1:sim.range[2]){
+  #  overfished = FALSE
+  #  true.overfished = TRUE
+  #  for(b in 1:ass.num){
+  #    temp = first.ass.yr + b*4 - 4
+  #    ind = first.ass.yr + b*4 - 4
+  #
+  #    if (depl.est[j,temp,b,a] < over.thres && overfished == FALSE) { 
+  #      overfished = TRUE 
+  #    }
+  #
+  #    if (depl[j,ind,a] < ctl.rule.tgt && true.overfished == TRUE) {
+  #      if (b != 1 ){
+  #        if (depl.est[j,temp,b,a] > ctl.rule.tgt || yrs.declared.rec.early[b-1,a] == 1){
+  #          yrs.declared.rec.early[b,a] <- -1
+  #        }
+  #      }
+  #    }
+  #
+  #    if (depl[j,ind,a] > ctl.rule.tgt && true.overfished == TRUE) {
+  #      true.overfished = FALSE
+  #      if (depl.est[j,temp,b,a] < ctl.rule.tgt && overfished == TRUE){
+  #        yrs.declared.rec.late[b,a] <- 1
+  #      }
+  #      if (depl.est[j,temp,b,a] > ctl.rule.tgt && overfished == FALSE){
+  #        yrs.declared.rec.early[b,a] <- -1
+  #      }
+  #    }
+  #
+  #    if (depl[j,ind,a] > ctl.rule.tgt && true.overfished == FALSE){
+  #      if(depl.est[j,temp,b,a] < ctl.rule.tgt && overfished == TRUE){
+  #        yrs.declared.rec.late[b,a] <- 1
+  #      }
+  #    }
+  #
+  #    if(depl.est[j,temp,b,a] > ctl.rule.tgt && overfished == TRUE){
+  #      overfished = FALSE
+  #    }
+  #  }
+  #}
+#
+  #yrs.declared.rec.late.all[j,] = 4*(apply(yrs.declared.rec.late, 2, sum))
+  #yrs.declared.rec.early.all[j,] = 4*(apply(yrs.declared.rec.early, 2, sum))
+  #yrs.declared.all[j,] = yrs.declared.rec.late.all[j,] + yrs.declared.rec.early.all[j,]
 
   #Determine if any of the stocks fall below the overfished thresh after being "rebuilt"==================
   overfished.again = array(0, c(length(ds.list), total.yrs+1, sim.range[2]))
@@ -482,49 +496,53 @@ for (spec in 1:length(ds.list))
     overfished.again[j, ind:dim(depl)[2], a] = (depl[j, ind:dim(depl)[2], a] < over.thres)
   }
  
-  re.time.over[j,] = (time.over[j,] - om.time.over[j,])/ om.time.over[j,]
+  re.time.over[j,] = (om.time.over[j,] - time.over[j,])/ om.time.over[j,]
 
-  error = array(0, c(length(ds.list), total.yrs+1, sim.range[2]))
-  for (a in 1:sim.range[2]){
-    for (b in 1:ass.num){
-      temp = first.ass.yr + b*4 - 4
-      ind  = first.ass.yr + b*4 - 4
-      error[j,b,a] = (ssb.est[j,temp,b,a] -ssb[j,ind,a]) / ssb[j,ind,a]
-    }
-  }
+  # This caluclation is not currently working and I don't think I need it, likely is below re.ssb?
+  #error = array(0, c(length(ds.list), total.yrs+1, sim.range[2]))
+  #for (a in 1:sim.range[2]){
+  #  for (b in 1:ass.num){
+  #    temp = first.ass.yr + b*4 - 4
+  #    ind  = first.ass.yr + b*4 - 4
+  #    error[j,b,a] = (ssb[j,ind,a] - ssb.est[j,temp,b,a]) / ssb[j,ind,a]
+  #  }
+  #}
 
   #AAV in Catch ==========================================================================================
-  abs.catch = mapply(function(x) abs(catch.est[j,x,]-catch.est[j,x+1,]), x=(first.ass.yr+1):(total.yrs-1))
-  sum.catch.by.sim = apply(catch.est[j,(first.ass.yr + 1):(total.yrs-1),],2,sum)
+  abs.catch = mapply(function(x) abs(acl.est[j,x,] - acl.est[j,x+1,]), x=(first.ass.yr+1):(total.yrs-1))
+  sum.catch.by.sim = apply(acl.est[j,(first.ass.yr + 1):(total.yrs),],2,sum)
   aav[j,] = 100*(apply(abs.catch,1,sum))/sum.catch.by.sim
 
   #Catch over fixed period ===============================================================================
-  catch.median[j,] = apply(catch.est[j,(first.ass.yr+1):end.catch,],2,median)
+  catch.median[j,] = apply(acl.est[j,(first.ass.yr+1):end.catch,],2,median)
 
   #Calculate medians and relative errors==================================================================
-  med.ssb[j,,]    = t(apply(ssb[j,,],   1, quantile, c(0.025,0.50,0.975)))
-  med.ry[j,,]     = t(apply(ry[j,,],    1, quantile, c(0.025,0.50,0.975)))
-  med.depl[j,,]   = t(apply(depl[j,,],  1, quantile, c(0.025,0.50,0.975)))
-  med.catch[j,,]  = t(apply(catch[j,,], 1, quantile, c(0.025,0.50,0.975)))
-  med.ofl[j,,]    = t(apply(ofl[j,,], 1, quantile, c(0.025,0.50,0.975)))
-  med.acl[j,,]    = t(apply(acl[j,,], 1, quantile, c(0.025,0.50,0.975)))
   
+  # Operating model medians
+  med.ssb[j,,]    = t(apply(ssb[j,,],   1, quantile, set.quant))
+  med.ry[j,,]     = t(apply(ry[j,,],    1, quantile, set.quant))
+  med.depl[j,,]   = t(apply(depl[j,,],  1, quantile, set.quant))
+  med.ofl[j,,]    = t(apply(ofl[j,,],   1, quantile, set.quant))
+  med.acl[j,,]    = t(apply(acl[j,,],   1, quantile, set.quant))
+  
+  # Estimation model medians
   for (i in 1:length(ass.yr))
   {
      y = 1:ass.yr[i]
-     med.ssb.est[j,y,i,]     = t(apply( ssb.est[j, y, i, 1:sim.range[2]], 1, quantile, c(0.025,0.50,0.975)))
-     med.depl.est[j,y,i,]    = t(apply(depl.est[j, y, i, 1:sim.range[2]], 1, quantile, c(0.025,0.50,0.975)))
+     med.ssb.est[j,y,i,]     = t(apply( ssb.est[j,  y, i, 1:sim.range[2]], 1, quantile, set.quant ))
+     med.depl.est[j,y,i,]    = t(apply( depl.est[j, y, i, 1:sim.range[2]], 1, quantile, set.quant ))
+
      y = 1:(ass.yr[i]-1) 
-     med.ry.est[j,y,i,]      = t(apply(  ry.est[j, y, i, 1:sim.range[2]], 1, quantile, c(0.025,0.50,0.975)))      
+     med.ry.est[j,y,i,]      = t(apply( ry.est[j,   y, i, 1:sim.range[2]], 1, quantile, set.quant ))      
   }
   
-  med.m.est[j,,]         = t(apply(m.est[j,,1:sim.range[2]],         1, quantile, c(0.025,0.50,0.975)))
-  med.s.selex.est[j,1,,] = t(apply(s.selex.est[j,1,,1:sim.range[2]], 1, quantile, c(0.025,0.50,0.975)))
-  med.s.selex.est[j,2,,] = t(apply(s.selex.est[j,3,,1:sim.range[2]], 1, quantile, c(0.025,0.50,0.975)))
-  med.f.selex.est[j,1,,] = t(apply(f.selex.est[j,1,,1:sim.range[2]], 1, quantile, c(0.025,0.50,0.975)))
-  med.f.selex.est[j,2,,] = t(apply(f.selex.est[j,3,,1:sim.range[2]], 1, quantile, c(0.025,0.50,0.975)))
-  med.catch.est[j,,]     = t(apply(catch.est[j,,],                   1, quantile, c(0.025,0.50,0.975), na.rm = T))
-  med.ofl.est[j,,]       = t(apply(ofl.est[j,,],                     1, quantile, c(0.025,0.50,0.975), na.rm = T))
+  med.m.est[j,,]         = t(apply(m.est[j,,1:sim.range[2]],         1, quantile, set.quant))
+  med.s.selex.est[j,1,,] = t(apply(s.selex.est[j,1,,1:sim.range[2]], 1, quantile, set.quant))
+  med.s.selex.est[j,2,,] = t(apply(s.selex.est[j,3,,1:sim.range[2]], 1, quantile, set.quant))
+  med.f.selex.est[j,1,,] = t(apply(f.selex.est[j,1,,1:sim.range[2]], 1, quantile, set.quant))
+  med.f.selex.est[j,2,,] = t(apply(f.selex.est[j,3,,1:sim.range[2]], 1, quantile, set.quant))
+  med.acl.est[j,,]       = t(apply(acl.est[j,,],                     1, quantile, set.quant, na.rm = T))
+  med.ofl.est[j,,]       = t(apply(ofl.est[j,,],                     1, quantile, set.quant, na.rm = T))
 
   m.est.all[j,,]         = m.est[j,,]
   s.selex.est.all[j,,,]  = s.selex.est[j,,,]
@@ -589,7 +607,7 @@ for (spec in 1:length(ds.list))
   meds.all$med.ssb.est  <- med.ssb.est
   meds.all$med.ry.est   <- med.ry.est
   meds.all$med.depl.est <- med.depl.est
-  meds.all$med.catch.est<- med.catch.est
+  meds.all$med.acl.est  <- med.acl.est
   meds.all$med.ofl.est  <- med.ofl.est
   meds.all$med.m.est    <- med.m.est
   meds.all$med.s.selex.est <- med.s.selex.est
@@ -643,7 +661,7 @@ for (spec in 1:length(ds.list))
   med.s.selex.est.split[j,2,,] = t(apply(s.selex.est[j,3,,index], 1, quantile, c(0.025,0.50,0.975)))
   med.f.selex.est.split[j,1,,] = t(apply(f.selex.est[j,1,,index], 1, quantile, c(0.025,0.50,0.975)))
   med.f.selex.est.split[j,2,,] = t(apply(f.selex.est[j,3,,index], 1, quantile, c(0.025,0.50,0.975)))
-  med.catch.est.split[j,,]     = t(apply(catch.est[j,,index],    1, quantile, c(0.025,0.50,0.975), na.rm = T))
+  med.acl.est.split[j,,]       = t(apply(acl.est[j,,index],    1, quantile, c(0.025,0.50,0.975), na.rm = T))
   med.ofl.est.split[j,,]       = t(apply(ofl.est[j,,index],    1, quantile, c(0.025,0.50,0.975), na.rm = T))
 
   m.est.split[j,,       (index)]  = m.est[j,,index]
@@ -681,7 +699,7 @@ for (spec in 1:length(ds.list))
   meds.split$med.ssb.est  <- med.ssb.est.split
   meds.split$med.ry.est.  <- med.ry.est.split
   meds.split$med.depl.est <- med.depl.est.split
-  meds.split$med.catch.est<- med.catch.est.split
+  meds.split$med.acl.est  <- med.acl.est.split
   meds.split$med.ofl.est  <- med.ofl.est.split
   meds.split$med.m.est    <- med.m.est.split
   meds.split$med.s.selex.est <- med.s.selex.est.split
