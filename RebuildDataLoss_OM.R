@@ -15,7 +15,7 @@
 drive    <-"C:" #"//home//cwetzel//h_cwetzel"
 LH       <- "rockfish"
 start.n  <- 1
-end.n    <- 20
+end.n    <- 50
 data.scenario <- "ds1" 
 tantalus      <- FALSE
 github        <- TRUE

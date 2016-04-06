@@ -13,7 +13,7 @@ LH = "rockfish"
 #ds.list = c("ds1","ds4","ds6", "ds2", "ds3", "ds5") 
 ds.list = c("ds1","ds2","ds4", "ds3", "ds6", "ds5") 
 
-sim.range = c(1, 50)
+sim.range = c(1, 100)
 order = c(1,2,3,4,5,6) 
 data.scenario = ""
 setup.yrs = 50
@@ -153,7 +153,7 @@ for (spec in 1:length(ds.list))
   j = order[spec]
   data.scenario = ds.list[j]
 
-  dir = paste(drive,"/PhD/Chapter3/", run.name ,LH,"_",data.scenario,"_50yr_sims_multinom_AE_TRUE_",
+  dir = paste(drive,"/PhD/Chapter3/", run.name ,LH,"_",data.scenario,"_50yr_sims_multinom_boot_AE_TRUE_",
         sim.range[1],"_",sim.range[2],
         "/save/", sep = "")
   
@@ -165,9 +165,6 @@ for (spec in 1:length(ds.list))
       depl[j,,i]  = Proj$Depl[1:total.yrs]
       acl[j,,i]   = Proj$acl[1:total.yrs]
       ofl[j,,i]   = Proj$ofl.true[1:total.yrs]
-      # Correct the OFL for the first 4 years of the projection period
-      if (i == 1) { print("ACL catch correction being performed") }
-      acl[j,121:124,i] = Proj$ofl[121:124] * 0.75
       f.lens[j,,i]= Proj$f.len.samp
       s.lens[j,,i]= Proj$s.len.sam
       f.ages[j,,i]= Proj$f.age.samp
@@ -236,7 +233,7 @@ for (spec in 1:length(ds.list))
     ssb.est[j,,,i]     = Est$SB[,1:ass.num]
     ry.est[j,,,i]      = Est$Recruit[,1:ass.num]
     depl.est[j,,,i]    = Est$Bratio[,1:ass.num]
-    acl.est[j,,i]    = Est$ForeCat[1:total.yrs]
+    acl.est[j,,i]      = Est$ACL[1:total.yrs]
     ofl.est[j,,i]      = Est$OFL[1:total.yrs]
     m.est[j,,i]        = Est$M.store[1,1:ass.num]
     h.est[j,,i]        = Est$h[1,1:ass.num]
@@ -496,7 +493,7 @@ for (spec in 1:length(ds.list))
     overfished.again[j, ind:dim(depl)[2], a] = (depl[j, ind:dim(depl)[2], a] < over.thres)
   }
  
-  re.time.over[j,] = (om.time.over[j,] - time.over[j,])/ om.time.over[j,]
+  re.time.over[j,] = (time.over[j,] - om.time.over[j,])/ om.time.over[j,]
 
   # This caluclation is not currently working and I don't think I need it, likely is below re.ssb?
   #error = array(0, c(length(ds.list), total.yrs+1, sim.range[2]))
@@ -544,9 +541,9 @@ for (spec in 1:length(ds.list))
   med.acl.est[j,,]       = t(apply(acl.est[j,,],                     1, quantile, set.quant, na.rm = T))
   med.ofl.est[j,,]       = t(apply(ofl.est[j,,],                     1, quantile, set.quant, na.rm = T))
 
-  m.est.all[j,,]         = m.est[j,,]
-  s.selex.est.all[j,,,]  = s.selex.est[j,,,]
-  f.selex.est.all[j,,,]  = f.selex.est[j,,,]
+  #m.est.all[j,,]         = m.est[j,,]
+  #s.selex.est.all[j,,,]  = s.selex.est[j,,,]
+  #f.selex.est.all[j,,,]  = f.selex.est[j,,,]
 
   for (a in 1:ass.num){
     re.depl[j,a,,] <- (depl.est[j,,a,] - depl[j,1:total.yrs,]) / depl[j,1:total.yrs,]
@@ -556,17 +553,8 @@ for (spec in 1:length(ds.list))
     re.h[j,a,]     <- (h.est[j,a,] - steep) / steep
   }
 
-  ind = first.ass.yr:(total.yrs - 1)
-  for (a in 1:sim.range[2]) {
-    for( b in 1:length(ind)){
-      if ( acl[j,ind[b],a] == 0) { acl.min[j,ind[b],a] = 0.00001}
-      if ( acl[j,ind[b],a] != 0) { acl.min[j,ind[b],a] = acl[j,ind[b],a]}
-    }
-  }
-
-  re.catch[j,,] <- (catch.est[j,ind,] - acl[j,ind,])/max(acl[j,ind,], 0.000001)
-
-  #re.f.selex.adj[j,1,,] <- (f.selex.adj.est[j,1,,] - max(new.peak[j,,]) )/ ( max(new.peak[j,,]) )
+  ind = (first.ass.yr + 1) :(total.yrs)
+  re.catch[j,,] <- (acl.est[j,ind,] - acl[j,ind,])/acl[j,ind,]
 
   for (a in 1:ass.num){   
     re.f.selex[j,1,a,] <- (f.selex.est[j,1,a,] - fsp1.start) / fsp1.start
@@ -575,17 +563,6 @@ for (spec in 1:length(ds.list))
     re.s.selex[j,2,a,] <- (s.selex.est[j,3,a,] - ssp3) / ssp3
   }
   
-  #med.re.depl <- array(NA, dim = c(ds, ass.num, fishery.yrs, 3))
-  #med.re.ssb  <- array(NA, dim = c(ds, ass.num, fishery.yrs, 3))
-  #setup.yrs = 51
-  #for(b in 1:ds){
-  #  for(a in 1:ass.num){
-  #    med.re.depl[b,a,1:(setup.yrs+4*a-4),] <- t(apply(flat.out[[1]]$re.depl[b,a, 1:(setup.yrs + 4*a - 4),], 1, 
-  #      quantile, c(0.025, 0.50, 0.975)))
-  #    med.re.ssb [b,a,1:(setup.yrs+4*a-4),] <- t(apply(flat.out[[1]]$re.ssb [b,a, 1:(setup.yrs + 4*a - 4),], 1, 
-  #      quantile, c(0.025, 0.50, 0.975)))
-  #  }
-  #}
 
   for(a in 1:ass.num){
     index = ass.yr[a]
@@ -610,9 +587,6 @@ for (spec in 1:length(ds.list))
   meds.all$med.acl.est  <- med.acl.est
   meds.all$med.ofl.est  <- med.ofl.est
   meds.all$med.m.est    <- med.m.est
-  meds.all$med.s.selex.est <- med.s.selex.est
-  meds.all$med.f.selex.est <- med.f.selex.est
-  meds.all$m.est.all       <- m.est.all
   meds.all$failed.to.detect.rec.all   <- failed.to.detect.rec.all
   meds.all$failed.to.detect.over      <- failed.to.detect.over
   meds.all$incorrect.rebuild          <- incorrect.rebuild  
@@ -638,91 +612,91 @@ for (spec in 1:length(ds.list))
 
   
   #The medians and relative errors for the filtered reults==============================================
-  index = save.index
-
-  med.ssb.split[j,,]    = t(apply(ssb[j,,index],                  1, quantile, c(0.025,0.50,0.975)))
-  med.ry.split[j,,]     = t(apply(ry[j,1:(total.yrs),index],  1, quantile, c(0.025,0.50,0.975)))
-  med.depl.split[j,,]   = t(apply(depl[j,,index],                 1, quantile, c(0.025,0.50,0.975)))
-  med.catch.split[j,,]  = t(apply(catch[j,,index],                1, quantile, c(0.025,0.50,0.975)))
-  med.ofl.split[j,,]    = t(apply(ofl[j,,index],                  1, quantile, c(0.025,0.50,0.975)))
-  med.acl.split[j,,]    = t(apply(acl[j,,index],                  1, quantile, c(0.025,0.50,0.975)))
-  
-  for (i in 1:length(ass.yr))
-  {
-     y = 1:ass.yr[i]
-     med.ssb.est.split[j,y,i,]     = t(apply(ssb.est[j,y,i,index],  1, quantile, c(0.025,0.50,0.975)))
-     med.depl.est.split[j,y,i,]    = t(apply(depl.est[j,y,i,index], 1, quantile, c(0.025,0.50,0.975)))
-     y = 1:(ass.yr[i]-1) 
-     med.ry.est.split[j,y,i,]      = t(apply(ry.est[j,y,i,index],   1, quantile, c(0.025,0.50,0.975)))      
-  }
-  
-  med.m.est.split[j,,]         = t(apply(m.est[j,,index], 1, quantile, c(0.025,0.50,0.975)))
-  med.s.selex.est.split[j,1,,] = t(apply(s.selex.est[j,1,,index], 1, quantile, c(0.025,0.50,0.975)))
-  med.s.selex.est.split[j,2,,] = t(apply(s.selex.est[j,3,,index], 1, quantile, c(0.025,0.50,0.975)))
-  med.f.selex.est.split[j,1,,] = t(apply(f.selex.est[j,1,,index], 1, quantile, c(0.025,0.50,0.975)))
-  med.f.selex.est.split[j,2,,] = t(apply(f.selex.est[j,3,,index], 1, quantile, c(0.025,0.50,0.975)))
-  med.acl.est.split[j,,]       = t(apply(acl.est[j,,index],    1, quantile, c(0.025,0.50,0.975), na.rm = T))
-  med.ofl.est.split[j,,]       = t(apply(ofl.est[j,,index],    1, quantile, c(0.025,0.50,0.975), na.rm = T))
-
-  m.est.split[j,,       (index)]  = m.est[j,,index]
-  s.selex.est.split[j,,,(index)]  = s.selex.est[j,,,index]
-  f.selex.est.split[j,,,(index)]  = f.selex.est[j,,,index]
-
-
-  for (a in 1:ass.num){
-    re.depl.split[j,a,,] <- (depl.est[j,,a,index] - depl[j,1:total.yrs, index]) / depl[j,1:total.yrs,index]
-    re.ssb.split[j,a,,]  <- (ssb.est[j,,a,index]  - ssb[j,1:total.yrs,index]) / ssb[j,1:total.yrs,index]
-    re.ssb0.split[j,a,]  <- (ssb0.est[j,a,index]  - ssb[j,1,index])/ ssb[j,1,index]
-    re.m.split[j,a,]     <- (m.est[j,a,index] - m) / m
-  }
-
-  for(a in 1:ass.num){
-    temp = ass.yr[a]
-    rmse.sb0.split[j,a]   =  100 * sqrt((1 / length(index)) * 
-                      sum(((ssb0.est[j,a,index] - ssb[j, 1,index])^2) / (ssb[j, 1 ,index]^2)))
-    rmse.depl.split[j,a]  =  100 * sqrt((1 / length(index)) * 
-                     sum(((depl.est[j, temp, a, index] - depl[j, temp , index])^2)/
-                     (depl[j, temp , index]^2)))
-  }
-
-  yrs.declared.all.split[j,] = yrs.declared.rec.late.all[j,index] + yrs.declared.rec.early.all[j,index]
-
-  meds.split <- list()
-  meds.out.split <- paste(drive,"/PhD/Chapter3/", run.name, "/output/",LH,"_meds_split", sep = "")
-
-  meds.split$med.ssb  <- med.ssb.split
-  meds.split$med.ry   <- med.ry.split
-  meds.split$med.depl <- med.depl.split
-  meds.split$med.catch<- med.catch.split
-  meds.split$med.ofl  <- med.ofl.split
-  meds.split$med.acl  <- med.acl.split
-  meds.split$med.ssb.est  <- med.ssb.est.split
-  meds.split$med.ry.est.  <- med.ry.est.split
-  meds.split$med.depl.est <- med.depl.est.split
-  meds.split$med.acl.est  <- med.acl.est.split
-  meds.split$med.ofl.est  <- med.ofl.est.split
-  meds.split$med.m.est    <- med.m.est.split
-  meds.split$med.s.selex.est <- med.s.selex.est.split
-  meds.split$med.f.selex.est <- med.f.selex.est.split
-  meds.split$re.depl <- re.depl.split
-  meds.split$re.ssb  <- re.ssb.split
-  meds.split$re.ssb0 <- re.ssb0.split
-  meds.split$re.m <- re.m.split
-  meds.split$rmse.sb0 <- rmse.sb0.split
-  meds.split$rmse.depl<- rmse.depl.split
-  meds.split$n.overfished <- n.overfished
-  meds.split$om.n.overfished <- om.n.overfished
-  meds.split$re.f.selex <- re.f.selex[,,,save.index]
-  meds.split$re.s.selex <- re.s.selex[,,,save.index]
-  meds.split$re.time.over<- re.time.over
-  meds.split$catch.median <- catch.median
-  #meds.split$re.f.selex.adj <- re.f.selex.adj[,,,save.index]
-  #meds.split$failed.to.detect.rec.all   <- failed.to.detect.rec.all
-  #meds.split$failed.to.detect.over      <- failed.to.detect.over
-  #meds.split$incorrect.rebuild          <- incorrect.rebuild  
-  #meds.split$yrs.declared.rec.late.all  <- yrs.declared.rec.late.all
-  #meds.split$yrs.declared.rec.early.all <- yrs.declared.rec.early.all
-  meds.split$yrs.declared.all           <- yrs.declared.all.split
-  save (meds.split, file = meds.out.split)
+  #index = save.index
+#
+  #med.ssb.split[j,,]    = t(apply(ssb[j,,index],                  1, quantile, c(0.025,0.50,0.975)))
+  #med.ry.split[j,,]     = t(apply(ry[j,1:(total.yrs),index],  1, quantile, c(0.025,0.50,0.975)))
+  #med.depl.split[j,,]   = t(apply(depl[j,,index],                 1, quantile, c(0.025,0.50,0.975)))
+  #med.catch.split[j,,]  = t(apply(catch[j,,index],                1, quantile, c(0.025,0.50,0.975)))
+  #med.ofl.split[j,,]    = t(apply(ofl[j,,index],                  1, quantile, c(0.025,0.50,0.975)))
+  #med.acl.split[j,,]    = t(apply(acl[j,,index],                  1, quantile, c(0.025,0.50,0.975)))
+  #
+  #for (i in 1:length(ass.yr))
+  #{
+  #   y = 1:ass.yr[i]
+  #   med.ssb.est.split[j,y,i,]     = t(apply(ssb.est[j,y,i,index],  1, quantile, c(0.025,0.50,0.975)))
+  #   med.depl.est.split[j,y,i,]    = t(apply(depl.est[j,y,i,index], 1, quantile, c(0.025,0.50,0.975)))
+  #   y = 1:(ass.yr[i]-1) 
+  #   med.ry.est.split[j,y,i,]      = t(apply(ry.est[j,y,i,index],   1, quantile, c(0.025,0.50,0.975)))      
+  #}
+  #
+  #med.m.est.split[j,,]         = t(apply(m.est[j,,index], 1, quantile, c(0.025,0.50,0.975)))
+  #med.s.selex.est.split[j,1,,] = t(apply(s.selex.est[j,1,,index], 1, quantile, c(0.025,0.50,0.975)))
+  #med.s.selex.est.split[j,2,,] = t(apply(s.selex.est[j,3,,index], 1, quantile, c(0.025,0.50,0.975)))
+  #med.f.selex.est.split[j,1,,] = t(apply(f.selex.est[j,1,,index], 1, quantile, c(0.025,0.50,0.975)))
+  #med.f.selex.est.split[j,2,,] = t(apply(f.selex.est[j,3,,index], 1, quantile, c(0.025,0.50,0.975)))
+  #med.acl.est.split[j,,]       = t(apply(acl.est[j,,index],    1, quantile, c(0.025,0.50,0.975), na.rm = T))
+  #med.ofl.est.split[j,,]       = t(apply(ofl.est[j,,index],    1, quantile, c(0.025,0.50,0.975), na.rm = T))
+#
+  #m.est.split[j,,       (index)]  = m.est[j,,index]
+  #s.selex.est.split[j,,,(index)]  = s.selex.est[j,,,index]
+  #f.selex.est.split[j,,,(index)]  = f.selex.est[j,,,index]
+#
+#
+  #for (a in 1:ass.num){
+  #  re.depl.split[j,a,,] <- (depl.est[j,,a,index] - depl[j,1:total.yrs, index]) / depl[j,1:total.yrs,index]
+  #  re.ssb.split[j,a,,]  <- (ssb.est[j,,a,index]  - ssb[j,1:total.yrs,index]) / ssb[j,1:total.yrs,index]
+  #  re.ssb0.split[j,a,]  <- (ssb0.est[j,a,index]  - ssb[j,1,index])/ ssb[j,1,index]
+  #  re.m.split[j,a,]     <- (m.est[j,a,index] - m) / m
+  #}
+#
+  #for(a in 1:ass.num){
+  #  temp = ass.yr[a]
+  #  rmse.sb0.split[j,a]   =  100 * sqrt((1 / length(index)) * 
+  #                    sum(((ssb0.est[j,a,index] - ssb[j, 1,index])^2) / (ssb[j, 1 ,index]^2)))
+  #  rmse.depl.split[j,a]  =  100 * sqrt((1 / length(index)) * 
+  #                   sum(((depl.est[j, temp, a, index] - depl[j, temp , index])^2)/
+  #                   (depl[j, temp , index]^2)))
+  #}
+#
+  #yrs.declared.all.split[j,] = yrs.declared.rec.late.all[j,index] + yrs.declared.rec.early.all[j,index]
+#
+  #meds.split <- list()
+  #meds.out.split <- paste(drive,"/PhD/Chapter3/", run.name, "/output/",LH,"_meds_split", sep = "")
+#
+  #meds.split$med.ssb  <- med.ssb.split
+  #meds.split$med.ry   <- med.ry.split
+  #meds.split$med.depl <- med.depl.split
+  #meds.split$med.catch<- med.catch.split
+  #meds.split$med.ofl  <- med.ofl.split
+  #meds.split$med.acl  <- med.acl.split
+  #meds.split$med.ssb.est  <- med.ssb.est.split
+  #meds.split$med.ry.est.  <- med.ry.est.split
+  #meds.split$med.depl.est <- med.depl.est.split
+  #meds.split$med.acl.est  <- med.acl.est.split
+  #meds.split$med.ofl.est  <- med.ofl.est.split
+  #meds.split$med.m.est    <- med.m.est.split
+  #meds.split$med.s.selex.est <- med.s.selex.est.split
+  #meds.split$med.f.selex.est <- med.f.selex.est.split
+  #meds.split$re.depl <- re.depl.split
+  #meds.split$re.ssb  <- re.ssb.split
+  #meds.split$re.ssb0 <- re.ssb0.split
+  #meds.split$re.m <- re.m.split
+  #meds.split$rmse.sb0 <- rmse.sb0.split
+  #meds.split$rmse.depl<- rmse.depl.split
+  #meds.split$n.overfished <- n.overfished
+  #meds.split$om.n.overfished <- om.n.overfished
+  #meds.split$re.f.selex <- re.f.selex[,,,save.index]
+  #meds.split$re.s.selex <- re.s.selex[,,,save.index]
+  #meds.split$re.time.over<- re.time.over
+  #meds.split$catch.median <- catch.median
+  ##meds.split$re.f.selex.adj <- re.f.selex.adj[,,,save.index]
+  ##meds.split$failed.to.detect.rec.all   <- failed.to.detect.rec.all
+  ##meds.split$failed.to.detect.over      <- failed.to.detect.over
+  ##meds.split$incorrect.rebuild          <- incorrect.rebuild  
+  ##meds.split$yrs.declared.rec.late.all  <- yrs.declared.rec.late.all
+  ##meds.split$yrs.declared.rec.early.all <- yrs.declared.rec.early.all
+  #meds.split$yrs.declared.all           <- yrs.declared.all.split
+  #save (meds.split, file = meds.out.split)
   
 } 

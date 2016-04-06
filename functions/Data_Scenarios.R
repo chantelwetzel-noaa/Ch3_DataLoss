@@ -71,9 +71,8 @@ start.survey.len.samp  <- start.survey
 start.survey.age.samp  <- start.survey 
 
 #Data Available Based on Scenario
-#N.f.len = 75 ; N.s.len = 10 ; N.f.age = 25 ; N.s.age = 10 
-
-N.f.len = 100 ; N.s.len = 10 ; N.f.age = 50 ; N.s.age = 10 
+N.f.len = 75 ; N.s.len = 10 ; N.f.age = 25 ; N.s.age = 10 
+#N.f.len = 100 ; N.s.len = 10 ; N.f.age = 50 ; N.s.age = 10 
 if (data.scenario == "ds0") { 
     N.f.len = 500 ; N.s.len = 500 ; N.f.age = 500 ; N.s.age = 500 }
 
