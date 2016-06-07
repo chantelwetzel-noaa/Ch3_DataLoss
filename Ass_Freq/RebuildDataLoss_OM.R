@@ -14,8 +14,8 @@
 
 drive    <-"C:" #"//home//cwetzel//h_cwetzel"
 LH       <- "rockfish"
-start.n  <- 31
-end.n    <- 40
+start.n  <- 13
+end.n    <- 13
 data.scenario <- "ds3" 
 tantalus      <- FALSE
 github        <- TRUE
@@ -24,9 +24,11 @@ determ        <- FALSE
 setup.yrs     <- 50
 do.MLE        <- FALSE
 error.struct  <- "multinom" #"multinom" #"dirich"
-AgeError      <- FALSE
+AgeError      <- TRUE
 if (file.type == "perfect") { do.MLE = T }
 do.cpue       <- TRUE
+model.spec    <- "Ass_Freq"
+estimate.M    <- FALSE
 
 #Load packages
 require(r4ss)
@@ -34,7 +36,8 @@ require(compiler)
 require(gtools)
 
 #Set the directory and create folder
-directory <<- paste(drive,"/PhD/Chapter3/",LH, "_", data.scenario,"_",setup.yrs,"yr_sims_", error.struct,"_",file.type, "_","AE_", AgeError, "_",start.n,"_",end.n,"/",sep="")
+directory <<- paste0(drive,"/PhD/Chapter3/",LH, "_", data.scenario,"_",setup.yrs,"yr_sims_", error.struct,"_",file.type, "_","AE_", AgeError, "_",start.n,"_",end.n,"/")
+directory <<- paste0(drive,"/PhD/Chapter3/", model.spec, "/",LH, "_", data.scenario,"_", error.struct,"_",file.type, "_","AE_", AgeError, "_",start.n,"_",end.n,"/")
 om  <- paste( directory, "om", sep = "")
 run <- paste( directory, "run", sep = "")
 if( file.exists(directory) == FALSE) {
@@ -46,15 +49,15 @@ if( file.exists(directory) == FALSE) {
 
 #Move the executable to the correct folder to run simulations
 if ( !tantalus ) {
-	file.copy(paste(drive,"/PhD/Chapter3/ss3.exe",sep=""), om ) 
-	file.copy(paste(drive,"/PhD/Chapter3/ss3.exe",sep=""), run ) }
+	file.copy(paste0(drive,"/PhD/Chapter3/ss3.exe"), om ) 
+	file.copy(paste0(drive,"/PhD/Chapter3/ss3.exe"), run ) }
 if ( tantalus ) {
 	file.copy(paste(drive,"/PhD/Chapter3/SS3",sep=""), om )
 	file.copy(paste(drive,"/PhD/Chapter3/SS3",sep=""), run ) }
 
 #Source in external functions
 if ( github ) { 
- git.wd = "/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/"
+ git.wd = paste0("/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/", model.spec, "/")
  source(paste("C:", git.wd, "functions/Functions.R", sep = "")) }
 if ( !github ){ source(paste(drive,"/PhD/Chapter3/code/functions/Functions.R",sep="")) }
 
@@ -70,7 +73,7 @@ for (nsim in start.n:end.n)
  	Proj <- Est <- list()
  	#Resource the functions
     if (github) { 
-      git.wd = "/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/"
+      git.wd = paste0("/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/", model.spec, "/")
       source(paste("C:", git.wd, "functions/Functions.R", sep = "")) 
       source(paste0(drive, git.wd, "functions/Arrays.R"))
     }
@@ -196,7 +199,7 @@ for (nsim in start.n:end.n)
     #lmax.prior <- round(rnorm(1, L2f, 0.50),3)
     #cv.1.prior <- round(rnorm(1, CV1, 0.50),3)
     #cv.2.prior <- round(rnorm(1, CV2, 0.50),3)
-    m.prior    <- round(runif(1,  m -  m *0.25,  m + m*0.25),3) 
+    m.prior    <- ifelse(estimate.M == T, round(runif(1,  m -  m *0.25,  m + m*0.25),3), m) 
     lmin.prior <- L1 
     lmax.prior <- round(runif(1, L2f- L2f*0.10, L2f + L2f*0.10),3)
     k.prior    <- round(runif(1, kf - kf *0.10, kf  + kf *0.10),3)
@@ -245,7 +248,7 @@ for (nsim in start.n:end.n)
 	boot.files = 3  # Create a true, perfect, bootstrapped data set
     end.phase  = 1  # Only estimate a R0 value that makes the depletion survey true
     est.R0 = 1
-    m.phase = 5
+    m.phase = ifelse(estimate.M == T, 5, -5)
     h.phase = 6
 
     # Create the depletion survey for the data file
@@ -321,8 +324,8 @@ for (nsim in start.n:end.n)
     depl[1:y]      <- rep.out$Depl
     R0		       <- exp(rep.out$R0)
     SB0		       <- rep.out$SB.virgin
-    ofl.true[(y+1):(y+4)] <- rep.out$OFL
-    acl.true[(y+1):(y+4)] <- rep.out$ACL
+    ofl.true[(y+1):(y+ass.freq)] <- rep.out$OFL
+    acl.true[(y+1):(y+ass.freq)] <- rep.out$ACL
 
     decl.overfished = OM = FALSE
     counter = overfished.counter = 0
@@ -332,21 +335,11 @@ for (nsim in start.n:end.n)
     #Start the projection loop
     ###################################################################################################################
  	for (y in (pre.fishery.yrs + setup.yrs):total.yrs) {
- 		do.ass = y
-        if(LH == "rockfish") { 
-            do.ass = y - 2
-            if (setup.yrs == 50) { do.ass = y }
-        }
-
-    	if(LH == "flatfish") { 
-            do.ass = y 
-            if (setup.yrs == 50) { do.ass = y - 2 }
-        } 
 
  		#################################################################
     	#Estimation Model
  		################################################################
-    	if ( do.ass %% 4 == 0 ){
+    	if ( y %% ass.freq == 0 ){
        		counter = counter + 1
  			#Move the needed files to the estimation area
     		file.copy("starter.ss", paste(run,"/starter.ss",sep =""), overwrite=T)
@@ -407,7 +400,7 @@ for (nsim in start.n:end.n)
     		if (counter != 1){
     			dat.new <- dat.old <- dat <- NULL
     			dat.new <- SS_readdat(paste(run,"/", file.type, nsim,"_", y,".ss",sep=""))
-    			dat.old <- SS_readdat(paste(run,"/", file.type ,nsim,"_", y-4,".ss",sep=""))
+    			dat.old <- SS_readdat(paste(run,"/", file.type ,nsim,"_", y - ass.freq,".ss",sep=""))
     			dat.old$endyr    <- dat.new$endyr
     			dat.old$N_catch  <- dat.new$N_catch
     			dat.old$catch    <- cbind(catch[1:(y-1)], dat.new$catch[,2:3])
@@ -431,16 +424,16 @@ for (nsim in start.n:end.n)
                 }
 
     			dat.old$add_to_comp <- 0.00001
-                dat.new$agecomp     <- Get_Samps(data.type = "age", year.vec = (y - 4): (y - 1) )
-                dat.new$lencomp     <- Get_Samps(data.type = "len", year.vec = (y - 4): (y - 1) )
+                dat.new$agecomp     <- Get_Samps(data.type = "age", year.vec = (y - ass.freq): (y - 1) )
+                dat.new$lencomp     <- Get_Samps(data.type = "len", year.vec = (y - ass.freq): (y - 1) )
 
     			dat.old$N_lencomp <- dat.new$N_lencomp
     			ind = dat.new$lencomp$FltSvy == 1 ; ind.old.1 = dat.old$lencomp$FltSvy == 1
-                if ( sum(ind) != sum(ind.old.1) ) { ind1 = (sum(ind)-3):sum(ind) }
+                if ( sum(ind) != sum(ind.old.1) ) { ind1 = (sum(ind.old.1) + 1):sum(ind) }
                 if ( sum(ind) == sum(ind.old.1) ) { ind1 = 0 }
 
     			ind = dat.new$lencomp$FltSvy == 2 ; ind.old.2 = dat.old$lencomp$FltSvy == 2
-                ind2 = (length(ind)-1):length(ind)
+                ind2 = (length(ind) - ass.freq/2 + 1):length(ind)
                 if (sum(ind1) != 0){
                     dat.old$lencomp <- rbind(dat.old$lencomp[ind.old.1,], dat.new$lencomp[ind1,], 
                                          dat.old$lencomp[ind.old.2,], dat.new$lencomp[ind2,])
@@ -451,10 +444,10 @@ for (nsim in start.n:end.n)
                 }
     			dat.old$N_agecomp <- dat.new$N_agecomp
 				ind = dat.new$agecomp$FltSvy == 1 ; ind.old.1 = dat.old$agecomp$FltSvy == 1
-    			if ( sum(ind) != sum(ind.old.1) ) { ind1 = (sum(ind)-3):sum(ind) }
+    			if ( sum(ind) != sum(ind.old.1) ) { ind1 = (sum(ind.old.1) + 1):sum(ind) }
                 if ( sum(ind) == sum(ind.old.1) ) { ind1 = 0}
     			ind = dat.new$agecomp$FltSvy == 2 ; ind.old.2 = dat.old$agecomp$FltSvy == 2
-    			ind2 = (length(ind)-1):length(ind)
+    			ind2 = (length(ind)- ass.freq/2 + 1):length(ind)
                 if (sum(ind1) != 0){
                     dat.old$agecomp <- rbind(dat.old$agecomp[ind.old.1,], dat.new$agecomp[ind1,], 
                                             dat.old$agecomp[ind.old.2,], dat.new$agecomp[ind2,]) }
@@ -557,6 +550,8 @@ for (nsim in start.n:end.n)
                     start.bias   <- start.bias.est   <- new.bias$df[1,1]
                     full.bias    <- full.bias.est    <- new.bias$df[2,1]
                     last.bias    <- last.bias.est    <- new.bias$df[3,1] #y - stop.rec.est 
+                    #special trap for nsim 13 of ds3
+                    if (nsim == 13) { check <- ifelse(last.bias < (y-5), y-5, last.bias); last.bias <- last.bias.est <- check }
                     last.no.bias <- last.no.bias.est <- new.bias$df[4,1] #y 
                     max.bias.adj <- max.bias.adj.est <-new.bias$df[5,1]
                     main.rec.end <- main.rec.end.est <- y - 1
@@ -608,12 +603,14 @@ for (nsim in start.n:end.n)
 			rep.new   <- readLines(paste(run, "/Report.sso", sep=""))
 			rep.out   <- Rep_Summary(rep.new, y, pre.fishery.yrs, do.forecast)
             fspr.est  <- as.numeric(strsplit(rep.new[grep(paste("SPR_Btgt",sep=""),rep.new)]," ")[[1]][3])
+            ind       <- y - 100
+            RecDevs[1:length(rep.out$RecDevs),counter]   <- ifelse(determ == TRUE, rep(0, length(ind)), rep.out$RecDevs)
         	ind       <- y - 1 
-        	#TotBio[1:ind,counter]    <- rep.out$TotBio
         	Recruits[1:ind,counter]  <- rep.out$Recruits
+
         	
-        	OFL[y:(y+3)]          <- rep.out$OFL
-        	ACL[y:(y+3)]          <- mapply(function(x)  ifelse(rep.out$ACL[x] < 5, 5, rep.out$ACL[x]), x = 1:4)
+        	OFL[y:(y + ass.freq - 1)]  <- rep.out$OFL
+        	ACL[y:(y + ass.freq - 1)]  <- mapply(function(x)  ifelse(rep.out$ACL[x] < 5, 5, rep.out$ACL[x]), x = 1:ass.freq)
         	FSPR[,counter]        <- rep.out$FSPR
         	Fmult[,counter]       <- fspr.est
         	M.store[1,counter]    <- rep.out$M
@@ -645,21 +642,22 @@ for (nsim in start.n:end.n)
         	Est[[10]]<- F.selex
         	Est[[11]]<- S.selex
         	Est[[12]]<- Recruits
-        	Est[[13]]<- Lmin.store
-        	Est[[14]]<- Lmax.store
-        	Est[[15]]<- k.store
-            Est[[16]]<- fsp2.est 
-            Est[[17]]<- recovered.est
-            Est[[18]]<- h.store
-            Est[[19]]<- grad.out
-            Est[[20]]<- grad.check
+            Est[[13]]<- RecDevs
+        	Est[[14]]<- Lmin.store
+        	Est[[15]]<- Lmax.store
+        	Est[[16]]<- k.store
+            Est[[17]]<- fsp2.est 
+            Est[[18]]<- recovered.est
+            Est[[19]]<- h.store
+            Est[[20]]<- grad.out
+            Est[[21]]<- grad.check
 
-       		names(Est) <- c("TotBio","OFL","ACL","Fmult","FSPR","M.store","R0.out","SB","Bratio","F.selex","S.selex","Recruits",
+       		names(Est) <- c("TotBio","OFL","ACL","Fmult","FSPR","M.store","R0.out","SB","Bratio","F.selex","S.selex","Recruits", "RecDevs",
                           	 "Lmin.store", "Lmax.store", "k.store",  "fsp2.est","recovered.est", "h", 'grad.out', 'grad.check')
 	        save(Est, file=estimates)
 
             #Set the ACLs for the next four years 
-            catch[y:(y+3)] <- ACL[y:(y+3)] 
+            catch[y:(y + ass.freq - 1)] <- ACL[y:(y + ass.freq - 1)] 
     
             #Rename the ctl and data files
             file.rename(paste(run,"/Report.sso",sep =""), paste(run,"/Report",nsim,"_",y,".sso",sep ="")) 
@@ -681,9 +679,9 @@ for (nsim in start.n:end.n)
             } 
 
             if(decl.overfished == TRUE){
-                end.yr = y + 3
+                end.yr = y + ass.freq - 1
                 block.yrs = c(decl.yr, end.yr)
-                if(Bratio[y,counter] >= bio.target){
+                if(round(Bratio[y,counter],2) >= bio.target){
                     decl.overfished = FALSE 
                     end.yr = y
                     recovered.est[y] <- end.yr
@@ -702,6 +700,12 @@ for (nsim in start.n:end.n)
                 f.len.samp[y] <- floor(0.20 * f.len.samp[y])
                 s.len.samp[y] <- s.len.samp[y]
                 f.age.samp[y] <- floor(0.20 * f.age.samp[y])
+                s.age.samp[y] <- s.age.samp[y]
+            }
+            if (data.scenario == "ds7" || data.scenario == "ds8" ) {
+                f.len.samp[y] <- floor(1.25 * f.len.samp[y])
+                s.len.samp[y] <- s.len.samp[y]
+                f.age.samp[y] <- floor(1.25 * f.age.samp[y])
                 s.age.samp[y] <- s.age.samp[y]
             }
             if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds2" ) {
@@ -782,8 +786,7 @@ for (nsim in start.n:end.n)
 
         rep.new   <- readLines(paste(om, "/Report.sso", sep=""))
         temp.sb = mapply(function(x) as.numeric(strsplit(rep.new[grep(paste("SPB_",x,sep=""),rep.new)]," ")[[1]][3]), x = 1:y)       
-        #rep.out   <- Rep_Summary(rep.new, y, pre.fishery.yrs, do.forecast)
-        check.depl<- temp.sb[y]/temp.sb[1] #rep.out$Depl[y]
+        check.depl<- temp.sb[y]/temp.sb[1] 
         if (check.depl > bio.target){
             #buffer = 1 #0.95
             #hcr.high = ctl.rule.tgt
@@ -797,12 +800,16 @@ for (nsim in start.n:end.n)
         if (y %% 2 == 0){ index          <- c(index, Do_Survey(file = rep.new, y , survey.err)) }
 
         if (do.cpue){
-            #if (decl.overfished == T){
-                #if (data.scenario == "ds3" || data.scenario == "ds4" || data.scenario == "ds7"){
-                     cpue           <- cpue  #}
-                #if (data.scenario == "ds1" || data.scenario == "ds2" ){
-                #    cpue           <- c(cpue, (file = rep.new, y , cpue.err)) }
-            #}   
+            if (start.cpue == 119) {cpue <- cpue }
+            if (start.cpue != 119) {
+                if (decl.overfished == T){
+                    if (data.scenario == "ds3" || data.scenario == "ds4" || data.scenario == "ds7"){
+                        cpue           <- cpue  }
+                    if (data.scenario == "ds1" || data.scenario == "ds2" 
+                        || data.scenario == "ds7" || data.scenario == "ds8"){
+                        cpue <- c(cpue, Do_Fishery(file = rep.new, y , cpue.err)) }
+                }
+            }
         }
 
         SSB [y]        <- as.numeric(strsplit(rep.new[grep(paste("SPB_",y,sep=""),rep.new)]," ")[[1]][3])
@@ -840,6 +847,7 @@ for (nsim in start.n:end.n)
         Proj[[14]]<- recovered.om
         Proj[[15]]<- index
         Proj[[16]]<- ifelse(do.cpue == T, cpue, "NA")
+        Proj[[17]]<- autocorr[100:length(autocorr)]
 
     	names(Proj) <- c ("SSB", "Depl","R0","Ry", "catch","ofl.true", "acl.true", "f.len.samp","s.len.sam","f.age.samp",
     					"s.age.samp", "peak", "dome", "recovered.om", "index", "cpue")

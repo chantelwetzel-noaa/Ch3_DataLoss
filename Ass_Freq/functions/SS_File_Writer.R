@@ -86,7 +86,7 @@ writeCtl.om <- function (ctl,y)
     sigma.set = ifelse(sigmaR == 0, 0.01, sigmaR)
     rec.mat <- matrix(c(
     #_LO    HI     INIT         PRIOR       PR_type     SD      PHASE
-    2,      15,    log(R0),     log(R0),    -1,         10,     est.R0, "# log(R0)",  
+    2,      15,    log(R0),     log(R0),    -1,          10,     est.R0, "# log(R0)",  
     0.20,   1,     steep,       steep,       1,       0.09,     -2, "# SR_steep ",
     0,      1.5,   sigma.set,   sigma.set,  -1,         99,     -99,"#SR_sigmaR",
     -5,     5,     0,           0,          -1,         99,     -99,"# SR_envlink",
@@ -358,7 +358,7 @@ writeCtl <- function (ctl,y)
     sigma.set = ifelse(sigmaR == 0, 0.01, sigmaR)
     rec.mat <- matrix(c(
     #_LO    HI     INIT     PRIOR   PR_type     SD      PHASE
-    2,      15,    log(R0), log(R0), -1,        10,      est.R0, "# log(R0)",  
+    2,      15,    8.0,       8.0,    -1,        10,      est.R0, "# log(R0)",  
     #0.20,   1,     steep,   steep,   1,       0.09,     -2, "# SR_steep ",
     0.20,   1,     h.prior,   h.prior,   1,    0.10,     h.phase, "# SR_steep ",
     0,      1.5,   sigma.set,  sigma.set,   -1,         99,     -99,"#SR_sigmaR",
@@ -589,7 +589,7 @@ writeForecast <- function (forecast,y)
     0, 0, 0, 0, 0, 0, " # Benchmark years: beg_bio, end_bio, beg_selex, end_selex, bef_relF, end_relF\n",
     1,          " # Bmark_relF_Basis: 1= use year range; 2= set relF same as forecast below\n",
     do.forecast," #Forecast: 0=none; 1=F(SPR); 2=F(MSY) 3=F(Btgt); 4=F(endyr); 5=Ave F (enter yrs); 6=read Fmult\n",
-    10,          " # N forecast years\n",
+    20,          " # N forecast years\n",
     1,          " #F scalar (only used for Do_Forecast == 5)\n",
     0, 0, 0, 0, " #Fcast_years:  beg_selex, end_selex, beg_relF, end_relF\n",
     1,          " # Control rule method (1=west coast adjust catch; 2=adjust F)\n",
@@ -656,18 +656,9 @@ writeDat<-function(dat, y, survey, fore.catch)
         cpue.data = cbind(
             fishery.data.yrs, rep(1, length(fishery.data.yrs)), rep(1, length(fishery.data.yrs)), 
             rep(5000, length(fishery.data.yrs)), rep(cpue.cv, length(fishery.data.yrs))) }
-            
-
-    if (do.cpue == T){
-        fishery.data.yrs = seq(start.cpue, y, 1)
-        cpue.data = cbind(
-            fishery.data.yrs, rep(1, length(fishery.data.yrs)), rep(1, length(fishery.data.yrs)), 
-            rep(5000, length(fishery.data.yrs)), rep(cpue.cv, length(fishery.data.yrs))) }
         
     depl.survey    = cbind(y, 1, 3, final.depl, 0.01)
-                    #cbind(y-pre.fishery.yrs, 1, 3, final.depl, 0.01)
 
-    #data.yrs = (start.fishery.len.samp - pre.fishery.yrs):(y-pre.fishery.yrs)
     data.yrs = start.fishery.len.samp:y
     data.matrix = matrix(0, length(data.yrs), 2*length(len.step))
     data.matrix[,1] = f.len.samp[data.yrs]
@@ -695,8 +686,6 @@ writeDat<-function(dat, y, survey, fore.catch)
     keep = fishery.age.data[,9] != 0
     fishery.age.data = fishery.age.data[keep,]
 
-    #data.yrs = (start.survey.age.samp- pre.fishery.yrs) :(y-pre.fishery.yrs)
-    #data.yrs =  start.survey.age.samp : y
     data.matrix = matrix(0, length(survey.data.yrs), 2*ages - 2)
     data.matrix[,1] = s.age.samp[survey.data.yrs]
     survey.age.data = cbind(survey.data.yrs, rep(1, length(survey.data.yrs)), 

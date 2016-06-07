@@ -31,18 +31,20 @@ auto      <- FALSE
 selec.adj <- 0
 dome.adj  <- -8.5
 
+ass.freq  <- 8
+
 #Adjust the max age value that would be used if ageing error is included
 max.age = ages - 1
 
 sigmaR 	     <- 0.60  
 ss.survey.cv <- survey.cv <- 0.40 
 cpue.cv      <- 0.30
-select.sd 	 <- 0.05  #Selectivity Time Varying StDev
+select.sd 	 <- 0.0 #5  #Selectivity Time Varying StDev
 dome.sd      <- 0.20
 m.sd <- k.sd <- 0.20
-age.error    <- 0.10
+age.error    <- 0.05 #0.10
 
-if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds4" || data.scenario == 'ds6'){
+if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds4" || data.scenario == 'ds6' || data.scenario == 'ds8'){
 	select.sd <- 0
 	m.sd      <- 0 
 	dome.sd   <- 0 
@@ -73,7 +75,8 @@ start.survey.age.samp  <- start.survey
 
 #Data Available Based on Scenario
 #N.f.len = 75 ; N.s.len = 10 ; N.f.age = 25 ; N.s.age = 10 
-N.f.len = 30 ; N.s.len = 5 ; N.f.age = 20 ; N.s.age = 5 
+N.f.len = 30 ; N.s.len = 5 ; N.f.age = 20 ; N.s.age = 5 #ass freq and fixed M
+#N.f.len = 50 ; N.s.len = 10 ; N.f.age = 25 ; N.s.age = 10 #Ass Freq new Ns
 #N.f.len = 100 ; N.s.len = 10 ; N.f.age = 50 ; N.s.age = 10 
 if (data.scenario == "ds0") { 
     N.f.len = 500 ; N.s.len = 500 ; N.f.age = 500 ; N.s.age = 500 }

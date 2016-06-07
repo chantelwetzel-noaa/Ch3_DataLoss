@@ -9,20 +9,19 @@
 
 
 #Load in the R objects from the Simulation Eval Code ========================================
-drive = "C:"
-run.name = ""#"Fall2015"
+drive = "D:"
+run.name = "April16_PreCPUE"#"Fall2015"
 
-load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_meds_split"))
-med.rock <- meds.all
-load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_est_split"))
-est.rock <- est.all
-load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_om_split"))
-om.rock <- om.all
+load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_meds_all"))
+load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_est_all"))
+load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_om_all"))
 
-rock.out <- flat.out <- list()
-rock.out[[1]] <- med.rock
-rock.out[[2]] <- est.rock
-rock.out[[3]] <- om.rock
+
+rock.out  <- med.out <- est.out <- om.out <- list()
+rock.out[[1]] <- med.out[[1]] <- meds.all
+rock.out[[2]] <- est.out[[1]] <- est.all
+rock.out[[3]] <- om.out[[1]]  <- om.all
+
 
 #==================================================================================================================
 print.letter <- function(label="(a)",xy=c(0.1,0.925),...) {   #... means any new parameters are copied faithfully to text() below
@@ -32,83 +31,175 @@ print.letter <- function(label="(a)",xy=c(0.1,0.925),...) {   #... means any new
   text(x=text.x, y=text.y, labels=label, ...)             
 }
 
-alpha.label1 = c('(a)', '(c)', '(e)', '(g)')
-alpha.label2 = c('a) data all, no tv',   'b) data all, tv',  
-                'c) reduce data, no tv', 'd) reduce data, tv', 
-                "e) no data",            "f) no data tv")
+alpha.label = c('(a)', '(b)', '(c)', '(d)', '(e)', '(f)')
+name.label = c('Full Data', 'Data Reduction', 'Historical Data')
 
 library(RColorBrewer)
-color <- rgb(0, 0, 0, 0.30) 
-a = 256
-plot.color = c(rgb(0, 153/a, 0), rgb(255/a, 128/a, 0), "Blue", "violet")
-trans = 0.20
-trans.color = c(rgb(0, 153/a, 0, trans), rgb(255/a, 128/a, 0, trans+ 0.05), rgb(0,0,1, trans), rgb(0,0.5, 0.5, trans))
 
 #Dimensions used for plotting======================================================================================
 ds =  dim(rock.out[[2]]$ssb.est)[1] #Determines the number of data scenarios to plot
-pre.yrs  = 71
 hist.yrs = 50
 proj.yrs = 100
-first.ass = pre.yrs + hist.yrs - 1
+ass.yr1  = 120
+pre.yrs  = 71
+final.yr = proj.yrs + hist.yrs + pre.yrs - 1  #rock.yrs + 50 + pre.yrs.rock - 1
+
+ass.yrs = seq(ass.yr1, ass.yr1 + proj.yrs,4)
+N       = dim(om.out[[1]]$ssb)[3] 
+
+# Relative error about spawning biomas==================================================================
+setwd("C:/PhD/Chapter3/WriteUp/Plots")
+setwd("D:/PhD/Chapter3/April16_PreCPUE/Plots")
+png(filename = "RE_SSB_full.png", width = 6.7, height = 5, units = 'in', res = 256)
+
+par(mfrow= c(2,3), mar = c(0.2,0.2,0.2,0.2), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
+letter.cex = 1; axis.cex = 1.2; label.cex = 0.8
+ass.plot.yrs = 26
+min = -0.75; max = 1.25
+
+for (a in 1:ds){
+  to.plot = ass.yrs[1:ass.plot.yrs]
+  re.ssb = matrix(0, length(to.plot), 100)
+  for (b in 1:length(to.plot)){
+    re.ssb[b,] = med.out[[1]]$re.ssb[a,b,to.plot[b],]
+  }
+
+  boxplot(t(re.ssb), ylim = c(min, max), col = rep('grey',length(to.plot)), axes= F)
+  box(); abline(h = 0)
+  if( a ==1 || a==4) { axis(side = 2)
+      mtext(side = 2, outer = T, "RE spawning biomass", line = 2.5)} 
+  if( a > 3){
+    axis(side = 1, at = 1:length(to.plot), labels = to.plot - pre.yrs + 1)
+    mtext(side = 1, outer = T, "Assessment year", line = 2.5)
+  }
+  if (a < 4) { mtext(side = 3, outer = F, name.label[a]) }
+  if (a == 3 ){ mtext(side = 4, outer = F, "Time-invariant", line = 1) }
+  if (a == 6 ){ mtext(side = 4, outer = F, "Time-varying", line = 1) }
+  print.letter(alpha.label[a], xy = c(0.07, 0.05), cex = 1.1)  
+}
+
+dev.off()
+
+#=======================================================================================================
+# Relative error about relative biomass ================================================================
+#=======================================================================================================
+
+png(filename = "RE_depl_full.png", width = 6.7, height = 5, units = 'in', res = 256)
+
+par(mfrow= c(2,3), mar = c(0.2,0.2,0.2,0.2), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
+letter.cex = 1; axis.cex = 1.2; label.cex = 0.8
+ass.plot.yrs = 26
+min = -0.75; max = 1.25
+
+for (a in 1:ds){
+  to.plot = ass.yrs[1:ass.plot.yrs]
+  re.depl = matrix(0, length(to.plot), 100)
+  for (b in 1:length(to.plot)){
+    re.depl[b,] = med.out[[1]]$re.depl[a,b,to.plot[b],]
+  }
+
+  boxplot(t(re.depl), ylim = c(min, max), col = rep('grey',length(to.plot)), axes= F)
+  box(); abline(h = 0)
+  if( a ==1 || a==4) { axis(side = 2)
+      mtext(side = 2, outer = T, "RE relative biomass", line = 2.5)} 
+  if( a > 3){
+    axis(side = 1, at = 1:length(to.plot), labels = to.plot - pre.yrs + 1)
+    mtext(side = 1, outer = T, "Assessment year", line = 2.5)
+  }
+  if (a < 4) { mtext(side = 3, outer = F, name.label[a]) }
+  if (a == 3 ){ mtext(side = 4, outer = F, "Time-invariant", line = 1) }
+  if (a == 6 ){ mtext(side = 4, outer = F, "Time-varying", line = 1) }
+  print.letter(alpha.label[a], xy = c(0.07, 0.05), cex = 1.1)  
+}
+
+dev.off()
+
+#=========================================================================================================
+# RMSE over time for spawning biomass
+#=========================================================================================================
+png(filename = "RMSE_SSB_full.png", width = 6.7, height = 3, units = 'in', res = 256)
+
+par(mfrow= c(1,2), mar = c(0.2,0.2,0.2,0.2), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
+letter.cex = 1; axis.cex = 1; label.cex = 1
+ass.plot.yrs = 26
+min = 0; max = 100
+pch.vec = rep(16:18,2)
+
+for (a in 1:ds){
+  index = ass.yrs - pre.yrs
+  if (a == 1 || a ==4){
+    plot(index, med.out[[1]]$rmse.depl[a,], type = 'l', lwd = 1, ylim = c(min, max), axes = F, xaxs="i")
+    points(index, med.out[[1]]$rmse.depl[a,], pch = pch.vec[a])
+    box()
+    axis(side = 1)#, at = 1:length(to.plot), labels = to.plot - pre.yrs + 1)
+    if (a == 1) { mtext(side = 1, "Assessment Year", outer = T, cex = label.cex, line = 2)
+                  axis(side = 2, cex = axis.cex)
+                  mtext(side = 2, "RMSE spawning biomass", cex = label.cex, outer = T, line = 2)
+                  print.letter(alpha.label[a], xy = c(0.10, 0.95), cex = 1.1)  }
+    if( a == 4) { print.letter(alpha.label[a-2], xy = c(0.10, 0.95), cex = 1.1)  }
+  }
+  lines(index, med.out[[1]]$rmse.depl[a,], lwd = 1)
+  points(index, med.out[[1]]$rmse.depl[a,], pch = pch.vec[a])
+}
+
+dev.off()
 
 
-start.plot = 105
-ass.index = rev(c(1, 3, 5, 7))
-text.yr = sort((pre.yrs + ass.yr)[ass.index]) - 5
 
-final.yr = hist.yrs + pre.yrs + max(ass.index)*4 - 1  
 
-ass.yr = seq(hist.yrs, hist.yrs + proj.yrs, 4) 
-ass.yrs= seq(first.ass, first.ass + proj.yrs, 4)
-N = dim(om.rock$ssb)[3] 
 
-#Create Plots to compare results==================================================================
-#windows(10, 10, record = TRUE)
 
-#Spawning Biomass
-par(mfrow= c(3,2), mar = c(0.1,0.1,0.1,0.1), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
+color <- rgb(0, 0, 0, 0.30) 
+ass.index.flat = rev(c(2, 1, 4, 6))#rev(c(1,  5, 10, 14))#rev(c(1, 7, 14))
+ass.index.rock = rev(c(1, 4, 10, 16, 26))#rev(c(1, 10, 20, 26))#rev(c(1, 13, 26))
+text.yr.flat = sort((pre.yrs.flat + ass.yr)[ass.index.flat]) - 2
+text.yr.rock = sort((pre.yrs.rock + ass.yr)[ass.index.rock]) - 5
+a = 256
+plot.color = c(rgb(0, 153/a, 0), rgb(255/a, 128/a, 0), "Blue", "violet")
+#plot.color = c('blue', "darkgreen", 'red')
+trans = 0.20
+trans.color = c(rgb(0, 153/a, 0, trans), rgb(255/a, 128/a, 0, trans+ 0.05), rgb(0,0,1, trans), rgb(0,0.5, 0.5, trans))
 
 lty.type = c(4, 3, 2, 5, 1)
-ymax = ceiling( max(rock.out[[1]]$med.ssb[,start.plot:final.yr,]))
+ymax = ceiling( max(rock.out[[1]]$med.ssb[,start.plot.rock:final.yr.rock,]))
 
 for(b in 1:ds){
   
-  plot(start.plot:final.yr,  rock.out[[1]]$med.ssb[b,start.plot:final.yr, 2], col = 1, type = 'l', lwd =2, 
-      ylim = c(0,ymax), ylab = "SB", xlab = "Year",  axes = F, xaxs="i")
+  #Plot rockfish
+  plot(start.plot.rock:final.yr.rock,  rock.out[[1]]$med.ssb[b,start.plot.rock:final.yr.rock,2], col = 1, type = 'l', lwd =2, 
+    ylim = c(0,ymax), ylab = "SB", xlab = "Year",  axes = F, xaxs="i")
+  if(b ==1) { mtext(side = 3, "Rockfish", outer = T, line = 2.5)
+              mtext(side = 2, "SSB", outer = T, line = 2.5) }
+  if (b ==1 || b == 3) { axis(side = 2)}
   box()
-
-  if (b ==1)   { mtext(side = 2, "SSB", outer = T, line = 2.5) }
-  if (b ==1 || b == 3) { axis(side = 2)}  
   if(b == ds) { 
+    #axis(side = 1, at =seq(120, 220,20), labels = seq(50, 150, 20))
     axis(side = 1, at =seq(170, 270,20), labels = seq(100, 200, 20))
     mtext("Year", side = 1, outer = T, line = 2.5)
   }
-
   #Calculate the % determined to be overfished
-  #per.of = round(rock.out[[1]]$n.overfished[b,sort(ass.index)]/N,2)
-  lines(start.plot:final.yr,  rock.out[[1]]$med.ssb[b,start.plot:final.yr,1], col = 'darkgrey', lty = 4, lwd =1)
-  lines(start.plot:final.yr,  rock.out[[1]]$med.ssb[b,start.plot:final.yr,3], col = 'darkgrey', lty = 4, lwd =1)
+  #per.of = round(rock.out[[1]]$n.overfished[b,sort(ass.index.rock)]/N.rock,2)
+  lines(start.plot.rock:final.yr.rock,  rock.out[[1]]$med.ssb[b,start.plot.rock:final.yr.rock,1], col = 'darkgrey', lty = 4, lwd =1)
+  lines(start.plot.rock:final.yr.rock,  rock.out[[1]]$med.ssb[b,start.plot.rock:final.yr.rock,3], col = 'darkgrey', lty = 4, lwd =1)
   print.letter(alpha.label2[b], xy = c(0.15, 0.95), cex = 1.1)
   #text(labels = per.of, x = text.yr.rock, y = rep(10, length(text.yr.rock)), cex = 1.2 ) 
 
-  for (i in 1:length(ass.index)){
-    temp = ass.index[i]*4 - 5 + hist.yrs + pre.yrs
-    y   = (start.plot):(temp)
-    ind = (start.plot):temp
-    xx  = c(y, rev(y))
-    yy  = c(rock.out[[1]]$med.ssb.est[b,ind,ass.index[i],1], rev(rock.out[[1]]$med.ssb.est[b,ind,ass.index[i],3]))
+  for (i in 1:length(ass.index.rock)){
+    temp = ass.index.rock[i]*4 - 5 + hist.yrs + pre.yrs.rock
+    y = (start.plot.rock):(temp)
+    ind = (start.plot.rock):temp
+    xx = c(y, rev(y))
+    yy = c(rock.out[[1]]$med.ssb.est[b,ind,ass.index.rock[i],1], rev(rock.out[[1]]$med.ssb.est[b,ind,ass.index.rock[i],3]))
     polygon(xx, yy, col = trans.color[i], lty = 0)
   }
-  lines(start.plot:final.yr,  rock.out[[1]]$med.ssb[b,start.plot:final.yr,2], col = 'grey70', lty = 1, lwd =3)
-
-  for (i in 1:length(ass.index))
+  lines(start.plot.rock:final.yr.rock,  rock.out[[1]]$med.ssb[b,start.plot.rock:final.yr.rock,2], col = 'grey70', lty = 1, lwd =3)
+  for (i in 1:length(ass.index.rock))
   {
-    temp = ass.index[i]*4 - 5 + hist.yrs + pre.yrs
-    y   = (start.plot):(temp)
-    ind = (start.plot):temp
-    lines(y, rock.out[[1]]$med.ssb.est[b,ind,ass.index[i],2], col = plot.color[i], lty = lty.type[i], lwd =2)
+    temp = ass.index.rock[i]*4 - 5 + hist.yrs + pre.yrs.rock
+    y = (start.plot.rock):(temp)
+    ind = (start.plot.rock):temp
+    lines(y, rock.out[[1]]$med.ssb.est[b,ind,ass.index.rock[i],2], col = plot.color[i], lty = lty.type[i], lwd =2)
   }
-
 }
 
 
@@ -116,115 +207,124 @@ for(b in 1:ds){
 #Spawning Biomass
 par(mfrow= c(3,2), mar = c(0.1,1.2,0.1,1.2), oma = c(4,4,4,4), cex.axis = 1.1, cex.lab = 1.1)
 
-final.yr   = 220
-start.plot = 105
-ass.index = rev(c(1, 8, 13, 20, 26))
-text.yr   = sort((pre.yrs+ ass.yr)[ass.index]) - 5
-color      = rgb(0, 0, 0, 0.30) 
+final.yr.rock = 220#195#246 #196
 
+start.plot.rock = 105#155 #105#112
+color <- rgb(0, 0, 0, 0.30) 
+
+ass.index.rock = rev(c(1, 8, 13, 20, 26))#rev(c(1, 10, 20, 26))#rev(c(1, 13, 26))
+
+text.yr.rock = sort((pre.yrs.rock + ass.yr)[ass.index.rock]) - 5
 a = 256
 plot.color = c(rgb(0, 153/a, 0), rgb(255/a, 128/a, 0), "Blue", "Brown")
+#plot.color = c('blue', "darkgreen", 'red')
 trans = 0.20
 trans.color = c(rgb(0, 153/a, 0, trans), rgb(255/a, 128/a, 0, trans+ 0.05),rgb(0,0,1, trans), rgb(153/a,0, 0, trans))
 line.color = "white"
 lty.type = c(4, 3, 2, 5, 1)
-
-ymax = ceiling( max(rock.out[[1]]$med.ssb[,start.plot:final.yr,])) + 1000
-
+ymax.rock = ceiling( max(rock.out[[1]]$med.ssb[,start.plot.rock:final.yr.rock,])) + 1000
 for(b in 1:ds){
-
-  plot(start.plot:final.yr,  rock.out[[1]]$med.ssb[b,start.plot:final.yr,2], col = 1, type = 'l', lwd =2, 
-      ylim = c(0,ymax), ylab = "", xlab = "",  axes = F, xaxs="i")
+  #Plot rockfish
+  plot(start.plot.rock:final.yr.rock,  rock.out[[1]]$med.ssb[b,start.plot.rock:final.yr.rock,2], col = 1, type = 'l', lwd =2, 
+    ylim = c(0,ymax.rock), ylab = "SB", xlab = "Year",  axes = F, xaxs="i")
+  if(b ==1) { mtext(side = 3, "Rockfish", outer = F, line = 1)
+              mtext(side = 2, "SSB", outer = T, line = 1.5) }
   box() ; axis(side =2)
-
-  if(b ==1) { mtext(side = 2, "SSB", outer = T, line = 1.5) }
   if(b > 2) { 
+    #axis(side = 1, at =seq(120, 220,10), labels = seq(50, 150, 10))
     axis(side = 1, at =seq(120, 220, 10), labels = seq(50, 150, 10))
-    mtext("Year", side = 1, outer = T, line = 2.5)}
-
-  lines(start.plot:final.yr,  rock.out[[1]]$med.ssb[b,start.plot:final.yr,1], col = 'darkgrey', lty = 4, lwd =1)
-  lines(start.plot:final.yr,  rock.out[[1]]$med.ssb[b,start.plot:final.yr,3], col = 'darkgrey', lty = 4, lwd =1)
-
-  print.letter(alpha.label2[b], xy = c(0.17, 0.95))
+    mtext("Year", side = 1, outer = T, line = 2.5)
+  }
+  lines(start.plot.rock:final.yr.rock,  rock.out[[1]]$med.ssb[b,start.plot.rock:final.yr.rock,1], col = 'darkgrey', lty = 4, lwd =1)
+  lines(start.plot.rock:final.yr.rock,  rock.out[[1]]$med.ssb[b,start.plot.rock:final.yr.rock,3], col = 'darkgrey', lty = 4, lwd =1)
+  #print.letter(alpha.label2[b], xy = c(0.17, 0.95))
   #per.of = round(rock.out[[1]]$n.overfished[b,sort(ass.index.rock)]/N.rock,2)
   #text( labels = per.of, x = text.yr.rock, y = rep(10, length(text.yr.rock)), cex = 1.2 )
-  for (i in 1:length(ass.index)){
-    temp = ass.index[i]*4 - 5 + hist.yrs + pre.yrs
-    y    = (start.plot):(temp)
-    ind  = (start.plot):temp
-    xx   = c(y, rev(y))
-    yy   = c(rock.out[[1]]$med.ssb.est[b,ind,ass.index[i],1], rev(rock.out[[1]]$med.ssb.est[b,ind,ass.index[i],3]))
+  for (i in 1:length(ass.index.rock)){
+    temp = ass.index.rock[i]*4 - 5 + hist.yrs + pre.yrs.rock
+    y = (start.plot.rock):(temp)
+    ind = (start.plot.rock):temp
+    xx = c(y, rev(y))
+    yy = c(rock.out[[1]]$med.ssb.est[b,ind,ass.index.rock[i],1], rev(rock.out[[1]]$med.ssb.est[b,ind,ass.index.rock[i],3]))
     polygon(xx, yy, col = trans.color[i], lty = 0)
   }
-  lines(start.plot:final.yr,  rock.out[[1]]$med.ssb[b,start.plot:final.yr,2], col = line.color, lty = 1, lwd =3)
-  
-  for (i in 1:length(ass.index))
+    lines(start.plot.rock:final.yr.rock,  rock.out[[1]]$med.ssb[b,start.plot.rock:final.yr.rock,2], col = line.color, lty = 1, lwd =3)
+  for (i in 1:length(ass.index.rock))
   {
-    temp = ass.index[i]*4 - 5 + hist.yrs + pre.yrs
-    y    = (start.plot):temp
-    ind  = (start.plot):temp
-    lines(y, rock.out[[1]]$med.ssb.est[b,ind,ass.index[i],2], col = plot.color[i], lty = lty.type[i], lwd =2)
+    temp = ass.index.rock[i]*4 - 5 + hist.yrs + pre.yrs.rock
+    y = (start.plot.rock):temp
+    ind = (start.plot.rock):temp
+    lines(y, rock.out[[1]]$med.ssb.est[b,ind,ass.index.rock[i],2], col = plot.color[i], lty = lty.type[i], lwd =2)
   }
 }
+
 
 
 #Depletion================================================================================================================================
 par(mfrow= c(3,2), mar = c(0.1,0.1,0.1,0.1), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
 ymax = 0.75
-ass.index = rev(c(1, 8, 13, 20, 26))
-
+ass.index.rock = rev(c(1, 8, 13, 20, 26))
 for(b in 1:ds){
-  plot(start.plot:final.yr,  rock.out[[1]]$med.depl[b,start.plot:final.yr,2], col = 1, type = 'l', lwd =2, 
-      ylim = c(0,ymax), ylab = "", xlab = "",  axes = F, xaxs="i")
-  box() 
-
+   #Plot rockfish
+  plot(start.plot.rock:final.yr.rock,  rock.out[[1]]$med.depl[b,start.plot.rock:final.yr.rock,2], col = 1, type = 'l', lwd =2, 
+    ylim = c(0,ymax), ylab = "Depletion", xlab = "Year",  axes = F, xaxs="i")
   if(b == 1 || b == 3){ axis(side = 2)}
-  if(b == 1 ) {mtext("Depletion", side = 2, outer = T, line = 2)}
-  if(b == ds) { 
+  if(b == 1 ) {mtext("Depeltion", side = 2, outer = T, line = 2)}
+  box() ; if(b == ds) { 
       axis(side = 1, at =seq(120, 220,10), labels = seq(50, 150, 10))
-      mtext("Year", side = 1, outer = T, line = 2.5) }
+      #axis(side = 1, at =seq(170, 270,10), labels = seq(100, 200, 10))
+      mtext("Year", side = 1, outer = T, line = 2.5)}
   if(b ==1) { mtext(side = 3, "Rockfish", outer = F, line = 1) }
-
-  lines(start.plot:final.yr,  rock.out[[1]]$med.depl[b,start.plot:final.yr,1], col ='darkgrey', lty = 4, lwd = 1)
-  lines(start.plot:final.yr,  rock.out[[1]]$med.depl[b,start.plot:final.yr,3], col ='darkgrey', lty = 4, lwd = 1)
+  lines(start.plot.rock:final.yr.rock,  rock.out[[1]]$med.depl[b,start.plot.rock:final.yr.rock,1], col ='darkgrey', lty = 4, lwd = 1)
+  lines(start.plot.rock:final.yr.rock,  rock.out[[1]]$med.depl[b,start.plot.rock:final.yr.rock,3], col ='darkgrey', lty = 4, lwd = 1)
   abline(h = 0.40, lty = 3, col = 'red')
-
+  #print.letter(alpha.label2[b], xy = c(0.12, 0.95))
   #per.of = round(rock.out[[1]]$n.overfished[b,sort(ass.index.rock)]/N.rock,2)
   #text( labels = per.of, x = text.yr.rock, y = rep(0, length(text.yr.rock)), cex = 1.2 )
   print.letter(alpha.label2[b], xy = c(0.15, 0.95), cex = 1.1)
 
-  for (i in 1:length(ass.index))
+  for (i in 1:length(ass.index.rock))
   {
-    temp = ass.index[i]*4 - 5 + hist.yrs + pre.yrs
-    y    = (start.plot):(temp)
-    ind  = (start.plot):temp
-    xx   = c(y, rev(y))
-    yy   = c(rock.out[[1]]$med.depl.est[b,ind,ass.index[i],1], rev(rock.out[[1]]$med.depl.est[b,ind,ass.index[i],3]))
+    temp = ass.index.rock[i]*4 - 5 + hist.yrs + pre.yrs.rock
+    y = (start.plot.rock):(temp)
+    ind = (start.plot.rock):temp
+    xx = c(y, rev(y))
+    yy = c(rock.out[[1]]$med.depl.est[b,ind,ass.index.rock[i],1], rev(rock.out[[1]]$med.depl.est[b,ind,ass.index.rock[i],3]))
     polygon(xx, yy, col = trans.color[i], lty = 0)
   }
-  lines(start.plot:final.yr,  rock.out[[1]]$med.depl[b,start.plot:final.yr,2], col = line.color, lty = 1, lwd =3)
-
-  for (i in 1:length(ass.index))
+  lines(start.plot.rock:final.yr.rock,  rock.out[[1]]$med.depl[b,start.plot.rock:final.yr.rock,2], col = line.color, lty = 1, lwd =3)
+  for (i in 1:length(ass.index.rock))
   {
-    temp = ass.index[i]*4 - 5 + hist.yrs + pre.yrs
-    y    = (start.plot):(temp)
-    ind  = (start.plot):temp
-    lines(y, rock.out[[1]]$med.depl.est[b,ind,ass.index[i],2], col = plot.color[i], lty = lty.type[i], lwd =2)
+    temp = ass.index.rock[i]*4 - 5 + hist.yrs + pre.yrs.rock
+    y = (start.plot.rock):(temp)
+    ind = (start.plot.rock):temp
+    lines(y, rock.out[[1]]$med.depl.est[b,ind,ass.index.rock[i],2], col = plot.color[i], lty = lty.type[i], lwd =2)
   }
 }
 
 #Plot the estimated recovery lines======================================================================
-  #put them in the right order
-  to.plot = cbind(rock.out[[1]]$re.time.over[1,], rock.out[[1]]$re.time.over[3,], rock.out[[1]]$re.time.over[5,],
-              rock.out[[1]]$re.time.over[2,], rock.out[[1]]$re.time.over[4,], rock.out[[1]]$re.time.over[6,])
-  boxplot(to.plot) ; abline(h = 0, lty = 1)
+  par(mfrow = c(1,2))
+  transform = 100 - rock.out[[1]]$n.overfished
+  om.trans = 100 - rock.out[[1]]$om.n.overfished
+
+  plot(1:26, transform[1,], type = 'l', col = 2, lwd = 2)
+  lines(1:26, om.trans[1,], lty = 2, col = 2, lwd = 2)
+  lines(1:26, transform[2,],lty = 1, col = 3, lwd = 2)
+  lines(1:26, om.trans[2,], lty = 2, col = 3, lwd = 2)
+  plot(1:26, transform[3,], type = 'l', col = 4, lwd = 2)
+  lines(1:26, om.trans[3,], lty = 2, col = 4, lwd = 2)
+  lines(1:26, transform[4,],lty = 1, col = 5, lwd = 2)
+  lines(1:26, om.trans[4,], lty = 2, col = 5, lwd = 2)
+  legend("bottomright", legend = c("data-no tv (EM)", "reduced - no tv (EM)", "data-tv (EM)", "reduced-tv (EM)"), col = c(2,3,4,5), lty = c(1,1,1,1))
+
+  boxplot(t(re.time.over)) ; abline(h = 0, lty = 1)
 
 
 #Plot the relative error ===============================================================================
 par(mfrow=c(3,2), mar = c(2,2,3,3))
 
 #Relative Error about depletion
-max = min = 1
+max = min = 0.5
 for (a in 1:ds){
   ass.num = 26
   re.depl = matrix(0, ass.num, 100)
@@ -318,99 +418,104 @@ for(b in 1:ds){
                   mtext(side = 1, "Assessment Year", outer = T, line = 2.5) }
 }
 
-# k estimates ================================================================================
-par(mfrow= c(3,2), mar = c(0.1,0.1,0.1,0.1), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
-ymin = 0 ; ymax = .10
-ind = 1:14
-for(b in 1:ds){
-  ass.num = 26
-  if (b == ds) { axis(side =1, at = seq(1,max(ind),2), labels = seq(hist.yrs, hist.yrs + 4 * max(ind) - 4, 8))
-       mtext(side = 2, "k", outer =T, line = 2.5) }
-  #print.letter(alpha.label1[b], xy = c(0.04, 0.95))
-  boxplot(t(rock.out[[2]]$k.est[b,,]), ylab = "k", ylim = c(ymin,ymax), col = rep('grey',ass.num), axes = F)
-  abline(h = kf, lty = 2, col = 1); box()
-  if (b == 1) { mtext(side =3, "Rockfish", outer = F, line = 0.5); axis(side = 2)}
-  if (b == 3) { axis(side = 2) }
-  #print.letter(alpha.label2[b], xy = c(0.16, 0.05))
-  if (b == ds) { axis(side =1, at = seq(1,26,3), labels = seq(hist.yrs, hist.yrs + 100, 12)); 
-                  mtext(side = 1, "Assessment Year", outer = T, line = 2.5) }
-}
+# RMSE SB0 ===========================================================================================
+par(mfrow = c(2,2))
 
-#Lmin estimates ================================================================================
-par(mfrow= c(3,2), mar = c(0.1,0.1,0.1,0.1), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
-ymin = 10 ; ymax = 30
-ind = 1:14
-for(b in 1:ds){
-  ass.num = 26
-  if (b == ds) { axis(side =1, at = seq(1,max(ind),2), labels = seq(hist.yrs, hist.yrs + 4 * max(ind) - 4, 8))
-       mtext(side = 2, "Lmin", outer =T, line = 2.5) }
-  #print.letter(alpha.label1[b], xy = c(0.04, 0.95))
-  boxplot(t(rock.out[[2]]$lmin.est[b,,]), ylab = "Lmin", ylim = c(ymin,ymax), col = rep('grey',ass.num), axes = F)
-  abline(h = L1, lty = 2, col = 1); box()
-  if (b == 1) { mtext(side =3, "Rockfish", outer = F, line = 0.5); axis(side = 2)}
-  if (b == 3) { axis(side = 2) }
-  #print.letter(alpha.label2[b], xy = c(0.16, 0.05))
-  if (b == ds) { axis(side =1, at = seq(1,26,3), labels = seq(hist.yrs, hist.yrs + 100, 12)); 
-                  mtext(side = 1, "Assessment Year", outer = T, line = 2.5) }
-}
+rmse.sb0 = rock.out[[1]]$rmse.sb0
+plot(1:26, rmse.sb0[1,], type = 'l', ylim = c(0, 30), col = 1, axes= F)
+lines(1:26, rmse.sb0[3,], lty = 2, col = 2)
+lines(1:26, rmse.sb0[5,], lty = 2, col = 3)
+mtext(side = 2, outer = F, "RMSE SB0", line = 2)
+box(); abline(h = 0)
+axis(side = 2); axis(side = 1, at = seq(1,26,3), labels = seq(hist.yrs, hist.yrs + 100, 12))
 
-#Lmax estimates ================================================================================
-par(mfrow= c(3,2), mar = c(0.1,0.1,0.1,0.1), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
-ymin = L2f-10 ; ymax = L2f+10
-ind = 1:14
-for(b in 1:ds){
-  ass.num = 26
-  if (b == ds) { axis(side =1, at = seq(1,max(ind),2), labels = seq(hist.yrs, hist.yrs + 4 * max(ind) - 4, 8))
-       mtext(side = 2, "Lmax", outer =T, line = 2.5) }
-  #print.letter(alpha.label1[b], xy = c(0.04, 0.95))
-  boxplot(t(rock.out[[2]]$lmax.est[b,,]), ylab = "Lmax", ylim = c(ymin,ymax), col = rep('grey',ass.num), axes = F)
-  abline(h = L2f, lty = 2, col = 1); box()
-  if (b == 1) { mtext(side =3, "Rockfish", outer = F, line = 0.5); axis(side = 2)}
-  if (b == 3) { axis(side = 2) }
-  #print.letter(alpha.label2[b], xy = c(0.16, 0.05))
-  if (b == ds) { axis(side =1, at = seq(1,26,3), labels = seq(hist.yrs, hist.yrs + 100, 12)); 
-                  mtext(side = 1, "Assessment Year", outer = T, line = 2.5) }
-}
+plot(1:26, rmse.sb0[2,], type = 'l', ylim = c(0, 30), col = 1, axes= F)
+lines(1:26, rmse.sb0[4,], lty = 2, col = 2)
+lines(1:26, rmse.sb0[6,], lty = 2, col = 3)
+box(); abline(h = 0)
+axis(side = 2); axis(side = 1, at = seq(1,26,3), labels = seq(hist.yrs, hist.yrs + 100, 12))
+mtext(side = 3, outer = T, "Rockfish", line = 1)
 
+rmse.depl = rock.out[[1]]$rmse.depl
+plot(1:26, rmse.depl[1,], type = 'l', ylim = c(0, 70), col = 1, axes= F)
+lines(1:26, rmse.depl[3,], lty = 2, col = 2)
+lines(1:26, rmse.depl[5,], lty = 2, col = 3)
+mtext(side = 2, outer = F, "RMSE Depletion", line = 2)
+box(); abline(h = 0)
+axis(side = 2); axis(side = 1, at = seq(1,26,3), labels = seq(hist.yrs, hist.yrs + 100, 12))
+
+plot(1:26, rmse.depl[2,], type = 'l', ylim = c(0, 70), col = 1, axes= F)
+lines(1:26, rmse.depl[4,], lty = 2, col = 2)
+lines(1:26, rmse.depl[6,], lty = 2, col = 3)
+box(); abline(h = 0)
+axis(side = 2); axis(side = 1, at = seq(1,26,3), labels = seq(hist.yrs, hist.yrs + 100, 12))
+mtext(side = 3, outer = T, "Rockfish", line = 1)
 
 
 #Plot the distributions of stock determinations========================================================
 
-#par(mfrow= c(ds,2), mar = c(1, 1, 1, 1), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
-#for (b in 1:ds){
-#  a = hist(rock.out[[1]]$yrs.declared.all[b,]/48, ylim = c(0,35), breaks = c(seq(-1.55,2.15,0.15)), main = "", axes = T)
-#  lines(rep(0,2), c(0, a$counts[11] ), col =1, lty = 2)
-#  print.letter(alpha.label2[b], xy = c(0.05, 0.90))
-#  if (b == 1) { mtext(side =3, "Rockfish", outer = F, line = 0.5)}
-#  if (b == ds) {  mtext(side = 1, "Relative Years Declared Recovered", line = 2.5, outer = T)}
-#}
+temp = rock.out[[2]]$time.over - rock.out[[3]]$om.time.over
+ind = temp[1,] > -101
+a = hist(temp[1,ind], ylim = c(0,35), breaks = c(seq(-75, 75, 5)))
+boxplot(t(rock.out[[1]]$re.time.over), ylim = c(-1,1.25)); abline(h=0)
 
-par(mfrow= c(3,2), mar = c(1, 1, 1, 1), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
+par(mfrow= c(ds,2), mar = c(1, 1, 1, 1), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
 for (b in 1:ds){
-  a = hist(rock.out[[1]]$yrs.declared.all[b,], ylim = c(0,35), breaks = c(seq(-61,95,4)), main = "", axes = T)
-  lines(rep(0,2), c(0, a$counts[14] ), col =1, lty = 2)
-  print.letter(alpha.label2[b], xy = c(0.16, 0.90))
+  a = hist(rock.out[[1]]$yrs.declared.all[b,]/48, ylim = c(0,35), breaks = c(seq(-1.55,2.15,0.15)), main = "", axes = T)
+  lines(rep(0,2), c(0, a$counts[11] ), col =1, lty = 2)
+  print.letter(alpha.label2[b], xy = c(0.05, 0.90))
   if (b == 1) { mtext(side =3, "Rockfish", outer = F, line = 0.5)}
   if (b == ds) {  mtext(side = 1, "Relative Years Declared Recovered", line = 2.5, outer = T)}
 }
 
+par(mfrow= c(3,2), mar = c(1, 1, 1, 1), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
+for (b in 1:ds){
+  #a = hist(flat.out[[1]]$yrs.declared.all[b,], ylim = c(0,35), breaks = c(seq(-54,95,4)), main = "", axes = T)
+  #lines(rep(0,2), c(0, a$counts[14] ), col =1, lty = 2.5)
+  #if (b == 1) { mtext(side =3, "Flatfish", outer = F, line = 0.5)}
+  ##axis(side = 2) ; axis(side = 1, at = seq(-2, 2, 1))
+  #if (b == ds) { mtext(side = 2, "Count", line = 2, outer = T) }
+  #print.letter(alpha.label1[b], xy = c(0.05, 0.90))
 
-#RMSE Table =========================================================================================================================
-ind = 1:10 
-vec = c(1,3,5,2,4,6)
-c = d = NULL
-for (a in 1:6){
-  temp = vec[a]
-  c = rbind(c, rock.out[[1]]$rmse.sb0[temp, ind])
-  d = rbind(d, rock.out[[1]]$rmse.depl[temp,ind])
+  a = hist(rock.out[[1]]$yrs.declared.all[b,], ylim = c(0,35), breaks = c(seq(-61,95,4)), main = "", axes = T)
+  lines(rep(0,2), c(0, a$counts[14] ), col =1, lty = 2)
+  print.letter(alpha.label2[b], xy = c(0.16, 0.90))
+  #axis(side = 1, at = seq(-2, 3, 1))
+  #axis(side = 1, at = seq(-2, 3, 1));
+  if (b == 1) { mtext(side =3, "Rockfish", outer = F, line = 0.5)}
+  if (b == ds) {  mtext(side = 1, "Relative Years Declared Recovered", line = 2.5, outer = T)}
 }
 
+#plot(1:ass.num, temp1, ylab="Failed to Detect", type = 'b', col = "red", ylim = c(0, max(temp1)+2))
+#points(1:ass.num, temp1, pch = 16, col = 'red')
+#points(1:ass.num, temp2, pch = 16, col = "blue")
+#lines (1:ass.num, temp2, lty = 1,  col = "blue")
+#points(1:ass.num, temp3, pch = 16, col = "green")
+#lines (1:ass.num, temp3, lty = 1,  col = "green")
+
+#RMSE Table =========================================================================================================================
+ind = c(2, 3, 4, 5, 8, 11, 13)
+#a = flat.out[[1]]$rmse.sb0[, ind]
+#b = flat.out[[1]]$rmse.depl[,ind]
+ind = c(3, 6, 10, 14, 18, 22, 26) 
+c = rock.out[[1]]$rmse.sb0[, ind]
+d = rock.out[[1]]$rmse.depl[,ind]
+
+#write.table(round(a, 0) , file = "", quote = F, row.names = F, col.names = F)
+#write.table(round(b, 0) , file = "", quote = F, row.names = F, col.names = F)
 write.table(round(c, 0) , file = "", quote = F, row.names = F, col.names = F)
 write.table(round(d, 0) , file = "", quote = F, row.names = F, col.names = F)
 
 #Median Relative Errors ============================================================================================================ 
+#ind = c(2, 3, 4, 5, 8, 11, 13)
+#a  = b = NULL
+#for (i in 1:length(ind)){
+#  a = cbind(a, apply(flat.out[[1]]$re.ssb0[,ind[i],],1,median))
+#  y = 50 + ind[i]*4 - 4
+#  b = cbind(b, apply(flat.out[[1]]$re.depl[,ind[i],y,], 1, median))
+#}
 
-ind = 1:10  
+ind = c(3, 6, 10, 14, 18, 22, 26)  
 c = d =NULL
 for (i in 1:length(ind)){
   c = cbind(c, apply(rock.out[[1]]$re.ssb0[,ind[i],],1,median))
@@ -418,6 +523,8 @@ for (i in 1:length(ind)){
   d = cbind(d, apply(rock.out[[1]]$re.depl[,ind[i],y,], 1, median))
 }
 
+#write.table(round(a, 2) , file = "", quote = F, row.names = F, col.names = F)
+#write.table(round(b, 2) , file = "", quote = F, row.names = F, col.names = F)
 write.table(round(c, 2) , file = "", quote = F, row.names = F, col.names = F)
 write.table(round(d, 2) , file = "", quote = F, row.names = F, col.names = F)
 
@@ -559,8 +666,16 @@ ymax = max(rock.out[[1]]$med.acl)
 tot.catch = NULL
 for(b in 1:ds){
 
-  ind = (pre.yrs + 51):(final.yr - 1)
+  ind = (pre.yrs.rock + 51):(final.yr.rock - 1)
   tot.catch = cbind(tot.catch, apply(rock.out[[2]]$acl.est[b, ind,], 2, sum) )
+  #boxplot(rock.out[[2]]$catch.est[,ind,], ylim = c(0, 1000))
+  #plot(ind,  rock.out[[1]]$med.acl[ds,ind,2], col = 1, 
+  #  type = 'l', lwd =2, ylim = c(0,ymax), axes = F)
+  #box() 
+  #if (b == ds) { axis(side = 1)}
+  #lines(ind, rock.out[[1]]$med.acl[ds,ind,1], col = 1, lty = 2, lwd =2)
+  #lines(ind, rock.out[[1]]$med.acl[ds,ind,3], col = 1, lty = 2, lwd =2)
+  #lines(ind, rock.out[[1]]$med.catch.est[b,ind,2], col = 'red', lty = 1, lwd =1)
 }
 
 boxplot(tot.catch, ylim = c(0, 35000))
@@ -610,3 +725,20 @@ for (b in 1:ds){
   abline(h = 0, lty = 2, col = 'red')
   if (b == ds) { axis(side = 1, at= seq(1,26,1), labels = ind) }
 }
+
+
+
+#sim = 92
+#par(mfrow=c(2,2))
+#for(sim in 1:sim) 
+#{
+#  plot(1:151, depl[71:221,sim], type = 'l', ylim =c(0,1.2), lwd =2, main = sim)
+#  abline (h =0.40)
+#  for(i in 1:26)
+#  {
+#    ind2 = setup.yrs + i*4 - 3
+#    ind = pre.fishery.yrs + setup.yrs + i*4 - 3
+#    points(ind2, depl.est[ind2,i,sim], col = 'red', pch = 16)
+#    print(cbind(depl.est[ind2,i,sim],depl[ind,sim]))
+#  }
+#}
