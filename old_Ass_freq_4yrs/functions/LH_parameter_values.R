@@ -72,7 +72,7 @@ if (LH == "rockfish" ) {
  len.step <- seq(from = 10, to = 80, by = 2)      ; mid.len.step <- seq(from = 11, to = 79, by = 2)  
  bin <- length(len.step)
        
- m <- 0.08                  ; steep <- 0.65 
+ m <- 0.08                  ; steep <- 0.60 
  wght.coef.m <- wght.coef.f <- 1.5e-5
  wght.exp.m  <- wght.exp.f  <- 3.00
  

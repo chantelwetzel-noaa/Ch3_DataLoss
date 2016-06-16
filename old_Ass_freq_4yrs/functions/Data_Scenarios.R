@@ -31,39 +31,35 @@ auto      <- FALSE
 selec.adj <- 0
 dome.adj  <- -8.5
 
-ass.freq  <- 6
-
 #Adjust the max age value that would be used if ageing error is included
 max.age = ages - 1
 
-sigmaR 	     <- 0.50  
+sigmaR 	     <- 0.60  
 ss.survey.cv <- survey.cv <- 0.40 
 cpue.cv      <- 0.30
-hi.cpue.cv   <- 0.50
-select.sd 	 <- 0.0 #5  #Selectivity Time Varying StDev
+select.sd 	 <- 0.05  #Selectivity Time Varying StDev
 dome.sd      <- 0.20
 m.sd <- k.sd <- 0.20
-age.error    <- 0
-if (AgeError == TRUE) { age.error    <- 0.10 }
+age.error    <- 0.10
 
-
-if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds4" || data.scenario == 'ds6' || data.scenario == 'ds8'){
+if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds4" || data.scenario == 'ds6'){
 	select.sd <- 0
 	m.sd      <- 0 
 	dome.sd   <- 0 
 }
 
 pre.fishery.yrs <- ages - 1 
-project.yrs <- 102 
+project.yrs <- 100 
+if (LH == "flatfish") { project.yrs = 52 }
 fishery.yrs <- setup.yrs + project.yrs + 1
 total.yrs   <- pre.fishery.yrs + fishery.yrs
 
-start.survey  <- ages + setup.yrs - 11 #21# 11 #21 
-start.fishery <- ages + setup.yrs - 15 #25
-start.cpue    <- ages + setup.yrs - 5 #2
+start.survey  <- ages + setup.yrs - 11#21# 11 #21 
+start.fishery <- ages + setup.yrs - 15#25#15 #25
+start.cpue    <- ages + setup.yrs - 2
 
 years       <- 1:total.yrs 
-ass.num     <- ceiling(project.yrs/ ass.freq) +1
+ass.num     <- (project.yrs)/ 4 + 1
 
 estimate.m = TRUE
 
@@ -77,10 +73,8 @@ start.survey.age.samp  <- start.survey
 
 #Data Available Based on Scenario
 #N.f.len = 75 ; N.s.len = 10 ; N.f.age = 25 ; N.s.age = 10 
-#N.f.len = 30 ; N.s.len = 5 ; N.f.age = 20 ; N.s.age = 5 #ass freq and fixed M
-N.f.len = 50 ; N.s.len = 10 ; N.f.age = 25 ; N.s.age = 10 #Ass Freq new Ns
+N.f.len = 30 ; N.s.len = 5 ; N.f.age = 20 ; N.s.age = 5 
 #N.f.len = 100 ; N.s.len = 10 ; N.f.age = 50 ; N.s.age = 10 
-
 if (data.scenario == "ds0") { 
     N.f.len = 500 ; N.s.len = 500 ; N.f.age = 500 ; N.s.age = 500 }
 
@@ -95,3 +89,5 @@ f.age.samp <- c(rep(0,start.fishery - 1),rep(N.f.age,length(data.yrs)))
 
 data.yrs   <- start.survey.age.samp : total.yrs
 s.age.samp <- c(rep(0,start.survey - 1),rep(N.s.age,length(data.yrs)))
+
+

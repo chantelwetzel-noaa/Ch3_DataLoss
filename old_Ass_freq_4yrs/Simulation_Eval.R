@@ -7,37 +7,33 @@
 #         Chantel Wetzel                   #
 ############################################
 
-drive = "C:"
-run.name = "OneAss_noAE_fixedM/"#smallN_noAE/"#"April16_PreCPUE/"#"CPUE_smallN_AE/"#"Ass_Freq/"#"April16_PreCPUE/"
-run.name = "OneAss_AE_hiageN/"
-AE = TRUE
+drive = "D:"
+run.name = "CPUE_smallN_AE"#"Ass_Freq/"#"April16_PreCPUE/"
 LH = "rockfish"
 ds.list = c("ds1","ds2","ds4", "ds3", "ds6", "ds5") 
-ds.list = c("ds1","ds4","ds6", "ds2", "ds3", "ds5")
-ds.list = c("ds1", "ds2") 
+ds.list = c("ds1","ds4","ds6", "ds2", "ds3", "ds5") 
 #ds.list = c("ds1", "ds4", "ds6", "ds8")
 #ds.list = c("full", "reduced", "eliminated", "tv_full", "tv_reduced", "tv_eliminated")
 
-sim.range = c(1, 50) #c(1, 100)
-max.sim = 50
+sim.range = c(1, 100) #c(1, 100)
+max.sim = 100
 if (max.sim != sim.range[2]){print ("Only working up a subset")}
 order = c(1,2,3,4,5,6) 
 data.scenario = ""
 setup.yrs = 50
 
 set.quant = c(0.10, 0.50, 0.90)
-
+ass.freq = 8
 
 #Dimensions by life-history
 git.wd = "C:/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/"
-source(paste(git.wd, "/functions/LH_parameter_values.R", sep=""))
-source(paste(git.wd, "/functions/Data_Scenarios.R", sep=""))
+source(paste(git.wd, run.name, "/functions/LH_parameter_values.R", sep=""))
+source(paste(git.wd, run.name, "/functions/Data_Scenarios.R", sep=""))
 
 if (file.exists( file = paste(drive,"/PhD/Chapter3/", run.name, "/output", sep = "") ) == FALSE ){
   dir.create(paste0(drive,"/PhD/Chapter3/", run.name, "/output"))
 }
 
-set.ass.freq = ass.freq = 4
 first.ass.yr <- total.yrs - project.yrs - 1
 end.catch = first.ass.yr + 25
 ass.yr = seq(first.ass.yr, total.yrs, ass.freq)
@@ -61,9 +57,6 @@ med.f.selex.est = array(0, dim = c(length(ds.list), 2, ass.num, 3))
 m.est.all       = array(0, dim = c(length(ds.list), ass.num, max.sim))
 s.selex.est.all = array(0, dim = c(length(ds.list), 6, ass.num, max.sim))
 f.selex.est.all = array(0, dim = c(length(ds.list), 6, ass.num, max.sim))
-mare.depl       = array(NA,dim = c(length(ds.list), ass.num, total.yrs, max.sim))
-mare.ssb        = array(NA,dim = c(length(ds.list), ass.num, total.yrs, max.sim))
-mare.ssb0       = array(NA,dim = c(length(ds.list), ass.num, max.sim))
 re.depl         = array(NA,dim = c(length(ds.list), ass.num, total.yrs, max.sim))
 re.ssb          = array(NA,dim = c(length(ds.list), ass.num, total.yrs, max.sim))
 re.ssb0         = array(NA,dim = c(length(ds.list), ass.num, max.sim))
@@ -150,12 +143,12 @@ for (spec in 1:length(ds.list))
   j = order[spec]
   data.scenario = ds.list[j]
 
-  #dir = paste(drive,"/PhD/Chapter3/", run.name ,LH,"_",data.scenario,"_multinom_boot_AE_TRUE_",
-  #      sim.range[1],"_",sim.range[2],
-  #      "/save/", sep = "")
-  dir = paste(drive,"/PhD/Chapter3/", run.name ,LH,"_",data.scenario,"_multinom_boot_AE_",AE,"_",
-        sim.range[1],"_", sim.range[2],
+  dir = paste(drive,"/PhD/Chapter3/", run.name ,LH,"_",data.scenario,"_multinom_boot_AE_TRUE_",
+        sim.range[1],"_",sim.range[2],
         "/save/", sep = "")
+  #dir = paste(drive,"/PhD/Chapter3/", run.name ,LH,"_",data.scenario,"_multinom_boot_AE_TRUE_",
+  #      sim.range[1],"_", max.sim,
+  #      "/save/", sep = "")
   
   for (i in sim.range[1]:max.sim) {
       dat = paste(dir, "om_proj_",i,sep ="")
@@ -220,16 +213,16 @@ for (spec in 1:length(ds.list))
     yr.decl.est[j,,i]  = c(index[1], ifelse(length(index)> 2, index[3],0), ifelse(length(index)> 2, index[5],0))
     yr.recr.est[j,,i]  = c(index[2], ifelse(length(index)> 2, index[4],0), ifelse(length(index)> 2, index[6],0))
 
-    #if (sum(Est$recovered.est) != 0){
-    #  ind = Est$recovered.est>0
-    #  values = unique(sort(Est$recovered.est[ind]))
-    #  time.over[j,i] = values[2] -values[1] + 1
-    #}
-    #if (length(values) == 1) { time.over[j,i] = -101 }
-#
-    #ind = ifelse(is.na(yr.recr.est[j,1,i]), first.ass.yr + 100, yr.recr.est[j,1,i])
-    #over.catch[j,i] = sum(Est$ACL[first.ass.yr:ind])
-    #ave.over.catch[j,i] = over.catch[j,i]/ind
+    if (sum(Est$recovered.est) != 0){
+      ind = Est$recovered.est>0
+      values = unique(sort(Est$recovered.est[ind]))
+      time.over[j,i] = values[2] -values[1] + 1
+    }
+    if (length(values) == 1) { time.over[j,i] = -101 }
+
+    ind = ifelse(is.na(yr.recr.est[j,1,i]), first.ass.yr + 100, yr.recr.est[j,1,i])
+    over.catch[j,i] = sum(Est$ACL[first.ass.yr:ind])
+    ave.over.catch[j,i] = over.catch[j,i]/ind
   } 
 
   #Save as an output file 
@@ -430,7 +423,7 @@ for (spec in 1:length(ds.list))
      med.depl.est[j,y,i,]    = t(apply( depl.est[j, y, i, 1:max.sim], 1, quantile, set.quant ))
 
      y = 1:(ass.yr[i]-1) 
-     med.ry.est[j,y,i,]      = t(apply( ry.est[j,   y, i, 1:max.sim], 1, quantile, set.quant, na.rm = T))      
+     med.ry.est[j,y,i,]      = t(apply( ry.est[j,   y, i, 1:max.sim], 1, quantile, set.quant ))      
   }
   
   med.m.est[j,,]         = t(apply(m.est        [j,,1:max.sim], 1, quantile, set.quant))
@@ -442,29 +435,15 @@ for (spec in 1:length(ds.list))
   med.ofl.est[j,,]       = t(apply(ofl.est[j,,],                     1, quantile, set.quant, na.rm = T))
 
   for (a in 1:new.ass.num){
-    mare.depl[j,a,,] <- abs(depl.est[j,,a,] - depl[j,1:total.yrs,]) / depl[j,1:total.yrs,]
-    mare.ssb[j,a,,]  <- abs(ssb.est[j,,a,]  - ssb[j, 1:total.yrs,]) / ssb[j, 1:total.yrs,]
-    mare.ssb0[j,a,]  <- abs(ssb0.est[j,a,]  - ssb[j,1,])/ ssb[j,1,]
-    re.depl[j,a,,]   <- (depl.est[j,,a,] - depl[j,1:total.yrs,]) / depl[j,1:total.yrs,]
-    re.ssb[j,a,,]    <- (ssb.est[j,,a,]  - ssb[j, 1:total.yrs,]) / ssb[j, 1:total.yrs,]
-    re.ssb0[j,a,]    <- (ssb0.est[j,a,]  - ssb[j,1,])/ ssb[j,1,]
-    re.m[j,a,]       <- (m.est[j,a,] - m) / m
-    re.h[j,a,]       <- (h.est[j,a,] - steep) / steep
-    re.k[j,a,]       <- (k.est[j,a,] - kf) / kf
-    re.lmin[j,a,]    <- (lmin.est[j,a,] - L1) / L1
-    re.lmax[j,a,]    <- (lmax.est[j,a,] - L2f) / L2f
+    re.depl[j,a,,] <- (depl.est[j,,a,] - depl[j,1:total.yrs,]) / depl[j,1:total.yrs,]
+    re.ssb[j,a,,]  <- (ssb.est[j,,a,]  - ssb[j, 1:total.yrs,]) / ssb[j, 1:total.yrs,]
+    re.ssb0[j,a,]  <- (ssb0.est[j,a,]  - ssb[j,1,])/ ssb[j,1,]
+    re.m[j,a,]     <- (m.est[j,a,] - m) / m
+    re.h[j,a,]     <- (h.est[j,a,] - steep) / steep
+    re.k[j,a,]     <- (k.est[j,a,] - kf) / kf
+    re.lmin[j,a,]  <- (lmin.est[j,a,] - L1) / L1
+    re.lmax[j,a,]  <- (lmax.est[j,a,] - L2f) / L2f
   }
-
-   boxplot(cbind(re.ssb[1,,120,], re.ssb[2,,120,]), ylim = c(-0.5,1), ylab = "RE SSB")
-   abline(h = 0)
-   legend('topleft', bty = 'n', legend = c("Time-invariant"))
-   legend('topright', bty = 'n', legend = c("Time-Varying"))
-
-   boxplot(cbind(re.depl[1,,120,], re.depl[2,,120,]), ylim = c(-0.5,1), ylab = "RE DEPL")
-   abline(h = 0)
-   legend('topleft', bty = 'n', legend = c("Time-invariant"))
-   legend('topright', bty = 'n', legend = c("Time-Varying"))
-
 
   ind = (first.ass.yr) :(total.yrs)
   for (a in 1:max.sim){
@@ -499,40 +478,18 @@ for (spec in 1:length(ds.list))
   meds.all <- list()
   meds.out <- paste(drive,"/PhD/Chapter3/", run.name,"/output/",LH,"_meds_all", sep = "")
 
-  meds.all$med.ssb      <- med.ssb
-  meds.all$med.ry       <- med.ry
-  meds.all$med.depl     <- med.depl
-  meds.all$med.catch    <- med.catch
-  meds.all$med.ofl      <- med.ofl
-  meds.all$med.acl      <- med.acl
+  meds.all$med.ssb  <- med.ssb
+  meds.all$med.ry   <- med.ry
+  meds.all$med.depl <- med.depl
+  meds.all$med.catch<- med.catch
+  meds.all$med.ofl  <- med.ofl
+  meds.all$med.acl  <- med.acl
   meds.all$med.ssb.est  <- med.ssb.est
   meds.all$med.ry.est   <- med.ry.est
   meds.all$med.depl.est <- med.depl.est
   meds.all$med.acl.est  <- med.acl.est
   meds.all$med.ofl.est  <- med.ofl.est
   meds.all$med.m.est    <- med.m.est
-  meds.all$mare.depl    <- mare.depl
-  meds.all$mare.ssb     <- mare.ssb
-  meds.all$mare.ssb0    <- mare.ssb0
-  meds.all$re.depl      <- re.depl
-  meds.all$re.ssb       <- re.ssb
-  meds.all$re.ssb0      <- re.ssb0
-  meds.all$re.m         <- re.m
-  meds.all$re.h         <- re.h
-  meds.all$re.k         <- re.k
-  meds.all$re.lmin      <- re.lmin
-  meds.all$re.lmax      <- re.lmax
-  meds.all$re.catch     <- re.catch
-  meds.all$re.ofl       <- re.ofl
-  meds.all$re.f.selex   <- re.f.selex
-  meds.all$re.s.selex   <- re.s.selex
-  meds.all$rmse.depl    <- rmse.depl
-  meds.all$rmse.sb0     <- rmse.sb0
-  meds.all$rmse.ssb.ass <- rmse.ssb.ass
-  meds.all$re.time.over <- re.time.over
-  meds.all$catch.median <- catch.median
-  meds.all$aav          <- aav
-  meds.all$filt.re.time.over          <- filt.re.time.over
   meds.all$failed.to.detect.rec.all   <- failed.to.detect.rec.all
   meds.all$failed.to.detect.over      <- failed.to.detect.over
   meds.all$incorrect.rebuild          <- incorrect.rebuild  
@@ -540,5 +497,24 @@ for (spec in 1:length(ds.list))
   meds.all$yrs.declared.rec.early.all <- yrs.declared.rec.early.all
   meds.all$yrs.declared.all           <- yrs.declared.all
   meds.all$overfished.again           <- overfished.again
+  meds.all$re.depl <- re.depl
+  meds.all$re.ssb  <- re.ssb
+  meds.all$re.ssb0 <- re.ssb0
+  meds.all$re.m    <- re.m
+  meds.all$re.h    <- re.h
+  meds.all$re.k    <- re.k
+  meds.all$re.lmin <- re.lmin
+  meds.all$re.lmax <- re.lmax
+  meds.all$re.catch<- re.catch
+  meds.all$re.ofl  <- re.ofl
+  meds.all$re.f.selex <- re.f.selex
+  meds.all$re.s.selex <- re.s.selex
+  meds.all$re.time.over <- re.time.over
+  meds.all$catch.median <- catch.median
+  meds.all$aav     <- aav
+  meds.all$rmse.depl <- rmse.depl
+  meds.all$rmse.sb0  <- rmse.sb0
+  meds.all$rmse.ssb.ass <- rmse.ssb.ass
+  meds.all$filt.re.time.over <- filt.re.time.over
   save (meds.all, file = meds.out)  
 } 

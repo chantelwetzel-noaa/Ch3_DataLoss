@@ -11,7 +11,7 @@ Rep_Summary<- function(rep.new, y, pre.fishery.yrs, do.forecast)
   tot.yrs <- 1:y 
 
   if (do.forecast > 0){
-    ofl.yrs <- (tot.yrs[length(tot.yrs)]+1):(tot.yrs[length(tot.yrs)] + ass.freq)
+    ofl.yrs <- (tot.yrs[length(tot.yrs)]+1):(tot.yrs[length(tot.yrs)] + 4)
     OFL = mapply(function(x) as.numeric(strsplit(rep.new[grep(paste("OFLCatch_",x,sep=""),rep.new)], " ")[[1]][3]), x = ofl.yrs)
     ACL = mapply(function(x) as.numeric(strsplit(rep.new[grep(paste("ForeCatch_",x,sep=""),rep.new)], " ")[[1]][3]), x = ofl.yrs)
     #ForeCatch = mapply(function(x) ForeCatch = as.numeric(strsplit(rep.new[grep(paste("ForeCatch_",x,sep=""),rep.new)], " ")[[1]][3]), x = ofl.yrs)
@@ -23,11 +23,6 @@ Rep_Summary<- function(rep.new, y, pre.fishery.yrs, do.forecast)
   
   Recruits = mapply(function(x) TotBio = as.numeric(strsplit(rep.new[grep(paste(1, x,"TIME",sep=" "),rep.new)]," ")[[1]][8]),
                                         x = 1:tot.yrs[length(tot.yrs)-1])
-  if (determ == FALSE){
-    dev.yrs = 100:(y-5)
-    rec.devs = mapply(function(x) as.numeric(strsplit(rep.new[grep(paste("Main_RecrDev_",x,sep=""),rep.new)]," ")[[1]][3]), x = dev.yrs)
-  }
-
 
   R0 = as.numeric(strsplit(rep.new[grep("R0",rep.new)], " ")[[1]][3])
 
@@ -73,7 +68,6 @@ Rep_Summary<- function(rep.new, y, pre.fishery.yrs, do.forecast)
   }
   RepSummary$Depl <- Depl
   RepSummary$Recruits<- Recruits
-  if(!determ) { RepSummary$RecDevs <- rec.devs}
   RepSummary$R0<- R0
 
   if (!OM) {

@@ -26,60 +26,11 @@ Get_Samps <- function(data.type, year.vec ){
 						if (data.type == 'len'){
 							out.comp = as.matrix(rmultinom(1, size = Nsamp, prob = probs))
 						}
-						# the 'perfect' data in the SS data.ss_new file has ageing error already included
-						if (data.type == "age"){
+						if (data.type == "age" && AgeError == FALSE){
 							out.comp = as.matrix(rmultinom(1, size = Nsamp, prob = probs))
 						}
 					}
-		
-					#if (AgeError == TRUE && data.type == 'age'){
-					#	new.ages <- numeric(ages*2-2)
-					#	age.sd   <- rep(age.error, ages - 1)
-					#	age.sd   <- c(age.sd, age.sd)
-					#	Nsamp    <- new.comp[year.temp, "Nsamp"]
-					#	for (c in 1:Nsamp) {
-					#		samp    <- rmultinom(n = 1, size = 1, prob = probs)
-					#		find    <- sort(samp == 1, index.return =T)$ix[ages*2 -2]
-					#		age.err <- rnorm(1, 0, age.sd[find])
-    	  			#		temp1   <- ifelse(find > (ages-1), find - (ages-1), find)
-    	  			#		temp2   <- temp1*age.err + temp1 #temp1*exp(age.err - 0.5 * age.err^2) 
-    	  			#		temp3   <- ifelse(temp2 > (floor(temp2)+ 0.50), ceiling(temp2), floor(temp2)) 
-    	  			#		temp3   <- min(temp3, ages-1)		
-					#		# Females go into 1:max.age
-    	  			#		#if ((find + temp3 - temp1) <= ages) { 
-    	  			#		if (find <= max.age) { #ages) { 
-    	      		#			#index = ifelse( (find + temp3 - temp1) < max.age, 
-    	            #           	#		find + temp3 - temp1, max.age) 
-    	      		#			index = ifelse( temp3 < max.age, temp3, max.age) 
-    	      		#			#print(cbind(find, temp1, index, temp3))
-    	      		#		}
-    	  			#		# Males go into max.age + 1 : max.age * 2
-    	  			#		#if ((find + temp3 - temp1) > ages) { 
-    	  			#		if (find  > max.age) { #ages) { 
-    	      		#			index = ifelse( (temp3 + max.age) < max.age * 2, 
-    	            #            	temp3 + max.age, max.age * 2)     	  				
-    	      		#			#index = ifelse( (find + temp3 - temp1 ) < max.age * 2, 
-    	            #            #	temp3 + ages, max.age * 2) 
-    	      		#			#print(cbind(find, temp1, index, temp3))
-    	      		#		}
-    	      		#		new.ages[index] <- new.ages[index] + 1
-					#	}
-					#	out.comp = new.ages
-					#}							
-					temp.comp[year.temp,(end + 1):dim(new.comp)[2]] = out.comp
-					#final.comp = rbind(final.comp, t(out.comp))
-				}	
-			}
-		}
-		test.comp = cbind(temp.comp[,1:end], round(temp.comp[,(end + 1):dim(new.comp)[2]],0))	
-	}
 	
-	if (file.type == "perfect") { test.comp = temp.comp }
-	
-	return(test.comp)	
-}
-
-
 					#if (error.struct == "dirich"){
 					#	para = 2
 					#	probs = new.comp[year.temp, -(1:end)]
@@ -110,4 +61,43 @@ Get_Samps <- function(data.type, year.vec ){
 					#		}
 					#	}
 					#	out.comp = new.ages
-					#}	
+					#}		
+					if (AgeError == TRUE && data.type == 'age'){
+						new.ages = numeric(ages*2-2)
+						age.sd <- rep(age.error, ages - 1)
+						age.sd <- c(age.sd, age.sd)
+						Nsamp  <- new.comp[year.temp, "Nsamp"]
+						for (c in 1:Nsamp) {
+							samp <- rmultinom(n = 1, size = 1, prob = probs)
+							find <- sort(samp == 1, index.return =T)$ix[ages*2 -2]
+							age.err <- rnorm(1, 0, age.sd[find])
+    	  					temp1   <- ifelse(find > (ages-1), find - (ages-1), find)
+    	  					temp2   <- temp1*exp(age.err - 0.5 * age.err^2) 
+    	  					temp3   <- ifelse(temp2 > (floor(temp2)+ 0.50), ceiling(temp2), floor(temp2)) 
+    	  					temp3   <- min(temp3, ages-1)		
+							# Females go into 1:max.age
+    	  					if ((find + temp3 - temp1) <= ages) { 
+    	      					index = ifelse( (find + temp3 - temp1) < max.age, 
+    	                       			find + temp3 - temp1, max.age) }
+    	  					# Males go into max.age + 1 : max.age * 2
+    	  					if ((find + temp3 - temp1) > ages) { 
+    	      					index = ifelse( (find + temp3 - temp1 ) < max.age * 2, 
+    	                        	temp3 + ages, max.age * 2) }
+    	      				new.ages[index] <- new.ages[index] + 1
+						}
+						out.comp = new.ages
+					}				
+			
+					temp.comp[year.temp,(end + 1):dim(new.comp)[2]] = out.comp
+					#final.comp = rbind(final.comp, t(out.comp))
+				}
+	
+			}
+		}
+		test.comp = cbind(temp.comp[,1:end], round(temp.comp[,(end + 1):dim(new.comp)[2]],0))	
+	}
+	
+	if (file.type == "perfect") { test.comp = temp.comp }
+	
+	return(test.comp)	
+}

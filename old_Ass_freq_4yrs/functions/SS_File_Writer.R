@@ -86,7 +86,7 @@ writeCtl.om <- function (ctl,y)
     sigma.set = ifelse(sigmaR == 0, 0.01, sigmaR)
     rec.mat <- matrix(c(
     #_LO    HI     INIT         PRIOR       PR_type     SD      PHASE
-    2,      15,    log(R0),     log(R0),    -1,          10,     est.R0, "# log(R0)",  
+    2,      15,    log(R0),     log(R0),    -1,         10,     est.R0, "# log(R0)",  
     0.20,   1,     steep,       steep,       1,       0.09,     -2, "# SR_steep ",
     0,      1.5,   sigma.set,   sigma.set,  -1,         99,     -99,"#SR_sigmaR",
     -5,     5,     0,           0,          -1,         99,     -99,"# SR_envlink",
@@ -291,7 +291,7 @@ writeCtl <- function (ctl,y)
     #ncol=15, byrow=T)
     #_LO    HI   INIT          PRIOR       PR_type SD      PHASE env  use_dev  dev_minyr   dev_maxyr   dev_stddev  Block     Block_Fxn
     25,     60,  fsp1.start,   fsp1.start, -1,     0.05,   1,    0,   0,       0,          0,          0.2,        0,        0,           "#Peak",
-    -10,    10,  fsp2,         fsp2,       -1,     0.05,  -2,    0,   0,       0,          0,          0.5,        block.num, block.fxn,  "#Top (Width)",                            
+    -10,    10,  fsp2,         fsp2,       -1,     0.05,   2,    0,   0,       0,          0,          0.5,        block.num, block.fxn,  "#Top (Width)",                            
     -10,    10,  fsp3,         fsp3,       -1,     0.05,   3,    0,   0,       0,          0,          0.5,        0,        0,           "#Asc_Width" ,                         
     -2,     20,  fsp4,         fsp4,       -1,     0.05,  -9,    0,   0,       0,          0,          0.5,        0,        0,           "#Desc_Width",                         
     -15,    15,  fsp5,         fsp5,       -1,     0.05,  -9,    0,   0,       0,          0,          0.5,        0,        0,           "#Init",                           
@@ -327,10 +327,8 @@ writeCtl <- function (ctl,y)
     3,      35,         lmin.prior,   lmin.prior,          -1,         10,     4,        c(rep(0,4), 0.5, 0,0), "#L_at_Amin_Fem_GP_1_",
     45,     70,         lmax.prior,   lmax.prior,          -1,         10,     3,        c(rep(0,4), 0.5, 0,0), "#L_at_Amax_Fem_GP_1_",
     0.00,   0.2,        k.prior,      k.prior,             -1,        .20,     3,       c(rep(0,4), 0.5, 0,0), "#VonBert_K_Fem_GP_1_",
-    #45,     70,         L2f,   L2f,          -1,         10,     -3,        c(rep(0,4), 0.5, 0,0), "#L_at_Amax_Fem_GP_1_",
-    #0.00,   0.2,        kf,      kf,             -1,        .20,     -3,       c(rep(0,4), 0.5, 0,0), "#VonBert_K_Fem_GP_1_",
-    0.01,   0.2,        CV1,          CV1,                 -1,       0.20,     -4,       c(rep(0,4), 0.5, 0,0), "#CV_young_Fem_GP_1_",
-    0.01,   0.1,        CV2,          CV2,                 -1,       0.20,     -4,       c(rep(0,4), 0.5, 0,0), "#CV_old_Fem_GP_1_",
+    0.01,   0.2,        cv1.prior,    cv1.prior,           -1,       0.20,     4,       c(rep(0,4), 0.5, 0,0), "#CV_young_Fem_GP_1_",
+    0.01,   0.1,        cv2.prior,    cv2.prior,           -1,       0.20,     4,       c(rep(0,4), 0.5, 0,0), "#CV_old_Fem_GP_1_",
     #0.01,   m.m.est*3,  m.m.est,      round(log(m.m.est),4), 3,      .25,   do.est,     c(rep(0,4), 0.5, 0,0), "#NatM_p_1_Mal_GP_1",
     #3,      35,         L1,           L1,                 -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#L_at_Amin_Mal_GP_1_",
     #35,     70,         L2m,          L2m,                -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#L_at_Amax_Mal_GP_1_",
@@ -360,7 +358,7 @@ writeCtl <- function (ctl,y)
     sigma.set = ifelse(sigmaR == 0, 0.01, sigmaR)
     rec.mat <- matrix(c(
     #_LO    HI     INIT     PRIOR   PR_type     SD      PHASE
-    2,      15,    8.0,       8.0,    -1,        10,      est.R0, "# log(R0)",  
+    2,      15,    log(R0), log(R0), -1,        10,      est.R0, "# log(R0)",  
     #0.20,   1,     steep,   steep,   1,       0.09,     -2, "# SR_steep ",
     0.20,   1,     h.prior,   h.prior,   1,    0.10,     h.phase, "# SR_steep ",
     0,      1.5,   sigma.set,  sigma.set,   -1,         99,     -99,"#SR_sigmaR",
@@ -591,7 +589,7 @@ writeForecast <- function (forecast,y)
     0, 0, 0, 0, 0, 0, " # Benchmark years: beg_bio, end_bio, beg_selex, end_selex, bef_relF, end_relF\n",
     1,          " # Bmark_relF_Basis: 1= use year range; 2= set relF same as forecast below\n",
     do.forecast," #Forecast: 0=none; 1=F(SPR); 2=F(MSY) 3=F(Btgt); 4=F(endyr); 5=Ave F (enter yrs); 6=read Fmult\n",
-    20,          " # N forecast years\n",
+    10,          " # N forecast years\n",
     1,          " #F scalar (only used for Do_Forecast == 5)\n",
     0, 0, 0, 0, " #Fcast_years:  beg_selex, end_selex, beg_relF, end_relF\n",
     1,          " # Control rule method (1=west coast adjust catch; 2=adjust F)\n",
@@ -657,13 +655,19 @@ writeDat<-function(dat, y, survey, fore.catch)
         fishery.data.yrs = seq(start.cpue, y, 1)
         cpue.data = cbind(
             fishery.data.yrs, rep(1, length(fishery.data.yrs)), rep(1, length(fishery.data.yrs)), 
-            rep(5000, length(fishery.data.yrs)), cpue.err.vec[fishery.data.yrs]) }
-        #cpue.data = cbind(
-        #    fishery.data.yrs, rep(1, length(fishery.data.yrs)), rep(1, length(fishery.data.yrs)), 
-        #    rep(5000, length(fishery.data.yrs)), rep(cpue.cv, length(fishery.data.yrs))) }
+            rep(5000, length(fishery.data.yrs)), rep(cpue.cv, length(fishery.data.yrs))) }
+            
+
+    if (do.cpue == T){
+        fishery.data.yrs = seq(start.cpue, y, 1)
+        cpue.data = cbind(
+            fishery.data.yrs, rep(1, length(fishery.data.yrs)), rep(1, length(fishery.data.yrs)), 
+            rep(5000, length(fishery.data.yrs)), rep(cpue.cv, length(fishery.data.yrs))) }
         
     depl.survey    = cbind(y, 1, 3, final.depl, 0.01)
+                    #cbind(y-pre.fishery.yrs, 1, 3, final.depl, 0.01)
 
+    #data.yrs = (start.fishery.len.samp - pre.fishery.yrs):(y-pre.fishery.yrs)
     data.yrs = start.fishery.len.samp:y
     data.matrix = matrix(0, length(data.yrs), 2*length(len.step))
     data.matrix[,1] = f.len.samp[data.yrs]
@@ -691,6 +695,8 @@ writeDat<-function(dat, y, survey, fore.catch)
     keep = fishery.age.data[,9] != 0
     fishery.age.data = fishery.age.data[keep,]
 
+    #data.yrs = (start.survey.age.samp- pre.fishery.yrs) :(y-pre.fishery.yrs)
+    #data.yrs =  start.survey.age.samp : y
     data.matrix = matrix(0, length(survey.data.yrs), 2*ages - 2)
     data.matrix[,1] = s.age.samp[survey.data.yrs]
     survey.age.data = cbind(survey.data.yrs, rep(1, length(survey.data.yrs)), 
@@ -771,7 +777,7 @@ writeDat<-function(dat, y, survey, fore.catch)
     cat(len.step,"\n",
     file=dat,append=T,sep=" ")
     
-age.error
+
     #if (data.scenario != "ds5") {
         cat(n.length.obs,  " #Number of Length Observations\n", 
         "#Year Seas Fleet Gender Partition Nsamp\n",
@@ -788,7 +794,7 @@ age.error
         rep(-1, ages),      " #True Ages\n",
         file=dat,append=T,sep=" ")
 
-        if (AgeError == TRUE)  { cat(age.error*1:ages,        " #Age Error StDev\n", file=dat,append=T,sep=" ")}
+        if (AgeError == TRUE)  { cat(0.10*1:ages,        " #Age Error StDev\n", file=dat,append=T,sep=" ")}
         if (AgeError == FALSE) { cat(rep(0.10, ages),    " #Age Error StDev\n", file=dat,append=T,sep=" ")}
 
         cat("#\n",
