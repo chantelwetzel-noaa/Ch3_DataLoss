@@ -5,11 +5,12 @@
 #=================================================
 
 drive = "C:"
-run.name = "Ass_Freq"
+run.name = ""
 LH = 'rockfish'
 # Source in the parameters
 github = TRUE
 git.wd = "C:/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/"
+source(paste(git.wd, run.name, "/functions/LH_parameter_values.R", sep=""))
 
 selex.fxn <- function(a){
 	#Double Normal Selectivity
@@ -41,6 +42,8 @@ selex.fxn <- function(a){
 N = 50
 ds.vec = 1:4 # 4 option fixed asym, fixed, dome, tv asym, tv dome
 selec <- array(NA, dim = c(length(ds.vec), length(len.step), N))
+#selec.adj <- 0
+#dome.adj  <- -8.5
 
 
 for (a in 1: length(ds.vec)){
@@ -74,21 +77,31 @@ print.letter <- function(label="(a)",xy=c(0.1,0.925),...) {   #... means any new
 
 
 setwd(paste0("/PhD/Chapter3/WriteUp/Plots"))
-png(filename = "selectivity.png", width = 6.7, height = 3, units = 'in', res = 256)
+png(filename = "selectivity.png", width = 6.7, height = 6.7, units = 'in', res = 256)
 
-par(mfrow = c(1,3), mar = c(1,1,1,1), oma = c(4,4,4,4))
+par(mfrow = c(2,2), mar = c(1,1,1,2), oma = c(4,4,4,4))
 axis.size = 1.1
 plot(len.step, selec[1,,1], type = 'l', axes = F, xlab = "", ylab = "", lwd = 1)
-lines(len.step, selec[2,,1], lty = 2, col = 'grey50', lwd = 1)
-box(); axis(side = 1, at = seq(20,80,20), cex.axis = axis.size) ; axis(side = 2, cex.axis = axis.size)
-mtext(side = 2, "Selectivity", line = 3)
+box(); axis(side = 2, cex.axis = axis.size, las = 1)
+mtext(side = 2, "Selectivity", line = 2.5, outer = T)
+mtext(side = 3, "historical/rebuilt", outer = F)
 print.letter("(a)", xy = c(0.09, 0.95))
-plot(len.step, selec[3,,1], type = 'l', axes = F, xlab = "", ylab = "")
+
+plot(len.step, selec[2,,1], typ = 'l', axes = F, xlab = "", ylab = "", lwd = 1)
+box()
+mtext(side = 3, "overfished",  outer = F)
+text(par("usr")[2]*1.05, mean(par("usr")[3:4])+0.15, "time-invarient", srt = -90, xpd = TRUE, pos = 4, cex = 1.2)
+#mtext( "time-invarient", outer = F)
+#text( 0:8, par("usr")[4] + 2,  xpd = TRUE, srt = 45)
+print.letter("(b)", xy = c(0.09, 0.95))
+
+plot(len.step, selec[3,,1], type = 'l', axes = F, xlab = "", ylab = "", las = 1)
 for(b in 2:N){
 	lines(len.step, selec[3,,b])
 }
 box(); axis(side = 1, at = seq(20,80,20), cex.axis = axis.size) 
-print.letter("(b)", xy = c(0.09, 0.95))
+axis(side = 2, cex.axis = axis.size, las = 1)
+print.letter("(c)", xy = c(0.09, 0.95))
 
 plot(len.step, selec[4,,1], type = 'l', axes = F, xlab = "", ylab = "")
 for(b in 2:N){
@@ -96,5 +109,8 @@ for(b in 2:N){
 }
 box();axis(side = 1, at = seq(20,80,20), cex.axis = axis.size) 
 mtext(side = 1, "Length (cm)", outer = T, line = 2.5)
-print.letter("(c)", xy = c(0.09, 0.95))
+text(par("usr")[2]*1.05, mean(par("usr")[3:4])+0.15, "time-varying", srt = -90, xpd = TRUE, pos = 4, cex = 1.2)
+#mtext(side = 4, "time-varying", outer = F)
+print.letter("(d)", xy = c(0.09, 0.95))
+
 dev.off()

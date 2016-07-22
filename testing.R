@@ -1,8 +1,8 @@
 LH= "rockfish"
 hist.len = "50_yr"
 #wd = paste("C:/PhD/Chapter3/",LH,"_ds7_50yr_sims_1_25/save/",sep="") 
-wd = paste("C:/PhD/Chapter3/",LH,"_ds1_50yr_sims_multinom_boot_AE_FALSE_1_100/save/",sep="") 
-wd = paste("D:/PhD/Chapter3/April16_PreCPUE/",LH,"_ds0_50yr_sims_multinom_boot_AE_TRUE_1_100/save/",sep="") 
+wd = paste("C:/PhD/Chapter3/",LH,"_ds2_multinom_boot_AE_TRUE_1_100/save/",sep="") 
+#wd = paste("D:/PhD/Chapter3/April16_PreCPUE/",LH,"_ds0_50yr_sims_multinom_boot_AE_TRUE_1_100/save/",sep="") 
 par(mfrow =c (4,3), oma =c(1,1,1,1), mar = c(2,4,2,3))
 hist.len = "50_yr"
 
@@ -17,10 +17,10 @@ if (LH == "rockfish") {
 	ss.years = 246#271#221#142
 	first.ass = 170#120#90#120
 	if (hist.len == "50_yr") {
-		ss.years = 221#271#221#142
+		ss.years = 223#271#221#142
 		first.ass = 120#170#120#90#120
 	}
-	ass.length = 26
+	ass.length = 18
 	target = 0.40#0.25 
 	thres  = 0.25#0.08
 	ass.index = c(1,3,6,9,12,15, 18, 21, 24)

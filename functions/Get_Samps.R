@@ -14,9 +14,11 @@ Get_Samps <- function(data.type, year.vec ){
 	temp.comp = new.comp
 	final.comp = NULL
 
+	max.f = ifelse( do.survey == T, 2, 1)
+
 	if (file.type == "boot"){
 		# Select the years for the fishery
-		for (f in 1:2){
+		for (f in 1:max.f){
 			for (a in 1:length(year.vec)){
 				year.temp = new.comp$Yr == year.vec[a] & new.comp$FltSvy == f
 				if (sum (year.temp) != 0){

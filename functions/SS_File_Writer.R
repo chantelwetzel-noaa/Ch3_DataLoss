@@ -1,13 +1,6 @@
 writeCtl.om <- function (ctl,y) 
 {   
     selec.master <- matrix(c(    
-    #_LO    HI   INIT   PRIOR  PR_type SD  PHASE   env  use_dev      dev_minyr   dev_maxyr   dev_stddev  Block     Block_Fxn
-    #25,     60,  fsp1.vec[1],  fsp1.vec[1],   -1,     1,   4,    0,   0,           0,          0,         0.20,    1, 2,   "#Inflection",
-    #-5,     5,   fsp2,  fsp2,   -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,           "#Slope",
-    ##Survey                     
-    #25,     60,  ssp1,  ssp1,   -1,     1,    4,   0,   0,           0,          0,          0.5,        0,        0,           "#Peak",                           
-    #-5,     5,   ssp2,  ssp2,   -1,     1,   -9,   0,   0,           0,          0,          0.5,        0,        0,           "#Top (Width)"),          
-    #ncol=15, byrow=T)
     #_LO    HI   INIT           PRIOR           PR_type SD  PHASE   env  use_dev      dev_minyr   dev_maxyr   dev_stddev  Block     Block_Fxn
     25,     60,  fsp1.vec[1],   fsp1.vec[1],    -1,     1,  -4,    0,   0,           0,          0,         0.20,    1, 2,   "#Peak",
     -10,    10,  fsp2.vec[2],   fsp2.vec[2],    -1,     1,  -9,    0,   0,           0,          0,         0.20,    1, 2,   "#Top (Width)",                            
@@ -47,12 +40,6 @@ writeCtl.om <- function (ctl,y)
     0.00,   0.2,        kf,           kf,         -1,        .25,     -3,        c(rep(0,4), 0.5, 0,0), "#VonBert_K_Fem_GP_1_",
     0.01,   0.2,        CV1,          CV1,        -1,        .10,    -99,        c(rep(0,4), 0.5, 0,0), "#CV_young_Fem_GP_1_",
     0.01,   0.1,        CV2,          CV2,        -1,        .10,    -99,        c(rep(0,4), 0.5, 0,0), "#CV_old_Fem_GP_1_",
-    #0.01,   m.m.est*3,  m.m.est,     round(log(m.m.est),4), 3,      .25,   do.est,     c(rep(0,4), 0.5, 0,0), "#NatM_p_1_Mal_GP_1",
-    #3,      35,         L1,          L1,                 -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#L_at_Amin_Mal_GP_1_",
-    #35,     70,         L2m,         L2m,                -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#L_at_Amax_Mal_GP_1_",
-    #0.01,   0.2,        km,          km,                 -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#VonBert_K_Mal_GP_1_",
-    #0.01,   0.2,        CV1,         CV1,                -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#CV_young_Mal_GP_1_",
-    #0.01,   0.1,        CV2,         CV2,                -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#CV_old_Mal_GP_1_",
     0,      0.1,        0,            0,                  -1,        .25,     -2,       c(rep(0,4), 0.5, 0,0), "#NatM_p_1_Mal_GP_1",
     0,      0.1,        0,            0,                  -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#L_at_Amin_Mal_GP_1_",
     0,      0.1,        0,            0,                  -1,         99,    -99,       c(rep(0,4), 0.5, 0,0), "#L_at_Amax_Mal_GP_1_",
@@ -281,14 +268,8 @@ writeCtl.om <- function (ctl,y)
 
 writeCtl <- function (ctl,y) 
 {   
+    turn.on = ifelse(do.survey == T,-1, 1)
     selec.master <- matrix(c(    
-    #_LO    HI   INIT   PRIOR  PR_type SD  PHASE   env  use_dev      dev_minyr   dev_maxyr   dev_stddev  Block     Block_Fxn
-    #25,     60,  fsp1.vec[1],  fsp1.vec[1],   -1,     1,   4,    0,   0,           0,          0,         0.20,      block.num, block.fxn,   "#Inflection",
-    #-5,     5,   fsp2,  fsp2,   -1,     1,  -9,    0,   0,           0,          0,          0.5,        0,        0,           "#Slope",
-    ##Survey                     
-    #25,     60,  ssp1,  ssp1,   -1,     1,    4,   0,   0,           0,          0,          0.5,        0,        0,           "#Peak",                           
-    #-5,     5,   ssp2,  ssp2,   -1,     1,   -9,   0,   0,           0,          0,          0.5,        0,        0,           "#Top (Width)"),          
-    #ncol=15, byrow=T)
     #_LO    HI   INIT          PRIOR       PR_type SD      PHASE env  use_dev  dev_minyr   dev_maxyr   dev_stddev  Block     Block_Fxn
     25,     60,  fsp1.start,   fsp1.start, -1,     0.05,   1,    0,   0,       0,          0,          0.2,        0,        0,           "#Peak",
     -10,    10,  fsp2,         fsp2,       -1,     0.05,  -2,    0,   0,       0,          0,          0.5,        block.num, block.fxn,  "#Top (Width)",                            
@@ -297,9 +278,9 @@ writeCtl <- function (ctl,y)
     -15,    15,  fsp5,         fsp5,       -1,     0.05,  -9,    0,   0,       0,          0,          0.5,        0,        0,           "#Init",                           
     -999,  100,  -999,         -999,       -1,     0.05,  -9,    0,   0,       0,          0,          0.5,        0,        0,           "#Final",   
     ##Survey                                
-    25,     60,  ssp1,         ssp1,       -1,     0.05,    1,   0,   0,       0,          0,          0.5,        0,        0,           "#Peak",                           
+    25,     60,  ssp1,         ssp1,       -1,     0.05,   turn.on*-1,   0,   0,       0,          0,          0.5,        0,        0,           "#Peak",                           
     -5,     5,   ssp2,         ssp2,       -1,     0.05,   -9,   0,   0,       0,          0,          0.5,        0,        0,           "#Top (Width)",                            
-    -10,    10,  ssp3,         ssp3,       -1,     0.05,    5,   0,   0,       0,          0,          0.5,        0,        0,           "#Asc_Width",                          
+    -10,    10,  ssp3,         ssp3,       -1,     0.05,   -turn.on*5,   0,   0,       0,          0,          0.5,        0,        0,           "#Asc_Width",                          
     -2,     20,  ssp4,         ssp4,       -1,     0.05,   -9,   0,   0,       0,          0,          0.5,        0,        0,           "#Desc_Width",                         
     -15,    15,  ssp5,         ssp5,       -1,     0.05,   -9,   0,   0,       0,          0,          0.5,        0,        0,           "#Init",                           
     -999,  100,  -999,         -999,       -1,     0.05,   -9,   0,   0,       0,          0,          0.5,        0,        0,           "#Final"),    
@@ -361,7 +342,6 @@ writeCtl <- function (ctl,y)
     rec.mat <- matrix(c(
     #_LO    HI     INIT     PRIOR   PR_type     SD      PHASE
     2,      15,    8.0,       8.0,    -1,        10,      est.R0, "# log(R0)",  
-    #0.20,   1,     steep,   steep,   1,       0.09,     -2, "# SR_steep ",
     0.20,   1,     h.prior,   h.prior,   1,    0.10,     h.phase, "# SR_steep ",
     0,      1.5,   sigma.set,  sigma.set,   -1,         99,     -99,"#SR_sigmaR",
     -5,     5,     0,       0,      -1,         99,     -99,"# SR_envlink",
@@ -648,19 +628,17 @@ writeDat<-function(dat, y, survey, fore.catch)
         #Value of Catch                          #Year                              #Fleet          
         fore.catch[(pre.fishery.yrs+1):y],   seq(ages,y,1),    rep(1,(y-pre.fishery.yrs)) )
 
-    survey.data.yrs = seq(start.survey, y, 2)
+    survey.data.yrs = survey.index.yrs #seq(start.survey, y, 2)
     ss.survey.data = cbind(
         survey.data.yrs, rep(1, length(survey.data.yrs)), rep(2, length(survey.data.yrs)), 
         rep(5000, length(survey.data.yrs)), rep(ss.survey.cv, length(survey.data.yrs)))
 
     if (do.cpue == T){
-        fishery.data.yrs = seq(start.cpue, y, 1)
+        fishery.data.yrs = fishery.cpue.yrs #seq(start.cpue, y, 1)
         cpue.data = cbind(
             fishery.data.yrs, rep(1, length(fishery.data.yrs)), rep(1, length(fishery.data.yrs)), 
-            rep(5000, length(fishery.data.yrs)), cpue.err.vec[fishery.data.yrs]) }
-        #cpue.data = cbind(
-        #    fishery.data.yrs, rep(1, length(fishery.data.yrs)), rep(1, length(fishery.data.yrs)), 
-        #    rep(5000, length(fishery.data.yrs)), rep(cpue.cv, length(fishery.data.yrs))) }
+            rep(5000, length(fishery.data.yrs)), cpue.err.vec[fishery.data.yrs]) 
+    }
         
     depl.survey    = cbind(y, 1, 3, final.depl, 0.01)
 
@@ -700,15 +678,16 @@ writeDat<-function(dat, y, survey, fore.catch)
                       rep(-1, length(survey.data.yrs)),
                       s.age.samp[survey.data.yrs], data.matrix)    
 
-    n.length.obs = dim(fishery.length.data)[1] + dim(survey.length.data)[1]
-    n.age.obs = dim(fishery.age.data)[1] + dim(survey.age.data)[1]
+    n.length.obs = dim(fishery.length.data)[1] 
+    n.age.obs = dim(fishery.age.data)[1]
+    if(do.survey == T) { n.age.obs = dim(fishery.age.data)[1] + dim(survey.age.data)[1] 
+                        n.length.obs = dim(fishery.length.data)[1] + dim(survey.length.data)[1]}
 
     cat(
     "#\n",
     "#Stock Synthesis\n",
     "#\n",
     1,                  " #Start Year\n",
-    #y-pre.fishery.yrs,  " #End Year\n",
     y,                  " #End Year\n",
     1,                  " #Number Seasons per Year\n",
     12,                 " #Months per Season/season\n",
@@ -741,9 +720,8 @@ writeDat<-function(dat, y, survey, fore.catch)
     2, 1, 0, "#Survey\n",
     file = dat, append = T, sep = " ")
 
-    #if(OM.run.1) {
-        cat(3, 1, 0, "#Depl\n",
-        file = dat, append = T, sep = " ") #}
+    cat(3, 1, 0, "#Depl\n",
+    file = dat, append = T, sep = " ") 
     
     if (do.cpue) { write.table(cpue.data, file = dat, append = T, row.names = FALSE, col.names = FALSE) }
     write.table(ss.survey.data, file = dat, append = T,row.names = FALSE, col.names = FALSE)
@@ -771,89 +749,40 @@ writeDat<-function(dat, y, survey, fore.catch)
     cat(len.step,"\n",
     file=dat,append=T,sep=" ")
     
-age.error
-    #if (data.scenario != "ds5") {
-        cat(n.length.obs,  " #Number of Length Observations\n", 
-        "#Year Seas Fleet Gender Partition Nsamp\n",
-        file=dat,append=T,sep=" ") 
-        
-        write.table(fishery.length.data,file=dat, append=T,row.names=FALSE, col.names=FALSE, quote=FALSE)  
-        write.table(survey.length.data,file=dat, append=T,row.names=FALSE, col.names=FALSE, quote=FALSE)  
+    #age.error
+    cat(n.length.obs,  " #Number of Length Observations\n", 
+    "#Year Seas Fleet Gender Partition Nsamp\n",
+    file=dat,append=T,sep=" ") 
     
-        cat("#\n",
-        max.age,             " #Number of Ages\n",
-        seq(1,max.age,1),    " #Age Bins\n",
-        1,                   " #Number of Ageing Error Sets\n",
-        "#Age Error Matrix\n",
-        rep(-1, ages),      " #True Ages\n",
-        file=dat,append=T,sep=" ")
+    write.table(fishery.length.data,file=dat, append=T,row.names=FALSE, col.names=FALSE, quote=FALSE)  
+    if (do.survey == T){
+    write.table(survey.length.data,file=dat, append=T,row.names=FALSE, col.names=FALSE, quote=FALSE) 
+    }
+      
+    cat("#\n",
+    max.age,             " #Number of Ages\n",
+    seq(1,max.age,1),    " #Age Bins\n",
+    1,                   " #Number of Ageing Error Sets\n",
+    "#Age Error Matrix\n",
+    rep(-1, ages),      " #True Ages\n",
+    file=dat,append=T,sep=" ")
 
-        if (AgeError == TRUE)  { cat(age.error*1:ages,        " #Age Error StDev\n", file=dat,append=T,sep=" ")}
-        if (AgeError == FALSE) { cat(rep(0.10, ages),    " #Age Error StDev\n", file=dat,append=T,sep=" ")}
+    if (AgeError == TRUE)  { cat(age.error*1:ages,        " #Age Error StDev\n", file=dat,append=T,sep=" ")}
+    if (AgeError == FALSE) { cat(rep(0.10, ages),    " #Age Error StDev\n", file=dat,append=T,sep=" ")}
 
-        cat("#\n",
-        n.age.obs,          " #Number Age Observations\n",
-        3,                  " #Age-Length Bin Option: 1=poplenbins; 2=datalenbins; 3=lengths\n",
-        0,                  " #Combine males into females at or below this bin number\n",
-        "#Year Seas Fleet Gender Partition Ageerr Lbinlo Lbinhi Nsamp\n",  
-        file=dat,append=T,sep=" ")
+    cat("#\n",
+    n.age.obs,          " #Number Age Observations\n",
+    3,                  " #Age-Length Bin Option: 1=poplenbins; 2=datalenbins; 3=lengths\n",
+    0,                  " #Combine males into females at or below this bin number\n",
+    "#Year Seas Fleet Gender Partition Ageerr Lbinlo Lbinhi Nsamp\n",  
+    file=dat,append=T,sep=" ")
     
-        write.table(fishery.age.data, file=dat, append=T, row.names=FALSE, col.names=FALSE, quote=FALSE) 
-        write.table(survey.age.data,  file=dat, append=T, row.names=FALSE, col.names=FALSE, quote=FALSE) 
-    #}
+    write.table(fishery.age.data, file=dat, append=T, row.names=FALSE, col.names=FALSE, quote=FALSE) 
+    if (do.survey == T){
+    write.table(survey.age.data,  file=dat, append=T, row.names=FALSE, col.names=FALSE, quote=FALSE) 
+    }
+    
 
-    #if (data.scenario == "ds5") {
-    #    cat(n.length.obs,  " #Number of Length Observations\n", 
-    #    "#Year Seas Fleet Gender Partition Nsamp\n",
-    #    file=dat,append=T,sep=" ") 
-#
-    #    find = (fishery.length.data[,6] != 75)
-    #    negative.yrs = -1 * fishery.length.data[find,1]
-    #    fishery.length.data[find,1] = negative.yrs
-#
-    #    write.table(fishery.length.data,file=dat, append=T,row.names=FALSE, col.names=FALSE, quote=FALSE)  
-    #    write.table(survey.length.data,file=dat, append=T,row.names=FALSE, col.names=FALSE, quote=FALSE)
-#
-    #    cat("#\n",
-    #    max.age,           " #Number of Ages\n",
-    #    seq(1,max.age,1),  " #Age Bins\n",
-    #    1,                  " #Number of Ageing Error Sets\n",
-    #    "#Age Error Matrix\n",
-    #    rep(-1, ages),      " #True Ages\n",
-    #    #rep(0.01,ages),     " #Age Error StDev\n",
-    #    rep(0.05, ages),    " #Age Error StDev\n",
-    #    "#\n",
-    #    n.age.obs,                  " #Number Age Observations\n",
-    #    3,                  " #Age-Length Bin Option: 1=poplenbins; 2=datalenbins; 3=lengths\n",
-    #    0,                  " #Combine males into females at or below this bin number\n",
-    #    "#Year Seas Fleet Gender Partition Ageerr Lbinlo Lbinhi Nsamp\n",  
-    #    file=dat,append=T,sep=" ")
-#
-    #    find = (fishery.age.data[,9] != 25)
-    #    negative.yrs = -1 * fishery.age.data[find,1]
-    #    fishery.age.data[find,1] = negative.yrs
-#
-    #    write.table(fishery.age.data, file=dat, append=T, row.names=FALSE, col.names=FALSE, quote=FALSE) 
-    #    write.table(survey.age.data,  file=dat, append=T, row.names=FALSE, col.names=FALSE, quote=FALSE) 
-#
-    #    #cat(0,  " #Number of Length Observations\n", 
-    #    #"#Year Seas Fleet Gender Partition Nsamp\n",
-    #    #file=dat,append=T,sep=" ") 
-    #    #cat("#\n",
-    #    #num.ages,           " #Number of Ages\n",
-    #    #seq(1,num.ages,1),  " #Age Bins\n",
-    #    #1,                  " #Number of Ageing Error Sets\n",
-    #    #"#Age Error Matrix\n",
-    #    #rep(-1, ages),      " #True Ages\n",
-    #    ##rep(0.01,ages),     " #Age Error StDev\n",
-    #    #(1:ages-0.5)*0.05,    " #Age Error StDev\n",
-    #    #"#\n",
-    #    #0,                  " #Number Age Observations\n",
-    #    #3,                  " #Age-Length Bin Option: 1=poplenbins; 2=datalenbins; 3=lengths\n",
-    #    #0,                  " #Combine males into females at or below this bin number\n",
-    #    #"#Year Seas Fleet Gender Partition Ageerr Lbinlo Lbinhi Nsamp\n",  
-    #    #file=dat,append=T,sep=" ")
-    #}
 
     cat("#\n", 
     0, " #Number of Mean Size at Age Observations\n",

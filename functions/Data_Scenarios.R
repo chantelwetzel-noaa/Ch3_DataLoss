@@ -39,18 +39,20 @@ max.age = ages - 1
 sigmaR 	     <- 0.50  
 ss.survey.cv <- survey.cv <- 0.40 
 cpue.cv      <- 0.30
-hi.cpue.cv   <- 0.50
-select.sd 	 <- 0.0 #5  #Selectivity Time Varying StDev
+hi.cpue.cv   <- 0.30 #0.50
+select.sd 	 <- 0.05  #Selectivity Time Varying StDev
 dome.sd      <- 0.20
 m.sd <- k.sd <- 0.20
 age.error    <- 0
 if (AgeError == TRUE) { age.error    <- 0.10 }
 
 
-if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds4" || data.scenario == 'ds6' || data.scenario == 'ds8'){
+if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds4" || data.scenario == 'ds6' || data.scenario == 'ds8'
+	data.scenario == "ds4" || data.scenario == "ds6"){
 	select.sd <- 0
 	m.sd      <- 0 
 	dome.sd   <- 0 
+	selec.adj <- 0
 }
 
 pre.fishery.yrs <- ages - 1 
@@ -58,7 +60,8 @@ project.yrs <- 102
 fishery.yrs <- setup.yrs + project.yrs + 1
 total.yrs   <- pre.fishery.yrs + fishery.yrs
 
-start.survey  <- ages + setup.yrs - 11 #21# 11 #21 
+n.yrs = ifelse(do.survey == T, 11, 2)
+start.survey  <- ages + setup.yrs - n.yrs #21# 11 #21 
 start.fishery <- ages + setup.yrs - 15 #25
 start.cpue    <- ages + setup.yrs - 5 #2
 

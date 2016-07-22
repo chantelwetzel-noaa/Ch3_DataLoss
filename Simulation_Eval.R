@@ -8,24 +8,25 @@
 ############################################
 
 drive = "C:"
-run.name = "OneAss_noAE_fixedM/"#smallN_noAE/"#"April16_PreCPUE/"#"CPUE_smallN_AE/"#"Ass_Freq/"#"April16_PreCPUE/"
-run.name = "OneAss_AE_hiageN/"
+run.name = "No_Survey/"#smallN_noAE/"#"April16_PreCPUE/"#"CPUE_smallN_AE/"#"Ass_Freq/"#"April16_PreCPUE/"
 AE = TRUE
+AgeError = AE
 LH = "rockfish"
 ds.list = c("ds1","ds2","ds4", "ds3", "ds6", "ds5") 
 ds.list = c("ds1","ds4","ds6", "ds2", "ds3", "ds5")
-ds.list = c("ds1", "ds2") 
+#ds.list = c("ds1", "ds2") 
 #ds.list = c("ds1", "ds4", "ds6", "ds8")
 #ds.list = c("full", "reduced", "eliminated", "tv_full", "tv_reduced", "tv_eliminated")
 
-sim.range = c(1, 50) #c(1, 100)
-max.sim = 50
+sim.range = c(1, 100) #c(1, 100)
+max.sim = 100
 if (max.sim != sim.range[2]){print ("Only working up a subset")}
 order = c(1,2,3,4,5,6) 
 data.scenario = ""
 setup.yrs = 50
 
 set.quant = c(0.10, 0.50, 0.90)
+do.survey = ifelse(run.name =="No_Survey", FALSE, TRUE)
 
 
 #Dimensions by life-history
@@ -37,7 +38,7 @@ if (file.exists( file = paste(drive,"/PhD/Chapter3/", run.name, "/output", sep =
   dir.create(paste0(drive,"/PhD/Chapter3/", run.name, "/output"))
 }
 
-set.ass.freq = ass.freq = 4
+set.ass.freq = ass.freq 
 first.ass.yr <- total.yrs - project.yrs - 1
 end.catch = first.ass.yr + 25
 ass.yr = seq(first.ass.yr, total.yrs, ass.freq)
@@ -96,6 +97,7 @@ yrs.declared.rec.late.all <- array(0, dim = c(length(ds.list), max.sim))
 yrs.declared.all          <- array(0, dim = c(length(ds.list), max.sim))
 
 aav                       <- array(0, dim = c(length(ds.list), max.sim))
+aav.over                  <- array(0, dim = c(length(ds.list), max.sim))
 
 #operating model values storage arrays ============================================================
 ssb   = array(0, dim = c(length(ds.list), total.yrs, max.sim))
@@ -220,16 +222,16 @@ for (spec in 1:length(ds.list))
     yr.decl.est[j,,i]  = c(index[1], ifelse(length(index)> 2, index[3],0), ifelse(length(index)> 2, index[5],0))
     yr.recr.est[j,,i]  = c(index[2], ifelse(length(index)> 2, index[4],0), ifelse(length(index)> 2, index[6],0))
 
-    #if (sum(Est$recovered.est) != 0){
-    #  ind = Est$recovered.est>0
-    #  values = unique(sort(Est$recovered.est[ind]))
-    #  time.over[j,i] = values[2] -values[1] + 1
-    #}
-    #if (length(values) == 1) { time.over[j,i] = -101 }
-#
-    #ind = ifelse(is.na(yr.recr.est[j,1,i]), first.ass.yr + 100, yr.recr.est[j,1,i])
-    #over.catch[j,i] = sum(Est$ACL[first.ass.yr:ind])
-    #ave.over.catch[j,i] = over.catch[j,i]/ind
+    if (sum(Est$recovered.est) != 0){
+      ind = Est$recovered.est>0
+      values = unique(sort(Est$recovered.est[ind]))
+      time.over[j,i] = values[2] -values[1] + 1
+    }
+    if (length(values) == 1) { time.over[j,i] = 101 }
+    
+    ind = ifelse(is.na(yr.recr.est[j,1,i]), first.ass.yr + 100, yr.recr.est[j,1,i])
+    over.catch[j,i] = sum(Est$ACL[first.ass.yr:ind])
+    ave.over.catch[j,i] = over.catch[j,i]/ind
   } 
 
   #Save as an output file 
@@ -346,18 +348,19 @@ for (spec in 1:length(ds.list))
 
   # Calculates the number of estimated overfished stocks over the 26 assessments called n.overfished
   depl.temp = depl.est[,,,]
+  n.overfished[j,1] = 100
   for(a in sim.range[1]:max.sim) { 
-    overfished = FALSE
-    for(b in 1:new.ass.num){
-      temp = first.ass.yr + b*4 - 4
+    overfished = TRUE
+    for(b in 2:new.ass.num){
+      temp = first.ass.yr + b*ass.freq - ass.freq
 
       if(depl.temp[j,temp,b,a] < ctl.rule.tgt && overfished == TRUE){
         n.overfished[j,b] = n.overfished[j,b] + 1
       }
-      if (depl.temp[j,temp,b,a] < over.thres && overfished == FALSE){
-        overfished = TRUE
-        n.overfished[j,b] = n.overfished[j,b] + 1
-      }
+      #if (depl.temp[j,temp,b,a] < over.thres && overfished == FALSE){
+      #  overfished = TRUE
+      #  n.overfished[j,b] = n.overfished[j,b] + 1
+      #}
       if(depl.temp[j,temp,b,a] > ctl.rule.tgt && overfished == TRUE){
         overfished = FALSE
       }
@@ -365,17 +368,18 @@ for (spec in 1:length(ds.list))
   }
 
   depl.temp = depl[,,]
+  om.n.overfished[j,1] = 100
   for(a in sim.range[1]:max.sim) { 
-    overfished = FALSE
-    for(b in 1:new.ass.num){
-      temp = first.ass.yr + b*4 - 4
+    overfished = TRUE
+    for(b in 2:new.ass.num){
+      temp = first.ass.yr + b*ass.freq - ass.freq
       if(depl.temp[j,temp,a] < ctl.rule.tgt && overfished == TRUE){
         om.n.overfished[j,b] = om.n.overfished[j,b] + 1
       }
-      if (depl.temp[j,temp,a] < over.thres && overfished == FALSE){
-        overfished = TRUE
-        om.n.overfished[j,b] = om.n.overfished[j,b] + 1
-      }
+      #if (depl.temp[j,temp,a] < over.thres && overfished == FALSE){
+      #  overfished = TRUE
+      #  om.n.overfished[j,b] = om.n.overfished[j,b] + 1
+      #}
       if(depl.temp[j,temp,a] > ctl.rule.tgt && overfished == TRUE){
         overfished = FALSE
       }
@@ -397,13 +401,27 @@ for (spec in 1:length(ds.list))
   re.time.over[j,] = (time.over[j,] - om.time.over[j,])/ om.time.over[j,]
 
   #filter to only calculate the ones that recovered in both the OM and EM
-  keep = time.over[j,] != -101
+  keep = time.over[j,] != 101
   filtered.time.over = time.over[j, keep]
   filtered.om.time.over = om.time.over[j, keep]
   keep = filtered.om.time.over != 101
   filtered.time.over = filtered.time.over[keep]
   filtered.om.time.over = filtered.om.time.over[keep]
   filt.re.time.over[[j]] = (filtered.time.over - filtered.om.time.over) / filtered.om.time.over
+
+  # AAV for the overfished period
+  find = time.over[j,] == 101
+  filtered.time.over = time.over[j, ] + first.ass.yr
+  filtered.time.over[find] = filtered.time.over[find] #+ 101 + 101
+  filtered.acl.est = acl.est[j,,]
+  temp.abs =temp.sum= NULL
+  for (z in 1:max.sim){
+    temp.abs = c(temp.abs, sum( abs(filtered.acl.est[(first.ass.yr+1):(filtered.time.over[z] -1),z] - 
+                filtered.acl.est[(first.ass.yr+2):(filtered.time.over[z]),z])))
+    temp.sum = c(temp.sum, sum(filtered.acl.est[(first.ass.yr+1):(filtered.time.over[z]), z]) )
+  }
+  
+  aav.over[j,] = 100*temp.abs/temp.sum
 
   #AAV in Catch ==========================================================================================
   abs.catch = mapply(function(x) abs(acl.est[j,x,] - acl.est[j,x+1,]), x=(first.ass.yr+1):(total.yrs-1))
@@ -454,17 +472,6 @@ for (spec in 1:length(ds.list))
     re.lmin[j,a,]    <- (lmin.est[j,a,] - L1) / L1
     re.lmax[j,a,]    <- (lmax.est[j,a,] - L2f) / L2f
   }
-
-   boxplot(cbind(re.ssb[1,,120,], re.ssb[2,,120,]), ylim = c(-0.5,1), ylab = "RE SSB")
-   abline(h = 0)
-   legend('topleft', bty = 'n', legend = c("Time-invariant"))
-   legend('topright', bty = 'n', legend = c("Time-Varying"))
-
-   boxplot(cbind(re.depl[1,,120,], re.depl[2,,120,]), ylim = c(-0.5,1), ylab = "RE DEPL")
-   abline(h = 0)
-   legend('topleft', bty = 'n', legend = c("Time-invariant"))
-   legend('topright', bty = 'n', legend = c("Time-Varying"))
-
 
   ind = (first.ass.yr) :(total.yrs)
   for (a in 1:max.sim){
@@ -532,6 +539,7 @@ for (spec in 1:length(ds.list))
   meds.all$re.time.over <- re.time.over
   meds.all$catch.median <- catch.median
   meds.all$aav          <- aav
+  meds.all$aav.over     <- aav.over
   meds.all$filt.re.time.over          <- filt.re.time.over
   meds.all$failed.to.detect.rec.all   <- failed.to.detect.rec.all
   meds.all$failed.to.detect.over      <- failed.to.detect.over
@@ -540,5 +548,7 @@ for (spec in 1:length(ds.list))
   meds.all$yrs.declared.rec.early.all <- yrs.declared.rec.early.all
   meds.all$yrs.declared.all           <- yrs.declared.all
   meds.all$overfished.again           <- overfished.again
+  meds.all$n.overfished    <- n.overfished
+  meds.all$om.n.overfished <- om.n.overfished
   save (meds.all, file = meds.out)  
 } 

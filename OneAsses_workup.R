@@ -1,6 +1,6 @@
 
-drive = "C:"
-run.name = "OneAss_noAE_fixedh"#smallN_noAE/"#"April16_PreCPUE/"#"CPUE_smallN_AE/"#"Ass_Freq/"#"April16_PreCPUE/"
+drive = "D:"
+run.name = "OneAss_noAE_fixedM"#smallN_noAE/"#"April16_PreCPUE/"#"CPUE_smallN_AE/"#"Ass_Freq/"#"April16_PreCPUE/"
 #run.name = "OneAss_AE_hiageN"
 #run.name = "OneAss_AE_sage50"
 AE = FALSE
@@ -11,8 +11,8 @@ ds.list = c("ds1", "ds2")
 #ds.list = c("ds1", "ds4", "ds6", "ds8")
 #ds.list = c("full", "reduced", "eliminated", "tv_full", "tv_reduced", "tv_eliminated")
 
-sim.range = c(1, 50) #c(1, 100)
-max.sim = 50
+sim.range = c(1, 100) #c(1, 100)
+max.sim = 100
 if (max.sim != sim.range[2]){print ("Only working up a subset")}
 order = c(1,2,3,4,5,6) 
 data.scenario = ""
@@ -154,12 +154,12 @@ for (spec in 1:length(ds.list))
       depl[j,,i]  = Proj$Depl[1:total.yrs]
       acl[j,,i]   = Proj$acl[1:total.yrs]
       ofl[j,,i]   = Proj$ofl.true[1:total.yrs]
-      f.lens[j,,i]= Proj$f.len.samp
-      s.lens[j,,i]= Proj$s.len.sam
-      f.ages[j,,i]= Proj$f.age.samp
-      s.ages[j,,i]= Proj$s.age.samp
-      dome[j,,i]  = Proj$dome
-      peak[j,,i]  = Proj$peak
+      f.lens[j,,i]= Proj$f.len.samp[1:total.yrs]
+      s.lens[j,,i]= Proj$s.len.sam[1:total.yrs]
+      f.ages[j,,i]= Proj$f.age.samp[1:total.yrs]
+      s.ages[j,,i]= Proj$s.age.samp[1:total.yrs]
+      dome[j,,i]  = Proj$dome[1:total.yrs]
+      peak[j,,i]  = Proj$peak[1:total.yrs]
       ind = Proj$recovered.om > 0
       recovery.yr[j,,i] = ifelse(sum(ind) != 0, Proj$recovered.om[ind], 0)
       om.time.over[j,i] = max(Proj$recovered.om) - first.ass.yr
