@@ -49,6 +49,31 @@ ass.freq = 6
 ass.yrs = seq(ass.yr1, ass.yr1 + proj.yrs, ass.freq)
 N       = dim(om.out[[1]]$ssb)[3] 
 
+# Trajectory example =============================================================================================
+
+#png(filename = "Trajectory.png", width = 6.7, height = 5, units = 'in', res = 256)
+
+par(mfrow= c(2,3), mar = c(0.2,0.2,0.2,0.2), oma = c(5,5,2,5), cex.axis = 1.1, cex.lab = 1.1)
+letter.cex = 1; axis.cex = 1.2; label.cex = 0.8
+ass.plot.yrs = ifelse(ass.freq == 8, 13, 26)
+ass.plot.yrs = ifelse(ass.freq == 6, 18, ass.plot.yrs)
+min = -1; max = 1.25
+text.yr = c(2, 7, 11,15)
+start = 110
+
+nsim = 2
+for(nsim in 1:100){
+for (a in 1:ds){
+  plot(start:120, est.out[[1]]$depl.est[a,start:120,1,nsim], axes = F, type = 'l', ylim = c(0,1), xlim = c(start, 220))
+  #plot(start:120, med.out[[1]]$re.depl[a,1,start:120,nsim], axes = F, type = 'l', ylim = c(-1,1.5), xlim = c(start, 220), main = nsim)
+  box(); abline(h = 0.40)
+  for(b in 2:18){
+    end = (120 + b*6 - 6)
+    lines(start:end, est.out[[1]]$depl.est[a,start:end,b,nsim])
+    #lines(start:end, med.out[[1]]$re.depl[a,b,start:end,nsim])
+  }
+}
+}
 # Relative error about spawning biomas==================================================================
 
 png(filename = "RE_SSB_full.png", width = 6.7, height = 5, units = 'in', res = 256)
@@ -107,7 +132,7 @@ for (a in 1:ds){
   scale.per.of = (1-med.out[[1]]$n.overfished[a,] / 100)*0.5 + min 
   plot(1:length(to.plot), scale.per.of, type = 'l', lwd = 1.5, ylim = c(min, max), axes= F, yaxs = "i")
   points(1:length(to.plot), scale.per.of, pch = 21, cex = 0.85)
-  boxplot(t(re.ssb),col = rep('grey',length(to.plot)), axes = F, add = TRUE, boxwex = rep(0.75, length(to.plot)))
+  box95(t(re.ssb), list = F, col = rep('grey',length(to.plot)), axes = F, add = TRUE, boxwex = rep(0.75, length(to.plot)))
   box(); abline(h = 0) ; abline(h = -0.98)
   if (a == 2 || a==5) { print.letter("% Rebuilt", xy = c(0.50, 0.05), cex = 1.1) }
   #text( labels = paste0(per.of, "%"), x = text.yr, y = rep(-1, length(text.yr)), cex = 1 )
@@ -191,48 +216,95 @@ for (a in 1:ds){
 dev.off()
 
 # Partition the results to only stocks that rebuild ================================================
-png(filename = "RE_SSB_Rebuilt.png", width = 6.7, height = 6, units = 'in', res = 256)
+png(filename = "RE_SSB_Rebuilt_vs_Not.png", width = 6.7, height = 5, units = 'in', res = 256)
 
-par(mfrow= c(2,3), mar = c(0.2,0.2,0.2,0.2), oma = c(5,5,2,5), cex.axis = 1.1, cex.lab = 1.1)
-letter.cex = 1; axis.cex = 1.2; label.cex = 0.8
+par(mfrow= c(2,2), mar = c(0.2,0.2,0.2,0.2), oma = c(5,5,2,5), cex.axis = 1.1, cex.lab = 1.1)
+letter.cex = 0.9; axis.cex = 1; label.cex = 1
 ass.plot.yrs = ifelse(ass.freq == 8, 13, 26)
 ass.plot.yrs = ifelse(ass.freq == 6, 18, ass.plot.yrs)
-min = -1.5; max = 1.25
+to.plot = ass.yrs[1:ass.plot.yrs]
+min = -0.85; max = 1.25
 text.yr = c(2, 7, 11,15)
- 
-for (a in 1:ds){
-  to.plot = ass.yrs[1:ass.plot.yrs]
-  ind = est.out[[1]]$time.over[a,] != 101
-  re.ssb = list()
+colors = rep( c('red', 'steelblue'), length(to.plot))
+colors = rep( c('white', 'darkgrey'), length(to.plot))
+
+for (aa in 1:2){ 
+  a = ifelse(aa > 1, 3, 1)
+  not = which(est.out[[1]]$time.over[3,] == 101) 
+  re.ssb = matrix(0, length(to.plot), N)
   for (b in 1:length(to.plot)){
-    re.ssb[[b]] = med.out[[1]]$re.ssb[a,b,to.plot[b],ind]
+    re.ssb[b,] = med.out[[1]]$re.ssb[a,b,to.plot[b],]
   }
-  per.of = med.out[[1]]$n.overfished[a,text.yr]
-  scale.per.of = (1-med.out[[1]]$n.overfished[a,] / 100)*0.5 + min 
-  plot(1:length(to.plot), scale.per.of, type = 'l', lwd = 1.5, ylim = c(min, max), axes= F, yaxs = "i")
-  points(1:length(to.plot), scale.per.of, pch = 21, cex = 0.85)
-  boxplot(re.ssb,col = rep('grey',length(to.plot)), axes = F, add = TRUE, boxwex = rep(0.75, length(to.plot)))
-  box(); abline(h = 0) ; abline(h = -0.98)
-  if (a == 2 || a==5) { print.letter("% Rebuilt", xy = c(0.50, 0.05), cex = 1.1) }
-  #text( labels = paste0(per.of, "%"), x = text.yr, y = rep(-1, length(text.yr)), cex = 1 )
-  if( a ==1 || a==4) { axis(side = 2, at = seq(-0.5, max, 0.5), las = 1)
-                      mtext(side = 2, outer = T, "RE spawning biomass", line = 3)} 
-  if( a ==3 || a==6) { axis(side = 4, at = c(min, min + 0.25, -1), label = c("0%", "50%", "100%"), las = 1) } 
-  if( a > 3){
-    axis(side = 1, at = seq(1,length(to.plot),4), 
+
+  #not.list = did.list = plot.list = list()
+  #for( b in 1:18){ not.list[[b]] = re.ssb[b,not]}
+  #for( b in 1:18){ did.list[[b]] = re.ssb[b,-not]}
+
+  temp1 = 1; temp2 = 1
+  for( b in 1:36){
+    if(b %% 2 != 0){ plot.list[[b]] = re.ssb[temp1,not]; temp1 = temp1 + 1}
+    if(b %% 2 == 0){ plot.list[[b]] = re.ssb[temp2,-not]; temp2 = temp2 + 1}
+  }
+
+  #box95(not.list, list = T, ylim = c(min, max), col = rep("grey", 18), axes = F, boxwex = rep(0.70, length(to.plot)))
+  box95(plot.list, list = T, ylim = c(min, max), col = colors, axes = F, boxwex = rep(0.60, length(to.plot)))
+  box(); abline(h = 0) 
+  if( a ==1 ) { axis(side = 2, at = seq(-0.5, max, 0.5), las = 1, cex.axis = axis.cex)
+                mtext(side = 2, outer = F, "RE spawning biomass", line = 3, cex = label.cex )}
+  print.letter(alpha.label[aa], xy = c(0.95, 0.95), cex = letter.cex) 
+  #axis(side = 1, at = seq(1,length(to.plot),4), 
+  #      labels = seq(to.plot[1]- pre.yrs + 1, to.plot[length(to.plot)] - pre.yrs + 1, 4*ass.freq) )
+  
+
+  #box95(did.list, list = T, ylim = c(min, max), col = rep("grey", 18), axes = F, boxwex = rep(0.65, length(to.plot)))
+  #box(); abline(h = 0)  
+  #axis(side = 1, at = seq(1,length(to.plot),4), 
+  #      labels = seq(to.plot[1]- pre.yrs + 1, to.plot[length(to.plot)] - pre.yrs + 1, 4*ass.freq) )
+  #if (a == 1) { mtext(side = 1, outer = T, "Assessment year", line = 3) }
+  mtext(side = 3, outer = F, name.label[a], cex = label.cex) 
+  #if(a == 3) { mtext(side = 3, outer = F, name.label[a], adj = -4) }
+  #print.letter(alpha.label[a+1], xy = c(0.95, 0.95), cex = 1.1)  
+}
+
+ymin = 0.20; ymax = 1.02
+steep = 0.65
+for(aa in 1:2){
+  a = ifelse(aa > 1, 3, 1)
+  not = which(est.out[[1]]$time.over[3,] == 101) 
+  plot.list = list()
+  temp1 = 1; temp2 = 1
+  for( b in 1:36){
+    if(b %% 2 != 0){ plot.list[[b]] = est.out[[1]]$h.est[a,temp1, not]; temp1 = temp1 + 1}
+    if(b %% 2 == 0){ plot.list[[b]] = est.out[[1]]$h.est[a,temp2,-not]; temp2 = temp2 + 1}
+  }
+
+  #not = which(est.out[[1]]$time.over[3,] == 101) 
+  #box95(x=t(est.out[[1]]$h.est[a,,not]), list = F, ylab = "Steepness", ylim = c(ymin,ymax), col = rep('grey', 18), axes = F,
+  #   boxwex = rep(0.70, length(to.plot)))
+  box95(plot.list, list = T, ylab = "Steepness", ylim = c(ymin,ymax), col = colors, axes = F,
+     boxwex = rep(0.60, length(to.plot)))
+  abline(h = steep, lty = 2, col = 1); box()
+  print.letter(alpha.label[aa+2], xy = c(0.95, 0.95), cex = letter.cex)
+  if (a == 1 ) { axis(side = 2, las = 1, cex.axis = axis.cex) }
+  axis(side = 1, cex.axis = axis.cex, at = seq(1.5,length(to.plot)*2,8), 
         labels = seq(to.plot[1]- pre.yrs + 1, to.plot[length(to.plot)] - pre.yrs + 1, 4*ass.freq) )
-    mtext(side = 1, outer = T, "Assessment year", line = 3)
-  }
-  if (a < 4) { mtext(side = 3, outer = F, name.label[a]) }
-  if (a == 3 ){ mtext(side = 4, outer = F, "time-invariant", line = 1) }
-  #text(par("usr")[2]*1.03, mean(par("usr")[3:4])+0.1, "time-invarient", srt = -90, xpd = TRUE, pos = 4, cex = 1.5)}
-  if (a == 6 ){ mtext(side = 4, outer = F, "time-varying", line = 1) }
-  #text(par("usr")[2]*1.03, mean(par("usr")[3:4])+0.1, "time-varying", srt = -90, xpd = TRUE, pos = 4, cex = 1.5)}
-  print.letter(alpha.label[a], xy = c(0.95, 0.95), cex = 1.1)  
+  #if (a < 4 ) { mtext(side = 3, outer = F, name.label[a]) }
+  if (a == 1) { mtext(side = 2, "Steepness", outer =F, line = 2.5, cex = label.cex) }
+  
+  #box95(x=t(est.out[[1]]$h.est[a,,-not]), list = F, ylab = "Steepness", ylim = c(ymin,ymax), col = rep('grey', 18), axes = F,
+  #boxwex = rep(0.70, length(to.plot)))
+  #abline(h = steep, lty = 2, col = 1); box()
+  #print.letter(alpha.label[a], xy = c(0.95, 0.95))
+  #axis(side = 1, at = seq(1,length(to.plot),4), 
+  #      labels = seq(to.plot[1]- pre.yrs + 1, to.plot[length(to.plot)] - pre.yrs + 1, 4*ass.freq) )
+  #if (a < 4 ) { mtext(side = 3, outer = F, name.label[a]) }
+  if (a == 1) { mtext(side = 1, "Assessment Year", outer = T, line = 2.5, cex = label.cex) }
 }
 
 dev.off()
 
+
+#================================================================================================
 png(filename = "RE_SSB_not_rebuilt_elim_fixed.png", width = 6.7, height = 6, units = 'in', res = 256)
 
 par(mfrow= c(1,3), mar = c(0.2,0.2,0.2,0.2), oma = c(5,5,2,5), cex.axis = 1.1, cex.lab = 1.1)
@@ -379,7 +451,7 @@ for (a in 1:ds){
   scale.per.of = (1- med.out[[1]]$n.overfished[a,] / 100)*0.5 + min 
   plot(1:length(to.plot), scale.per.of, type = 'l', lwd = 1.5, ylim = c(min, max), axes= F, yaxs = 'i')
   points(1:length(to.plot), scale.per.of, pch = 21, cex = 0.85)
-  boxplot(t(re.depl),col = rep('grey',length(to.plot)), axes = F, add = TRUE, boxwex = rep(0.75, length(to.plot)))
+  box95(t(re.depl), list = F, col = rep('grey',length(to.plot)), axes = F, add = TRUE, boxwex = rep(0.75, length(to.plot)))
   box(); abline(h = 0) ; abline(h= -0.98)
   if (a == 2 || a==5) { print.letter("% Rebuilt", xy = c(0.50, 0.05), cex = 1.1) }
   if( a ==1 || a==4) { axis(side = 2, at = seq(-0.5, max, 0.5), las = 1) 
@@ -913,7 +985,7 @@ par(mfrow= c(1,2), mar = c(0.2,0.2,0.2,0.2), oma = c(4,4,2,4), cex.axis = 1.1, c
 letter.cex = 0.9; axis.cex = 0.9; label.cex = 0.9
 ass.plot.yrs = ifelse(ass.freq == 8, 13, 26)
 ass.plot.yrs = ifelse(ass.freq == 6, 18, ass.plot.yrs)
-min = 0; max = max(med.out[[1]]$rmse.depl[1:5,]) + 10
+min = 0; max = max(med.out[[1]]$rmse.depl[1:5,]) + 20
 pch.vec = rep(16:18,2)
 
 for (a in 1:ds){
@@ -926,7 +998,7 @@ for (a in 1:ds){
     if (a == 1) { mtext(side = 1, "Assessment Year", outer = T, cex = label.cex, line = 2)
                   axis(side = 2, at = seq(0, max, 20), las = 1, cex.axis = axis.cex)
                   axis(side = 1, at = seq(index[1], (max(index)-5), 25), labels = seq(50, 125, 25), cex.axis = axis.cex)
-                  mtext(side = 2, "RMSE relative spawning biomass", cex = label.cex, outer = T, line = 2)
+                  mtext(side = 2, "RMSE (%) relative spawning biomass", cex = label.cex, outer = T, line = 2)
                   mtext(side = 3, outer = F, "time-invariant", cex = label.cex)
                   print.letter(alpha.label[a], xy = c(0.05, 0.95), cex = letter.cex)  }
     if( a == 4) { print.letter(alpha.label[a-2], xy = c(0.05, 0.95), cex = letter.cex)  
@@ -1007,8 +1079,55 @@ for(b in 1:ds){
 }
 dev.off()
 
+ 
 #=========================================================================================================
-# RE steepness ================================================================================
+# Steepness ================================================================================
+#=========================================================================================================
+png(filename = "h_failed_to_rebuild.png", width = 6.7, height = 5, units = 'in', res = 256)
+par(mfrow= c(2,3), mar = c(0.1,0.1,0.1,0.1), oma = c(4,4,4,4), cex.axis = 1.1, cex.lab = 1.1)
+ymin = 0.20 ; ymax = 1.1
+ind = 1:14
+ass.num = ifelse(ass.freq == 8, 13, 26)
+to.plot = 1:18
+
+for(b in 1:ds){
+  if (b == 1){ not = which(est.out[[1]]$time.over[3,] == 101) }
+  if (b == 4){ not = which(est.out[[1]]$time.over[6,] == 101) }
+
+  plot.list = list()
+  plot.list[[3]] = est.out[[1]]$h.est[b,1,]
+  plot.list[[2]] = est.out[[1]]$h.est[b,1,-not]
+  plot.list[[1]] = est.out[[1]]$h.est[b,1, not]
+  for (c in 4:19){ plot.list[[c]] = est.out[[1]]$h.est[b,c-2,]}
+  plot.list[[20]] = est.out[[1]]$h.est[b,length(to.plot),]
+  plot.list[[21]] = est.out[[1]]$h.est[b,length(to.plot),-not]
+  plot.list[[22]] = est.out[[1]]$h.est[b,length(to.plot), not]
+
+  plot(1:(length(to.plot)+4), rep(0,length(to.plot)+4), type = 'l', lwd = 1.5, ylim = c(ymin, ymax), axes= F, yaxs = 'i')
+  xx = c(seq(-1,3.5,0.25), rev(seq(-1,3.5,0.25))); yy = c(rep(-0.98,0.5*length(xx)), rep(ymax, 0.5*length(xx)))
+  polygon(xx, yy, col = 'lightgrey', border = F)
+  xx = c(19.5:23.5, rev(19.5:23.5)); yy = c(rep(-0.98,5), rep(ymax, 5))
+  polygon(xx, yy, col = 'lightgrey', border = F)
+
+  box95(x=plot.list, list = T, ylab = "Steepness", ylim = c(ymin,ymax), add = TRUE,
+    col = c('red','forestgreen',rep('steelblue3',length(to.plot)), 'forestgreen', 'red'), axes = F,
+    boxwex = rep(0.60, length(to.plot)+4))
+  abline(h = steep, lty = 2, col = 1); box()
+  print.letter(alpha.label[b], xy = c(0.95, 0.95))
+  
+  if (b == 1 || b == 4) { axis(side = 2) }
+  if (b > 3) { axis(side = 1, at = seq(2,length(to.plot),4), 
+        labels = seq(50, 150, 4*ass.freq) ) }
+  if (b < 4 ) { mtext(side = 3, outer = F, name.label[b]) }
+  if (b == 3) { mtext(side = 4, outer = F, "time-invariant", line = 1) }
+  if (b == 6) { mtext(side = 4, outer = F, "time-varying", line = 1) }
+  if (b == ds) { mtext(side = 1, "Assessment Year", outer = T, line = 2.5) 
+       mtext(side = 2, "Steepness", outer =T, line = 2.5) }
+}
+dev.off()
+
+#=========================================================================================================
+# RE steepness of simulations that were not estimated rebuilt 
 #=========================================================================================================
 png(filename = "re_h.png", width = 6.7, height = 5, units = 'in', res = 256)
 par(mfrow= c(2,3), mar = c(0.1,0.1,0.1,0.1), oma = c(4,5,4,4), cex.axis = 1.1, cex.lab = 1)

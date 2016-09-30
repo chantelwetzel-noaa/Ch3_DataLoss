@@ -47,8 +47,7 @@ age.error    <- 0
 if (AgeError == TRUE) { age.error    <- 0.10 }
 
 
-if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds4" || data.scenario == 'ds6' || data.scenario == 'ds8'
-	data.scenario == "ds4" || data.scenario == "ds6"){
+if (data.scenario == "ds0" || data.scenario == "ds1" || data.scenario == "ds4" || data.scenario == 'ds6' || data.scenario == 'ds8'){
 	select.sd <- 0
 	m.sd      <- 0 
 	dome.sd   <- 0 

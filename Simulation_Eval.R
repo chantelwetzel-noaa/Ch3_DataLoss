@@ -8,7 +8,7 @@
 ############################################
 
 drive = "C:"
-run.name = "No_Survey/"#smallN_noAE/"#"April16_PreCPUE/"#"CPUE_smallN_AE/"#"Ass_Freq/"#"April16_PreCPUE/"
+run.name = "Final_wo_survey/"#smallN_noAE/"#"April16_PreCPUE/"#"CPUE_smallN_AE/"#"Ass_Freq/"#"April16_PreCPUE/"
 AE = TRUE
 AgeError = AE
 LH = "rockfish"
@@ -492,13 +492,15 @@ for (spec in 1:length(ds.list))
     re.s.selex[j,2,a,] <- (s.selex.est[j,3,a,] - ssp3) / ssp3
   }
   
-
   for(a in 1:new.ass.num){
     index = ass.yr[a]
     rmse.sb0[j,a]   =  100 * sqrt((1 / max.sim) * 
                       sum(((ssb0.est[j,a,] - ssb[j, 1,])^2) / (ssb[j, 1 ,]^2)))
-    rmse.depl[j,a]  =  100 * sqrt((1/max.sim)*sum(((depl.est[j,index,a,] - depl[j,index ,])^2)/
-                        (depl[j,index ,]^2)))
+    square = ((depl.est[j,index,a,] - depl[j,index,])^2)/(depl[j,index ,]^2)
+    if (j == 6) { square = square[-68] }
+    #rmse.depl[j,a]  =  100 * sqrt((1/max.sim)*sum(((depl.est[j,index,a,] - depl[j,index ,])^2)/
+    #                    (depl[j,index ,]^2)))
+    rmse.depl[j,a]  =  100 * sqrt((1/length(square))*sum(square))
     rmse.ssb.ass[j,a] = 100 * sqrt((1 / max.sim) * 
                       sum(((ssb.est[j,index,a,] - ssb[j, index,])^2) / (ssb[j, index,]^2)))
   }
