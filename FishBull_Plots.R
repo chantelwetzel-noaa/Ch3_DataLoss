@@ -11,7 +11,8 @@
 #Load in the R objects from the Simulation Eval Code ========================================
 drive = "E:/SyncBack"
 run.name = "Final_wo_survey"
-setwd(paste0(drive,"/PhD/Chapter3/", run.name, "/JournalPlots"))
+#setwd(paste0(drive,"/PhD/Chapter3/", run.name, "/JournalPlots"))
+setwd(paste0(drive,"/PhD/Chapter3/WriteUp/Journal_Submission/JournalPlots"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_meds_all"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_est_all"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_om_all"))
@@ -208,28 +209,37 @@ dev.off()
 png(filename = "fig5_rmse.png", width = 6.7, height = 3.5, units = 'in', res = 256)
 
 par(mfrow= c(1,2), mar = c(0.2,0.2,0.2,0.2), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
+#par(mfrow= c(1,2), mar = c(0.2,3,0.2,3), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
 letter.cex = 1; axis.cex = 1; label.cex = 1
 ass.plot.yrs = ifelse(ass.freq == 8, 13, 26)
 ass.plot.yrs = ifelse(ass.freq == 6, 18, ass.plot.yrs)
-min = 0; max = max(med.out[[1]]$rmse.ssb.ass[4,]+5)
+min = 0; max = max(med.out[[1]]$rmse.ssb.ass[4,]+5) #; max2 = 360
 pch.vec = rep(16:18,2)
 
 for (a in 1:ds){
   index = ass.yrs - pre.yrs
   if (a == 1 || a == 4){
-    plot(index, med.out[[1]]$rmse.ssb.ass[a,], type = 'l', lwd = 1, ylim = c(min, max), axes = F, xaxs="i")
-    points(index, med.out[[1]]$rmse.ssb.ass[a,], pch = pch.vec[a])
-    box()
-    if (a == 1) { mtext(side = 1, "Assessment Year", outer = T, cex = label.cex, line = 2)
-                  axis(side = 2, at = seq(0, max, 20), cex = axis.cex, las = 1)
-                  mtext(side = 2, "RMSE spawning biomass", cex = label.cex, outer = T, line = 2)
-                  mtext(side = 3, outer = F, "Time-invariant")
-                  axis(side = 1, at = seq(index[1], (max(index)-5), 25), labels = seq(50, 125, 25))
-                  print.letter(alpha.label[a], xy = c(0.05, 0.95), cex = 1)  }
-    if( a == 4) { print.letter(alpha.label[a-2], xy = c(0.05, 0.95), cex = 1) 
-                  mtext(side = 3, outer = F, "Time-varying")
-                  axis(side = 1, at = seq(index[1], max(index), 25), labels = seq(50, 150, 25))
-                  legend("topright", legend = name.label, pch = pch.vec, bty= 'n')  }
+
+    if (a == 1) { 
+      plot(index, med.out[[1]]$rmse.ssb.ass[a,], type = 'l', lwd = 1, ylim = c(min, max), axes = F, xaxs="i")
+      points(index, med.out[[1]]$rmse.ssb.ass[a,], pch = pch.vec[a])
+      box()
+      mtext(side = 1, "Assessment Year", outer = T, cex = label.cex, line = 2)
+      axis(side = 2, at = seq(0, max, 20), cex = axis.cex, las = 1)
+      mtext(side = 2, "RMSE spawning biomass", cex = label.cex, outer = T, line = 2)
+      mtext(side = 3, outer = F, "Time-invariant")
+      axis(side = 1, at = seq(index[1], (max(index)-5), 25), labels = seq(50, 125, 25))
+      print.letter(alpha.label[a], xy = c(0.05, 0.95), cex = 1)  
+      legend("topright", legend = name.label, pch = pch.vec, bty= 'n') }
+
+    if( a == 4) { 
+      plot(index, med.out[[1]]$rmse.ssb.ass[a,], type = 'l', lwd = 1, ylim = c(min, max), axes = F, xaxs="i")
+      points(index, med.out[[1]]$rmse.ssb.ass[a,], pch = pch.vec[a])
+      #axis(side = 2, at = seq(0, max2, 50), cex = axis.cex, las = 1)
+      box()
+      print.letter(alpha.label[a-2], xy = c(0.05, 0.95), cex = 1) 
+      mtext(side = 3, outer = F, "Time-varying")
+      axis(side = 1, at = seq(index[1], max(index), 25), labels = seq(50, 150, 25)) }
 
   }
   lines(index, med.out[[1]]$rmse.ssb.ass[a,], lwd = 1, col = 1)

@@ -188,7 +188,8 @@ png("DataScenarios.png",width=7,height=7,res=300,units="in")
 dev.off()
 
 setwd("C:/PhD/Chapter3/WriteUp/Plots")
-png("DataScenarios_lowCV.png",width=7,height=7,res=300,units="in") 
+setwd("C:/Users/chantell.wetzel/Documents/GitHub/Ch3_DataLoss/WriteUp/Journal_Submission/JournalPlots")
+png("supp1_datascenarios.png",width=7,height=7,res=300,units="in") 
 
 #Catch
 	#windows(width=9,height=7)
@@ -238,7 +239,7 @@ png("DataScenarios_lowCV.png",width=7,height=7,res=300,units="in")
 		print.letter(xy = c(0.29, 0.61), "N = 50", cex = samp.cex)
 
 	#Fishery Ages
-		lines(f.ages,  rep(max(y.max) - 6, length(f.ages)), type="l", lwd=fl.size, col=linecol2)
+		lines(f.ages,  rep(max(y.max) - 6, length(f.ages)), type="l", lwd=fa.size, col=linecol2)
 		#text(end.yr + 21,  max(y.max) - 6, label[7], pos=2, col=1, font=2, cex=lab.size)
 		print.letter(xy = c(0.29, 0.53), "N = 25", cex = samp.cex)
 		print.letter(xy = c(0.90, 0.51), label[7], cex = lab.cex)
@@ -322,8 +323,9 @@ name.label = c('full data', 'data reduction', 'historical data')
 label<-c("catch", "fishery cpue", "fishery lengths",  "fishery ages") 
 
 setwd("C:/PhD/Chapter3/WriteUp/Plots")
+setwd("C:/Users/chantell.wetzel/Documents/GitHub/Ch3_DataLoss/WriteUp/Journal_Submission/JournalPlots")
 
-png("DataScenarios_lowCV_nosurvey.png",width=7,height=4.5,res=300,units="in") 
+png("fig2_datascenario.png",width=7,height=4.5,res=300,units="in") 
 #Catch
 	#windows(width=9,height=7)
 	par(mar=c(5.1,2.1,2.1,4.1))
@@ -351,7 +353,7 @@ png("DataScenarios_lowCV_nosurvey.png",width=7,height=4.5,res=300,units="in")
 		print.letter(xy = c(0.29, 0.81), "N = 50", cex = samp.cex)
 
 	#Fishery Ages
-		lines(f.ages,  rep(max(y.max) - 3, length(f.ages)), type="l", lwd=fl.size, col=linecol2)
+		lines(f.ages,  rep(max(y.max) - 3, length(f.ages)), type="l", lwd=fa.size, col=linecol2)
 		print.letter(xy = c(0.90, 0.65), label[4], cex = lab.cex)
 		print.letter(xy = c(0.29, 0.71), "N = 25", cex = samp.cex)
 
@@ -400,7 +402,7 @@ png("DataScenarios_lowCV_nosurvey.png",width=7,height=4.5,res=300,units="in")
 	#Fishery Lengths
 		lines(f.len.start:39,   rep(max(y.max) - 8, length(f.len.start:39)), type="l", lwd=fl.size, col=linecol2)		
 		lines(81:end.yr,        rep(max(y.max) - 8, length(81:end.yr)), type="l", lwd=fl.size, col=linecol2)
-		print.letter(xy = c(0.91, 0.13), label[3], cex = lab.cex)
+		print.letter(xy = c(0.91, 0.14), label[3], cex = lab.cex)
 		print.letter(xy = c(0.29, 0.19), "N = 50", cex = samp.cex)
 		print.letter(xy = c(0.70, 0.19), "N = 50", cex = samp.cex)
 
