@@ -9,7 +9,7 @@
 
 
 #Load in the R objects from the Simulation Eval Code ========================================
-drive = "E:/SyncBack"
+drive = "C:" #"E:/SyncBack"
 run.name = "Final_wo_survey"
 #setwd(paste0(drive,"/PhD/Chapter3/", run.name, "/JournalPlots"))
 setwd(paste0(drive,"/PhD/Chapter3/WriteUp/Journal_Submission/JournalPlots"))
@@ -18,7 +18,7 @@ load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_est_all"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_om_all"))
 
 #source(paste0(drive, "/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/box95.R"))
-source(paste0(drive, "/Documents/GitHub/Ch3_DataLoss/box95.R"))
+source(paste0(drive, "/Users/Chantel.Wetzel/Documents/GitHub/Ch3_DataLoss/box95.R"))
 
 rock.out  <- med.out <- est.out <- om.out <- list()
 rock.out[[1]] <- med.out[[1]] <- meds.all
@@ -333,12 +333,18 @@ dev.off()
 #=============================================================================================================
 
 # Supplementary Plots
-drive = "E:/SyncBack"
+drive = "C:" #"E:/SyncBack"
 run.name = "Final_w_survey"
-setwd(paste0(drive,"/PhD/Chapter3/Final_wo_survey/JournalPlots"))
+setwd(paste0(drive,"/PhD/Chapter3/Final_w_survey/JournalPlots"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_meds_all"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_est_all"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_om_all"))
+
+rock.out  <- med.out <- est.out <- om.out <- list()
+rock.out[[1]] <- med.out[[1]] <- meds.all
+rock.out[[2]] <- est.out[[1]] <- est.all
+rock.out[[3]] <- om.out[[1]]  <- om.all
+
 
 #Figure 3 ========================================================================================================
 png(filename = "supp2_ressb.png", width = 6.7, height = 6, units = 'in', res = 256)
