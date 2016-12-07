@@ -9,7 +9,7 @@
 
 
 #Load in the R objects from the Simulation Eval Code ========================================
-drive = "C:" #"E:/SyncBack"
+drive = "E:/SyncBack"
 run.name = "Final_wo_survey"
 #setwd(paste0(drive,"/PhD/Chapter3/", run.name, "/JournalPlots"))
 setwd(paste0(drive,"/PhD/Chapter3/WriteUp/Journal_Submission/JournalPlots"))
@@ -17,8 +17,8 @@ load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_meds_all"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_est_all"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_om_all"))
 
-#source(paste0(drive, "/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/box95.R"))
-source(paste0(drive, "/Users/Chantel.Wetzel/Documents/GitHub/Ch3_DataLoss/box95.R"))
+source(paste0(drive, "/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/box95.R"))
+#source(paste0(drive, "/Users/Chantel.Wetzel/Documents/GitHub/Ch3_DataLoss/box95.R"))
 
 rock.out  <- med.out <- est.out <- om.out <- list()
 rock.out[[1]] <- med.out[[1]] <- meds.all
@@ -71,8 +71,19 @@ for (a in 1:ds){
   }
   per.of = med.out[[1]]$n.overfished[a,text.yr]
   scale.per.of = (1-med.out[[1]]$n.overfished[a,] / 100)*0.5 + min 
-  plot(1:length(to.plot), scale.per.of, type = 'l', lwd = 1.5, ylim = c(min, max), axes= F, yaxs = "i")
-  points(1:length(to.plot), scale.per.of, pch = 21, cex = 0.85)
+
+  om.per.of = med.out[[1]]$om.n.overfished[a,text.yr]
+  om.scale.per.of = (1-med.out[[1]]$om.n.overfished[a,] / 100)*0.5 + min 
+
+  plot(1:length(to.plot), om.scale.per.of, type = 'l', lwd = 1.5, ylim = c(min, max), axes= F, yaxs = "i")
+  lines(1:length(to.plot), scale.per.of, col = 1, lty = 2)
+  if(a ==1 || a == 4) { legend("bottomright", legend = c("OM", "EM"), lty = c(1,2), bty = 'n', cex = 1.1) }
+
+  #per.of = med.out[[1]]$n.overfished[a,text.yr]
+  #scale.per.of = (1-med.out[[1]]$n.overfished[a,] / 100)*0.5 + min 
+  #plot(1:length(to.plot), scale.per.of, type = 'l', lwd = 1.5, ylim = c(min, max), axes= F, yaxs = "i")
+  #points(1:length(to.plot), scale.per.of, pch = 21, cex = 0.85)
+  
   box95(t(re.ssb), list = F, col = rep('grey',length(to.plot)), axes = F, add = TRUE, boxwex = rep(0.75, length(to.plot)))
   box(); abline(h = 0) ; abline(h = -0.98)
   if (a == 2 || a==5) { print.letter("% Rebuilt", xy = c(0.50, 0.05), cex = 1.1) }
@@ -177,10 +188,16 @@ for (a in 1:ds){
     re.depl[b,] = med.out[[1]]$re.depl[a,b,to.plot[b],]
   }
   if (a == 1){ re.depl[1,40] = 0.961795}
- 
+
   scale.per.of = (1- med.out[[1]]$n.overfished[a,] / 100)*0.5 + min 
-  plot(1:length(to.plot), scale.per.of, type = 'l', lwd = 1.5, ylim = c(min, max), axes= F, yaxs = 'i')
-  points(1:length(to.plot), scale.per.of, pch = 21, cex = 0.85)
+  om.scale.per.of = (1- med.out[[1]]$om.n.overfished[a,] / 100)*0.5 + min 
+  plot(1:length(to.plot), om.scale.per.of, type = 'l', lwd = 1.5, ylim = c(min, max), axes= F, yaxs = "i")
+  lines(1:length(to.plot), scale.per.of, col = 1, lty = 2)
+  if(a ==1 || a == 4) { legend("bottomright", legend = c("OM", "EM"), lty = c(1,2), bty = 'n', cex = 1.1) }
+ 
+  #scale.per.of = (1- med.out[[1]]$n.overfished[a,] / 100)*0.5 + min 
+  #plot(1:length(to.plot), scale.per.of, type = 'l', lwd = 1.5, ylim = c(min, max), axes= F, yaxs = 'i')
+  #points(1:length(to.plot), scale.per.of, pch = 21, cex = 0.85)
   box95(t(re.depl), list = F, col = rep('grey',length(to.plot)), axes = F, add = TRUE, boxwex = rep(0.75, length(to.plot)))
   box(); abline(h = 0) ; abline(h= -0.98)
   if (a == 2 || a==5) { print.letter("% Rebuilt", xy = c(0.50, 0.05), cex = 1.1) }
@@ -333,7 +350,7 @@ dev.off()
 #=============================================================================================================
 
 # Supplementary Plots
-drive = "C:" #"E:/SyncBack"
+drive = "E:/SyncBack"
 run.name = "Final_w_survey"
 setwd(paste0(drive,"/PhD/Chapter3/Final_w_survey/JournalPlots"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_meds_all"))
@@ -364,8 +381,18 @@ for (a in 1:ds){
   }
   per.of = med.out[[1]]$n.overfished[a,text.yr]
   scale.per.of = (1-med.out[[1]]$n.overfished[a,] / 100)*0.5 + min 
-  plot(1:length(to.plot), scale.per.of, type = 'l', lwd = 1.5, ylim = c(min, max), axes= F, yaxs = "i")
-  points(1:length(to.plot), scale.per.of, pch = 21, cex = 0.85)
+
+  om.per.of = med.out[[1]]$om.n.overfished[a,text.yr]
+  om.scale.per.of = (1-med.out[[1]]$om.n.overfished[a,] / 100)*0.5 + min 
+
+  plot(1:length(to.plot), om.scale.per.of, type = 'l', lwd = 1.5, ylim = c(min, max), axes= F, yaxs = "i")
+  lines(1:length(to.plot), scale.per.of, col = 1, lty = 2)
+  if(a ==1 || a == 4) { legend("bottomright", legend = c("OM", "EM"), lty = c(1,2), bty = 'n', cex = 1.1) }
+
+  #per.of = med.out[[1]]$n.overfished[a,text.yr]
+  #scale.per.of = (1-med.out[[1]]$n.overfished[a,] / 100)*0.5 + min 
+  #plot(1:length(to.plot), scale.per.of, type = 'l', lwd = 1.5, ylim = c(min, max), axes= F, yaxs = "i")
+  #points(1:length(to.plot), scale.per.of, pch = 21, cex = 0.85)
   box95(t(re.ssb), list = F, col = rep('grey',length(to.plot)), axes = F, add = TRUE, boxwex = rep(0.75, length(to.plot)))
   box(); abline(h = 0) ; abline(h = -0.98)
   if (a == 2 || a==5) { print.letter("% Rebuilt", xy = c(0.50, 0.05), cex = 1.1) }
@@ -408,10 +435,16 @@ for (a in 1:ds){
     re.depl[b,] = med.out[[1]]$re.depl[a,b,to.plot[b],]
   }
   if (a == 1){ re.depl[1,40] = 0.961795}
- 
+
   scale.per.of = (1- med.out[[1]]$n.overfished[a,] / 100)*0.5 + min 
-  plot(1:length(to.plot), scale.per.of, type = 'l', lwd = 1.5, ylim = c(min, max), axes= F, yaxs = 'i')
-  points(1:length(to.plot), scale.per.of, pch = 21, cex = 0.85)
+  om.scale.per.of = (1- med.out[[1]]$om.n.overfished[a,] / 100)*0.5 + min 
+  plot(1:length(to.plot), om.scale.per.of, type = 'l', lwd = 1.5, ylim = c(min, max), axes= F, yaxs = "i")
+  lines(1:length(to.plot), scale.per.of, col = 1, lty = 2)
+  if(a ==1 || a == 4) { legend("bottomright", legend = c("OM", "EM"), lty = c(1,2), bty = 'n', cex = 1.1) }
+ 
+  #scale.per.of = (1- med.out[[1]]$n.overfished[a,] / 100)*0.5 + min 
+  #plot(1:length(to.plot), scale.per.of, type = 'l', lwd = 1.5, ylim = c(min, max), axes= F, yaxs = 'i')
+  #points(1:length(to.plot), scale.per.of, pch = 21, cex = 0.85)
   box95(t(re.depl), list = F, col = rep('grey',length(to.plot)), axes = F, add = TRUE, boxwex = rep(0.75, length(to.plot)))
   box(); abline(h = 0) ; abline(h= -0.98)
   if (a == 2 || a==5) { print.letter("% Rebuilt", xy = c(0.50, 0.05), cex = 1.1) }
