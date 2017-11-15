@@ -9,16 +9,15 @@
 
 
 #Load in the R objects from the Simulation Eval Code ========================================
-drive = "E:/SyncBack"
+drive = "C:"
 run.name = "Final_wo_survey"
 #setwd(paste0(drive,"/PhD/Chapter3/", run.name, "/JournalPlots"))
-setwd(paste0(drive,"/PhD/Chapter3/WriteUp/Journal_Submission/JournalPlots"))
+setwd(paste0(drive,"/PhD/Chapter3/WriteUp/Fishery_Bulletin_Submission/revised_submission/JournalPlots"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_meds_all"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_est_all"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_om_all"))
 
-source(paste0(drive, "/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/box95.R"))
-#source(paste0(drive, "/Users/Chantel.Wetzel/Documents/GitHub/Ch3_DataLoss/box95.R"))
+source(paste0(drive, "/Users/Chantel.Wetzel/Documents/GitHub/Ch3_DataLoss/box95.R"))
 
 rock.out  <- med.out <- est.out <- om.out <- list()
 rock.out[[1]] <- med.out[[1]] <- meds.all
@@ -270,18 +269,27 @@ dev.off()
 #=========================================================================================================
 png(filename = "fig7_h.png", width = 6.7, height = 6, units = 'in', res = 256)
 par(mfrow= c(2,3), mar = c(0.1,0.1,0.1,0.1), oma = c(4,4,4,4), cex.axis = 1.1, cex.lab = 1.1)
-ymin = 0.20 ; ymax = 1.1
+ymin = 0.20 ; ymax = 1.2
 ind = 1:14
 ass.num = ifelse(ass.freq == 8, 13, 26)
+min = -0.25; max = 1.2
 
 for(b in 1:ds){
+
+  scale.per.of = (1- med.out[[1]]$n.overfished[b,] / 100)*0.25 + min 
+  om.scale.per.of = (1- med.out[[1]]$om.n.overfished[b,] / 100)*0.25 + min 
+  plot(1:length(to.plot), om.scale.per.of, type = 'l', lwd = 1.5, ylim = c(min, max), axes= F, yaxs = "i")
+  lines(1:length(to.plot), scale.per.of, col = 1, lty = 2)
+  if(b ==1 || b == 4) { legend("bottomright", legend = c("OM", "EM"), lty = c(1,2), bty = 'n', cex = 1.1) }
+
+
   box95(x=t(est.out[[1]]$h.est[b,,]), list = F, ylab = "Steepness", ylim = c(ymin,ymax), col = rep('grey',ass.num), axes = F,
-     boxwex = rep(0.70, length(to.plot)))
-  abline(h = steep, lty = 2, col = 1); box()
+     boxwex = rep(0.70, length(to.plot)), add = TRUE)
+  box(); abline(h= 0); abline(h = steep, lty = 2, col = 1)
   print.letter(alpha.label[b], xy = c(0.95, 0.95))
   
-  if (b == 1 || b == 4) { axis(side = 2) }
-  if (b > 3) { axis(side =1, at = seq(1,18,2), labels = seq(hist.yrs, hist.yrs + 100, 12)) }
+  if (b == 1 || b == 4) { axis(side = 2, at = c(0, 0.30, 0.60, 1)) }
+  if (b > 3) { axis(side = 1 , at = seq(1,18,2), labels = seq(hist.yrs, hist.yrs + 100, 12)) }
   if (b < 4 ) { mtext(side = 3, outer = F, name.label[b]) }
   if (b == 3) { mtext(side = 4, outer = F, "time-invariant", line = 1) }
   if (b == 6) { mtext(side = 4, outer = F, "time-varying", line = 1) }
@@ -303,12 +311,20 @@ alpha.cex = 1 ; lab.cex = 1
 ass.plot.yrs = ifelse(ass.freq == 8, 13, 26)
 ass.plot.yrs = ifelse(ass.freq == 6, 18, ass.plot.yrs)
 to.plot = ass.yrs[1:ass.plot.yrs]
+min = 41.5; max = 49
 
 par(mfrow = c(2, ds/2 ), mar = c(0.2, 0.2, 0.2, 0.2), oma = c(5,5,5,5))
-ymin = 42; ymax = 49
+ymin = 43; ymax = 49
 for(b in 1:ds){
-  box95(x=t(est.out[[1]]$f.selex.est[b,1,,]), ylim = c(ymin, ymax), axes = F,col = 'grey')
-  abline(h = 45, col = 1, lty =2); box() ; 
+  scale.per.of = (1- med.out[[1]]$n.overfished[b,] / 100)*1.5 + min 
+  om.scale.per.of = (1- med.out[[1]]$om.n.overfished[b,] / 100)*1.5 + min 
+  plot(1:length(to.plot), om.scale.per.of, type = 'l', lwd = 1.5, ylim = c(min, max), axes= F, yaxs = "i")
+  lines(1:length(to.plot), scale.per.of, col = 1, lty = 2)
+  if(b ==1 || b == 4) { legend("bottomright", legend = c("OM", "EM"), lty = c(1,2), bty = 'n', cex = 1.1) }
+
+
+  box95(x=t(est.out[[1]]$f.selex.est[b,1,,]), ylim = c(ymin, ymax), axes = F,col = 'grey',  add = TRUE)
+  abline(h = 45, col = 1, lty =2); box() ; abline (h = 43)
   if( b == 1 || b == 4) {axis (side = 2, at = seq(ymin, ymax, 2), las = 1) }
   print.letter(alpha.label[b], xy = c(0.93, 0.95), cex = alpha.cex)
   mtext(side = 3, name.label[b], cex = alpha.cex)
