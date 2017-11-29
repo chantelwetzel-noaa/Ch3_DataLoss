@@ -16,7 +16,7 @@ load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_meds_all"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_est_all"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_om_all"))
 
-source(paste0(drive, "/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/box95.R"))
+source(paste0(drive, "/Users/Chantel.Wetzel/Documents/GitHub/Ch3_DataLoss/box95.R"))
 
 rock.out  <- med.out <- est.out <- om.out <- list()
 rock.out[[1]] <- med.out[[1]] <- meds.all
@@ -1437,7 +1437,7 @@ dev.off()
 #===========================================================================================================
 # Output table =============================================================================================
 #===========================================================================================================
-output = paste(getwd(), "/table_quants", sep = "")
+output = paste(getwd(), "/table_quants_post_review", sep = "")
 quant.vec = c(0.05, 0.50, 0.95)
 failed = om.failed = NULL
 ave.over.catch.out = over.out = filt.over.out = aav.out = aav.over.out = filt.time.over = filt.om.time.over = 
