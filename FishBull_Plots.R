@@ -12,7 +12,8 @@
 drive = "C:"
 run.name = "Final_wo_survey"
 #setwd(paste0(drive,"/PhD/Chapter3/", run.name, "/JournalPlots"))
-setwd(paste0(drive,"/PhD/Chapter3/WriteUp/Fishery_Bulletin_Submission/revised_submission/JournalPlots"))
+#setwd(paste0(drive,"/PhD/Chapter3/WriteUp/Fishery_Bulletin_Submission/revised_submission/JournalPlots"))
+setwd(paste0(drive,"/PhD/Chapter3/WriteUp/Fishery_Bulletin_Submission/FB-2017-0065-A.R1/second_revision"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_meds_all"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_est_all"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_om_all"))
@@ -53,8 +54,8 @@ ass.yrs = seq(ass.yr1, ass.yr1 + proj.yrs, ass.freq)
 N       = dim(om.out[[1]]$ssb)[3] 
 
 #Figure 3 ========================================================================================================
-png(filename = "fig3_ressb.png", width = 6.7, height = 6, units = 'in', res = 256)
-
+#png(filename = "fig3_ressb.png", width = 6.7, height = 6, units = 'in', res = 600)
+pdf(file = "fig3_ressb.pdf", width = 6.7, height = 6)
 par(mfrow= c(2,3), mar = c(0.2,0.2,0.2,0.2), oma = c(5,5,2,5), cex.axis = 1.1, cex.lab = 1.1)
 letter.cex = 1; axis.cex = 1.2; label.cex = 0.8
 ass.plot.yrs = ifelse(ass.freq == 8, 13, 26)
@@ -107,8 +108,8 @@ dev.off()
 
 
 # Figure 6: Partition the results to only stocks that rebuild ================================================
-png(filename = "fig6_ressb_h_compare.png", width = 6.7, height = 6, units = 'in', res = 256)
-
+#png(filename = "fig6_ressb_h_compare.png", width = 6.7, height = 6, units = 'in', res = 600)
+pdf(file = "fig5_ressb_h_compare.pdf", width = 6.7, height = 6)
 par(mfrow= c(2,2), mar = c(0.2,0.2,0.2,0.2), oma = c(5,5,2,5), cex.axis = 1.1, cex.lab = 1.1)
 letter.cex = 0.9; axis.cex = 1; label.cex = 1
 ass.plot.yrs = ifelse(ass.freq == 8, 13, 26)
@@ -127,6 +128,7 @@ for (aa in 1:2){
     re.ssb[b,] = med.out[[1]]$re.ssb[a,b,to.plot[b],]
   }
 
+  plot.list[[b]]
   temp1 = 1; temp2 = 1
   for( b in 1:36){
     if(b %% 2 != 0){ plot.list[[b]] = re.ssb[temp1,not]; temp1 = temp1 + 1}
@@ -167,8 +169,8 @@ for(aa in 1:2){
 dev.off()
 
 # Figure 6b Time-varying: Partition the results to only stocks that rebuild ================================================
-png(filename = "fig6_ressb_tv_h_compare.png", width = 6.7, height = 6, units = 'in', res = 256)
-
+#png(filename = "fig6_ressb_tv_h_compare.png", width = 6.7, height = 6, units = 'in', res = 600)
+pdf(file = "fig6_ressb_tv_h_compare.pdf", width = 6.7, height = 6)
 par(mfrow= c(2,2), mar = c(0.2,0.2,0.2,0.2), oma = c(5,5,2,5), cex.axis = 1.1, cex.lab = 1.1)
 letter.cex = 0.9; axis.cex = 1; label.cex = 1
 ass.plot.yrs = ifelse(ass.freq == 8, 13, 26)
@@ -233,8 +235,8 @@ dev.off()
 #================================================================================================
 
 # Figure 4: RE Depl =======================================================================================================
-png(filename = "fig4_redepl.png", width = 6.7, height = 6, units = 'in', res = 256)
-
+#png(filename = "fig4_redepl.png", width = 6.7, height = 6, units = 'in', res = 600)
+pdf(file = "fig4_redepl.pdf", width = 6.7, height = 6)
 par(mfrow= c(2,3), mar = c(0.2,0.2,0.2,0.2), oma = c(5,5,2,5), cex.axis = 1.1, cex.lab = 1.1)
 letter.cex = 1; axis.cex = 1.2; label.cex = 0.8
 ass.plot.yrs = ifelse(ass.freq == 8, 13, 26)
@@ -286,8 +288,8 @@ dev.off()
 #=========================================================================================================
 # RMSE over time for spawning biomass
 #=========================================================================================================
-png(filename = "fig5_rmse.png", width = 6.7, height = 3.5, units = 'in', res = 256)
-
+#png(filename = "fig5_rmse.png", width = 6.7, height = 3.5, units = 'in', res = 600)
+pdf(file = "fig5_rmse.pdf", width = 6.7, height = 3.5)
 par(mfrow= c(1,2), mar = c(0.2,0.2,0.2,0.2), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
 #par(mfrow= c(1,2), mar = c(0.2,3,0.2,3), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
 letter.cex = 1; axis.cex = 1; label.cex = 1
@@ -331,7 +333,8 @@ dev.off()
 #=========================================================================================================
 # Steepness ================================================================================
 #=========================================================================================================
-png(filename = "fig7_h.png", width = 6.7, height = 6, units = 'in', res = 256)
+#png(filename = "fig7_h.png", width = 6.7, height = 6, units = 'in', res = 600)
+pdf(file = "fig7_h.pdf", width = 6.7, height = 6)
 par(mfrow= c(2,3), mar = c(0.1,0.1,0.1,0.1), oma = c(4,4,4,4), cex.axis = 1.1, cex.lab = 1.1)
 ymin = 0.20 ; ymax = 1.2
 ind = 1:14
@@ -369,8 +372,8 @@ dev.off()
 #Selectivity Plots ==========================================================================
 #=========================================================================================================
 
-png(filename = "fig8_FisherySelect_peak.png", width = 6.7, height = 6, units = 'in', res = 256)
-
+#png(filename = "fig8_FisherySelect_peak.png", width = 6.7, height = 6, units = 'in', res = 600)
+pdf(file = "fig8_FisherySelect_peak.pdf", width = 6.7, height = 6)
 #alpha.label = c("(a)", "(b)", "(c)", "(d)", "(e)", "(f)", '(g)', '(h)', "(i)", '(j)', "(k)", "(l)")
 #scenario.lab = c("Full data", "Reduced data", "Eliminated data")
 alpha.cex = 1 ; lab.cex = 1
@@ -406,7 +409,8 @@ mtext(side =1, "Assessment Year", outer = T, line = 3, cex = lab.cex)
 dev.off()
 
 #======================================================================================================
-png(filename = "fig9_FisherySelect_dome.png", width = 6.7, height = 6, units = 'in', res = 256)
+#png(filename = "fig9_FisherySelect_dome.png", width = 6.7, height = 6, units = 'in', res = 600)
+pdf(file = "fig9_FisherySelect_dome.pdf", width = 6.7, height = 6)
 alpha.cex = 1 ; lab.cex = 1
 ds.list = c(1,2,4,5)
 par(mfrow = c(2, length(ds.list)/2), mar = c(0.2, 0.2, 0.2, 0.2), oma = c(5,5,5,5))
@@ -444,7 +448,7 @@ dev.off()
 # Supplementary Plots
 drive = "C:"
 run.name = "Final_w_survey"
-setwd(paste0(drive,"/PhD/Chapter3/WriteUp/Fishery_Bulletin_Submission/revised_submission/JournalPlots"))
+#setwd(paste0(drive,"/PhD/Chapter3/WriteUp/Fishery_Bulletin_Submission/revised_submission/JournalPlots"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_meds_all"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_est_all"))
 load(paste0(drive,"/PhD/Chapter3/",run.name,"/output/rockfish_om_all"))
@@ -456,8 +460,8 @@ rock.out[[3]] <- om.out[[1]]  <- om.all
 
 #Alternative master figure for time-invariant=====================================================================
 
-png(filename = "fig_7_survey_sensitivity_time_invariant.png", width = 6.7, height = 7.7, units = 'in', res = 256)
-
+#png(filename = "fig_7_survey_sensitivity_time_invariant.png", width = 6.7, height = 7.7, units = 'in', res = 600)
+pdf(file = "fig_7_survey_sensitivity_time_invariant.pdf", width = 6.7, height = 7.7)
 par(mfrow= c(3,3), mar = c(0.2,0.2,0.2,0.2), oma = c(5,5,2,5), cex.axis = 1.1, cex.lab = 0.8)
 letter.cex = 1; axis.cex = 1.2; lab.cex = 0.75
 alpha.cex = 1 ; lab.cex = 0.9
@@ -481,7 +485,7 @@ for (a in 1:3){
   box95(t(re.ssb), list = F, ylim = c(-0.6, max), col = rep('grey',length(to.plot)), axes = F, add = FALSE, boxwex = rep(0.75, length(to.plot)))
   box(); abline(h = 0) ; abline(h = -0.98) 
 
-  if(a == 1) { axis(side = 2, at = seq(-0.5, max, 0.5), las = 1) ; mtext(side = 2, outer = F, "RE SB", line = 3, cex = lab.cex)} 
+  if(a == 1) { axis(side = 2, at = seq(-0.5, max, 0.5), las = 1) ; mtext(side = 2, outer = F, expression(paste("RE ", italic(SB))), line = 3, cex = lab.cex)} 
   #if(a == 3) { axis(side = 4, at = c(min, min + 0.25, -1), label = c("0%", "50%", "100%"), las = 1) } 
   mtext(side = 3, outer = F, name.label.alt[a], cex = 0.85) 
  
@@ -500,7 +504,7 @@ for (a in 1:3){
  
   box95(t(re.depl), list = F, ylim = c(-0.6, max), col = rep('grey',length(to.plot)), axes = F, add = FALSE, boxwex = rep(0.75, length(to.plot)))
   box(); abline(h = 0) ; abline(h= -0.98)
-  if(a == 1) { axis(side = 2, at = seq(-0.5, max, 0.5), las = 1) ; mtext(side = 2, outer = F, "RE Relative SB", line = 3, cex = lab.cex)} 
+  if(a == 1) { axis(side = 2, at = seq(-0.5, max, 0.5), las = 1) ; mtext(side = 2, outer = F, expression(paste("RE Relative ", italic(SB))), line = 3, cex = lab.cex)} 
   #if(a == 3) { axis(side = 4, at = c(min, min + 0.25, -1), label = c("0%", "50%", "100%"), las = 1) } 
 
   print.letter(c("D", "E", "F")[a], xy = c(0.95, 0.95), cex = 1.1)  
@@ -534,7 +538,7 @@ dev.off()
 
 
 #Figure 3 ========================================================================================================
-png(filename = "supp2_ressb.png", width = 6.7, height = 6, units = 'in', res = 256)
+png(filename = "supp2_ressb.png", width = 6.7, height = 6, units = 'in', res = 600)
 
 par(mfrow= c(2,3), mar = c(0.2,0.2,0.2,0.2), oma = c(5,5,2,5), cex.axis = 1.1, cex.lab = 1.1)
 letter.cex = 1; axis.cex = 1.2; label.cex = 0.8
@@ -589,7 +593,7 @@ dev.off()
 
 
 #================================================================================================
-png(filename = "supp3_redepl.png", width = 6.7, height = 6, units = 'in', res = 256)
+png(filename = "supp3_redepl.png", width = 6.7, height = 6, units = 'in', res = 600)
 
 par(mfrow= c(2,3), mar = c(0.2,0.2,0.2,0.2), oma = c(5,5,2,5), cex.axis = 1.1, cex.lab = 1.1)
 letter.cex = 1; axis.cex = 1.2; label.cex = 0.8
@@ -638,8 +642,8 @@ dev.off()
 #=========================================================================================================
 # RMSE over time for spawning biomass
 #=========================================================================================================
-png(filename = "supp4_rmse.png", width = 6.7, height = 3.5, units = 'in', res = 256)
-
+#png(filename = "supp4_rmse.png", width = 6.7, height = 3.5, units = 'in', res = 600)
+pdf(file = "fig8_rmse.pdf", width = 6.7, height = 3.5)
 par(mfrow= c(1,2), mar = c(0.2,0.2,0.2,0.2), oma = c(4,4,2,4), cex.axis = 1.1, cex.lab = 1.1)
 letter.cex = 1; axis.cex = 1; label.cex = 1
 ass.plot.yrs = ifelse(ass.freq == 8, 13, 26)
@@ -677,14 +681,16 @@ dev.off()
 # Time-invariant estimates
 #=========================================================================================================
 
-png(filename = "fig_time_invariant.png", width = 6.7, height = 9, units = 'in', res = 256)
-
+#png(filename = "fig3_time_invariant.png", width = 6.7, height = 9, units = 'in', res = 600)
+pdf(file = "fig3_time_invariant.pdf", width = 6.7, height = 9)
 par(mfrow= c(5,3), mar = c(0.2,0.2,0.2,0.2), oma = c(5,5,2,5), cex.axis = 1.1, cex.lab = 0.8)
-letter.cex = 1; axis.cex = 1.2; lab.cex = 0.75
+letter.cex = 1; axis.cex = 1.2; lab.cex = 0.75; alpha.cex = 1 
 ass.plot.yrs = ifelse(ass.freq == 8, 13, 26)
 ass.plot.yrs = ifelse(ass.freq == 6, 18, ass.plot.yrs)
 min = -1.5; max = 1.55
 text.yr = c(2, 7, 11,15)
+ass.num = ifelse(ass.freq == 8, 13, 26)
+steep = 0.65
  
 # RE SSB
 for (a in 1:3){
@@ -698,7 +704,7 @@ for (a in 1:3){
   box95(t(re.ssb), list = F, ylim = c(-0.6, max), col = rep('grey',length(to.plot)), axes = F, add = FALSE, boxwex = rep(0.75, length(to.plot)))
   box(); abline(h = 0) ; abline(h = -0.98) 
 
-  if(a == 1) { axis(side = 2, at = seq(-0.5, max, 0.5), las = 1) ; mtext(side = 2, outer = F, "RE SB", line = 3, cex = lab.cex)} 
+  if(a == 1) { axis(side = 2, at = seq(-0.5, max, 0.5), las = 1) ; mtext(side = 2, outer = F, expression(paste("RE ",italic(SB))), line = 3, cex = lab.cex)} 
   #if(a == 3) { axis(side = 4, at = c(min, min + 0.25, -1), label = c("0%", "50%", "100%"), las = 1) } 
   mtext(side = 3, outer = F, name.label[a], cex = lab.cex) 
  
@@ -717,7 +723,8 @@ for (a in 1:3){
  
   box95(t(re.depl), list = F, ylim = c(-0.6, max), col = rep('grey',length(to.plot)), axes = F, add = FALSE, boxwex = rep(0.75, length(to.plot)))
   box(); abline(h = 0) ; abline(h= -0.98)
-  if(a == 1) { axis(side = 2, at = seq(-0.5, max, 0.5), las = 1) ; mtext(side = 2, outer = F, "RE Relative SB", line = 3, cex = lab.cex)} 
+  if(a == 1) { axis(side = 2, at = seq(-0.5, max, 0.5), las = 1) ; mtext(side = 2, outer = F, expression(paste("RE Relative ", italic(SB))), 
+        line = 3, cex = lab.cex)} 
   #if(a == 3) { axis(side = 4, at = c(min, min + 0.25, -1), label = c("0%", "50%", "100%"), las = 1) } 
 
   print.letter(c("D", "E", "F")[a], xy = c(0.95, 0.95), cex = 1.1)  
@@ -783,8 +790,8 @@ dev.off()
 # Time-varying estimates
 #=========================================================================================================
 
-png(filename = "fig_time_varying.png", width = 6.7, height = 9, units = 'in', res = 256)
-
+#png(filename = "fig_time_varying.png", width = 6.7, height = 9, units = 'in', res = 600)
+pdf(file = "fig4_time_varying.pdf", width = 6.7, height = 9)
 par(mfrow= c(5,3), mar = c(0.2,0.2,0.2,0.2), oma = c(5,5,2,5), cex.axis = 1.1, cex.lab = 0.8)
 letter.cex = 1; axis.cex = 1.2; lab.cex = 0.75
 ass.plot.yrs = ifelse(ass.freq == 8, 13, 26)
@@ -804,7 +811,8 @@ for (a in 4:6){
   box95(t(re.ssb), list = F, ymin = c(-0.6, max), col = rep('grey',length(to.plot)), axes = F, add = FALSE, boxwex = rep(0.75, length(to.plot)))
   box(); abline(h = 0) ; abline(h = -0.98) 
 
-  if(a == 4) { axis(side = 2, at = seq(-0.5, max, 0.5), las = 1) ; mtext(side = 2, outer = F, "RE SB", line = 3, cex = lab.cex) } 
+  if(a == 4) { axis(side = 2, at = seq(-0.5, max, 0.5), las = 1) ; mtext(side = 2, outer = F, expression(paste("RE ",italic(SB))), 
+    line = 3, cex = lab.cex) } 
   mtext(side = 3, outer = F, name.label[a-3], cex = lab.cex)  
   print.letter(alpha.label[a-3], xy = c(0.95, 0.95), cex = 1.1)  
 }
@@ -819,7 +827,7 @@ for (a in 4:6){
  
   box95(t(re.depl), list = F, ymin = c(-0.6, max), col = rep('grey',length(to.plot)), axes = F, add = FALSE, boxwex = rep(0.75, length(to.plot)))
   box(); abline(h = 0) ; abline(h= -0.98)
-  if(a == 4) { axis(side = 2, at = seq(-0.5, max, 0.5), las = 1) ; mtext(side = 2, outer = F, "RE Relative SB", line = 3, cex = lab.cex)} 
+  if(a == 4) { axis(side = 2, at = seq(-0.5, max, 0.5), las = 1) ; mtext(side = 2, outer = F, expression(paste("RE Relative ",italic(SB))), line = 3, cex = lab.cex)} 
 
   print.letter(c("D", "E", "F")[a-3], xy = c(0.95, 0.95), cex = 1.1)  
 }

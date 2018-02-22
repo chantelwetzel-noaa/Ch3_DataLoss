@@ -64,9 +64,11 @@ linecol4 <- rgb(0.3,0.3,0.3,.35)
 samp.cex = 0.80
 lab.cex = 0.95
 
-setwd("C:/PhD/Chapter3/WriteUp/Plots")
-png("DataScenarios.png",width=7,height=7,res=300,units="in") 
+#setwd("C:/PhD/Chapter3/WriteUp/Plots")
+setwd("C:/PhD/Chapter3/WriteUp/Fishery_Bulletin_Submission/FB-2017-0065-A.R1")
 
+#png("DataScenarios.png",width=7,height=7,res=300,units="in") 
+pdf(file = "fig2_datascenarios.pdf", width = 7, height = 7)
 #Catch
 	#windows(width=9,height=7)
 	par(mar=c(5.1,2.1,2.1,4.1))
@@ -317,7 +319,7 @@ fa.size  = 5
 far.size = 1
 lab.size = 1
 
-name.label = c('full data', 'data reduction', 'historical data')
+name.label = c('Full data', 'Reduced data', 'Eliminated data')
 
 
 label<-c("catch", "fishery cpue", "fishery lengths",  "fishery ages") 
@@ -325,7 +327,8 @@ label<-c("catch", "fishery cpue", "fishery lengths",  "fishery ages")
 setwd("C:/PhD/Chapter3/WriteUp/Plots")
 setwd("C:/Users/chantell.wetzel/Documents/GitHub/Ch3_DataLoss/WriteUp/Journal_Submission/JournalPlots")
 
-png("fig2_datascenario.png",width=7,height=4.5,res=300,units="in") 
+#png("fig2_datascenario.png",width=7,height=4.5,res=300,units="in") 
+pdf(file = "fig2_datascenario.pdf",width=7,height=4.5)
 #Catch
 	#windows(width=9,height=7)
 	par(mar=c(5.1,2.1,2.1,4.1))

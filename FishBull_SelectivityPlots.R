@@ -4,12 +4,12 @@
 #
 #=================================================
 
-drive = "E:/SyncBack"
+drive = "C" #"E:/SyncBack"
 run.name = ""
 LH = 'rockfish'
 # Source in the parameters
 github = TRUE
-git.wd = "C:/Users/Chantell.Wetzel/Documents/GitHub/Ch3_DataLoss/"
+git.wd = "C:/Users/Chantel.Wetzel/Documents/GitHub/Ch3_DataLoss/"
 source(paste(git.wd, run.name, "/functions/LH_parameter_values.R", sep=""))
 
 selex.fxn <- function(a){
@@ -50,7 +50,7 @@ for (a in 1: length(ds.vec)){
 	source(paste(git.wd, run.name, "/functions/LH_parameter_values.R", sep=""))
 	fsp2.start  <- fsp2
 	# Load the seeds
-	load(paste("E:/SyncBack/PhD/Chapter3/seed_list",sep="")) 
+	load(paste("C:/PhD/Chapter3/seed_list",sep="")) 
 	select.seed   <- as.numeric(seed.list[[1]][,"spare1"])
 	select.sd   <- ifelse(a>2, 0.05, 0)
 	dome.sd     <- ifelse(a>2, 0.20, 0)
@@ -75,17 +75,23 @@ print.letter <- function(label="(a)",xy=c(0.1,0.925),...) {   #... means any new
   text(x=text.x, y=text.y, labels=label, ...)             
 }
 
+#install.packages("extrafont")
+#library(extrafont)
+#font_import()
 
-setwd("E:/SyncBack/PhD/Chapter3/Final_wo_survey/JournalPlots")
-png(filename = "fig1_selectivity.png", width = 6.7, height = 6.7, units = 'in', res = 256)
+#setwd("E:/SyncBack/PhD/Chapter3/Final_wo_survey/JournalPlots")
+#setwd(paste0(drive,"/PhD/Chapter3/WriteUp/Fishery_Bulletin_Submission/revised_submission/JournalPlots"))
+setwd(paste0(drive,":/PhD/Chapter3/WriteUp/Fishery_Bulletin_Submission/FB-2017-0065-A.R1/third_revision"))
 
+#png(filename = "fig1_selectivity.png", width = 6.7, height = 6.7, units = 'in', res = 256)
+pdf(file = "fig1_selectivity.pdf", width = 6.7, height = 6.7)
 par(mfrow = c(2,2), mar = c(1,1,1,2), oma = c(4,4,4,4))
 axis.size = 1.1
 plot(len.step, selec[1,,1], type = 'l', axes = F, xlab = "", ylab = "", lwd = 1)
 box(); axis(side = 2, cex.axis = axis.size, las = 1)
 mtext(side = 2, "Selectivity", line = 2.5, outer = T)
 mtext(side = 3, "Historical/Rebuilt", outer = F)
-print.letter("A", xy = c(0.09, 0.95))
+print.letter("A", xy = c(0.09, 0.95), cex = 2, font = 2, family = "serif")
 
 plot(len.step, selec[2,,1], typ = 'l', axes = F, xlab = "", ylab = "", lwd = 1)
 box()
