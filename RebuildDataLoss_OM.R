@@ -14,18 +14,18 @@
 
 drive    <-"C:" #"//home//cwetzel//h_cwetzel"
 LH       <- "rockfish"
-start.n  <- 1
-end.n    <- 1
-data.scenario <- "ds0" 
-tantalus      <- FALSE
-github        <- TRUE
-file.type     <- "boot" #"boot" "perfect"
-determ        <- FALSE
-setup.yrs     <- 50
+start.n  <- 1 #first simulation number
+end.n    <- 1 #last simulation number (allows user to only do a subset if needed)
+data.scenario <- "ds0" # the data scenarios are defined in the /functions/Data_Scenario.R file
+tantalus      <- FALSE # switch if simulations were being done on a Linux server
+github        <- TRUE  # used as a directory switch across computers
+file.type     <- "boot" # "boot" "perfect"
+determ        <- FALSE # recruitment deviaions on or off
+setup.yrs     <- 50 # pre-fishing years to spin the population out of equilibrium
 do.MLE        <- FALSE
 if (file.type == "perfect") { do.MLE = T }
-error.struct  <- "multinom" #"multinom" #"dirich"
-AgeError      <- TRUE
+error.struct  <- "multinom" #"multinom" #"dirich" # length and age sample distribution
+AgeError      <- TRUE 
 do.cpue       <- TRUE
 model.spec    <- "" #"Ass_Freq"
 estimate.M    <- FALSE
